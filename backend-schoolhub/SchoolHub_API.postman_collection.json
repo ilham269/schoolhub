@@ -1,0 +1,486 @@
+{
+  "info": {
+    "name": "SchoolHub API",
+    "description": "API Collection untuk SchoolHub Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@schoolhub.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/auth/me"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Guru",
+      "item": [
+        {
+          "name": "Get All Guru",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/guru"
+          }
+        },
+        {
+          "name": "Create Guru",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Guru\",\n  \"email\": \"test.guru@schoolhub.com\",\n  \"password\": \"password123\",\n  \"nip\": \"1987654321000099\",\n  \"nama_lengkap_guru\": \"Test Guru, S.Pd\",\n  \"gender\": \"L\",\n  \"tanggal_lahir\": \"1985-01-01\",\n  \"alamat\": \"Jl. Test No. 1\",\n  \"nomor_telepon\": \"081234567890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/guru"
+          }
+        },
+        {
+          "name": "Get Guru by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/guru/1"
+          }
+        },
+        {
+          "name": "Update Guru",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomor_telepon\": \"081234567899\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/guru/1"
+          }
+        },
+        {
+          "name": "Delete Guru",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/guru/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Murid",
+      "item": [
+        {
+          "name": "Get All Murid",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/murid"
+          }
+        },
+        {
+          "name": "Create Murid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Murid\",\n  \"email\": \"test.murid@student.schoolhub.com\",\n  \"password\": \"password123\",\n  \"kelas_id\": 1,\n  \"nis\": \"2024999999\",\n  \"Nama_lengkap_murid\": \"Test Murid\",\n  \"gender\": \"L\",\n  \"tanggal_lahir\": \"2008-01-01\",\n  \"alamat\": \"Jl. Test No. 1\",\n  \"nomor_telepon\": \"082199999999\",\n  \"nama_orangtua\": \"Bapak Test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/murid"
+          }
+        },
+        {
+          "name": "Get Murid by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/murid/1"
+          }
+        },
+        {
+          "name": "Get Murid by Kelas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/murid/kelas/1"
+          }
+        },
+        {
+          "name": "Update Murid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomor_telepon\": \"082188888888\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/murid/1"
+          }
+        },
+        {
+          "name": "Delete Murid",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/murid/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Karyawan",
+      "item": [
+        {
+          "name": "Get All Karyawan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/karyawan"
+          }
+        },
+        {
+          "name": "Create Karyawan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Karyawan\",\n  \"email\": \"test.karyawan@schoolhub.com\",\n  \"password\": \"password123\",\n  \"nip\": \"1987654321100099\",\n  \"nama_lengkap_karyawan\": \"Test Karyawan\",\n  \"bagian\": \"IT Support\",\n  \"nomor_telepon\": \"081399999999\",\n  \"alamat\": \"Jl. Test No. 1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/karyawan"
+          }
+        },
+        {
+          "name": "Get Karyawan by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/karyawan/1"
+          }
+        },
+        {
+          "name": "Get Karyawan by Bagian",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/karyawan/bagian/Tata%20Usaha"
+          }
+        },
+        {
+          "name": "Update Karyawan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bagian\": \"Administrasi\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/karyawan/1"
+          }
+        },
+        {
+          "name": "Delete Karyawan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/karyawan/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Kelas",
+      "item": [
+        {
+          "name": "Get All Kelas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas"
+          }
+        },
+        {
+          "name": "Create Kelas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X RPL 3\",\n  \"kelas\": \"X\",\n  \"jurusan\": \"RPL\",\n  \"angkatan\": 2026\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/kelas"
+          }
+        },
+        {
+          "name": "Get Kelas by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas/1"
+          }
+        },
+        {
+          "name": "Get Kelas by Jurusan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas/jurusan/RPL"
+          }
+        },
+        {
+          "name": "Get Kelas by Tingkat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas/tingkat/XI"
+          }
+        },
+        {
+          "name": "Update Kelas",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"angkatan\": 2027\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}/kelas/1"
+          }
+        },
+        {
+          "name": "Delete Kelas",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas/1"
+          }
+        }
+      ]
+    }
+  ]
+}
