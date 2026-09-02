@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
 
-    
+
 
     use HasApiTokens, Notifiable;
     /** @use HasFactory<UserFactory> */
@@ -69,5 +69,20 @@ class User extends Authenticatable
     public function Karyawan()
     {
         return $this->hasOne(Karyawan::class);
+    }
+    public function announcements()
+    {
+    return $this->hasMany(
+        Announcement::class,
+        'created_by'
+    );
+    }
+
+    public function news()
+    {
+    return $this->hasMany(
+        News::class,
+        'created_by'
+    );
     }
 }
