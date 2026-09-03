@@ -44,4 +44,11 @@ class Murid extends Model
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
+    public function pengumpulanTugas()
+    {
+    return $this->hasMany(
+        PengumpulanTugas::class,
+        'murid_id'
+    );
+    }
 }

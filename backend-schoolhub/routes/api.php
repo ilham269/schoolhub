@@ -7,6 +7,10 @@ use App\Http\Controllers\Api\GuruController;
 use App\Http\Controllers\Api\MuridController;
 use App\Http\Controllers\Api\KaryawanController;
 use App\Http\Controllers\Api\KelasController;
+use App\Http\Controllers\Api\PengumumanController;
+use App\Http\Controllers\Api\BeritaController;
+use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\DashboardController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -24,8 +28,63 @@ Route::prefix('auth')->group(function () {
     });
 });
 
+// Public Routes (tanpa auth)
+Route::prefix('public')->group(function () {
+    // Pengumuman
+    Route::get('/pengumuman', [PengumumanController::class, 'published']);
+    Route::get('/pengumuman/{id}', [PengumumanController::class, 'show']);
+    
+    // Berita
+    Route::get('/berita', [BeritaController::class, 'published']);
+    Route::get('/berita/latest/{limit?}', [BeritaController::class, 'latest']);
+    Route::get('/berita/slug/{slug}', [BeritaController::class, 'showBySlug']);
+    Route::get('/berita/{id}', [BeritaController::class, 'show']);
+});
+
 // Protected API Routes
 Route::middleware('auth:sanctum')->group(function () {
+    
+    // Dashboard Routes
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index']);
+        Route::get('/admin', [DashboardController::class, 'admin']);
+        Route::get('/guru', [DashboardController::class, 'guru']);
+        Route::get('/murid', [DashboardController::class, 'murid']);
+        Route::get('/karyawan', [DashboardController::class, 'karyawan']);
+        Route::get('/report', [DashboardController::class, 'report']);
+    });
+
+    // Pengumuman Routes
+    Route::prefix('pengumuman')->group(function () {
+        Route::get('/', [PengumumanController::class, 'index']);
+        Route::post('/', [PengumumanController::class, 'store']);
+        Route::get('/{id}', [PengumumanController::class, 'show']);
+        Route::put('/{id}', [PengumumanController::class, 'update']);
+        Route::delete('/{id}', [PengumumanController::class, 'destroy']);
+        Route::get('/kategori/{kategori}', [PengumumanController::class, 'byKategori']);
+    });
+
+    // Berita Routes
+    Route::prefix('berita')->group(function () {
+        Route::get('/', [BeritaController::class, 'index']);
+        Route::post('/', [BeritaController::class, 'store']);
+        Route::get('/{id}', [BeritaController::class, 'show']);
+        Route::put('/{id}', [BeritaController::class, 'update']);
+        Route::delete('/{id}', [BeritaController::class, 'destroy']);
+        Route::get('/kategori/{kategori}', [BeritaController::class, 'byKategori']);
+    });
+
+    // Settings Routes
+    Route::prefix('settings')->group(function () {
+        Route::get('/', [SettingController::class, 'index']);
+        Route::get('/{key}', [SettingController::class, 'show']);
+        Route::put('/app', [SettingController::class, 'updateApp']);
+        Route::put('/akademik', [SettingController::class, 'updateAkademik']);
+        Route::put('/sistem', [SettingController::class, 'updateSistem']);
+        Route::put('/email', [SettingController::class, 'updateEmail']);
+        Route::put('/notification', [SettingController::class, 'updateNotification']);
+        Route::post('/reset/{key}', [SettingController::class, 'reset']);
+    });
     
     // Guru Routes
     Route::prefix('guru')->group(function () {
