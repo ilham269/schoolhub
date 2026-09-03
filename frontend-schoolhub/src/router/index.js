@@ -10,20 +10,18 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-    // 2. Contoh cara mendaftarkan halaman lain (seperti Profil atau Login)
-    // Pastikan Anda sudah membuat file ProfilView.vue dan LoginView.vue di folder src/views/ sebelum menghapus tanda //
-    
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/auth/LoginView.vue')
+    },
+    // Tambahkan route lain sesuai kebutuhan
     /*
     {
       path: '/profil',
       name: 'profil',
       component: () => import('../views/ProfilView.vue') 
     },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('../views/LoginView.vue')
-    }
     */
   ],
 })

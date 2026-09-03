@@ -147,6 +147,7 @@
 import { ref, onMounted } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
+import api from '@/utils/api'
 
 // State untuk Filter Jurusan
 const activeFilter = ref('Semua')
@@ -158,8 +159,10 @@ const daftarGuru = ref([])
 
 const fetchGuru = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/guru')
-    const result = await response.json()
+    // Menggunakan axios instance dari utils/api.js
+    // Request akan otomatis di-proxy ke http://localhost:8000/api/guru
+    const response = await api.get('/guru')
+    const result = response.data
 
     console.log('Hasil API:', result)
 
