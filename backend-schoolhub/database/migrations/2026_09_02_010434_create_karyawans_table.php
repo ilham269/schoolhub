@@ -18,7 +18,7 @@ return new class extends Migration
                 ->unique();
 
             $table->string('nama_lengkap_karyawan');
-            $table->string('gambar_karyawan')->nullable();
+
             $table->string('bagian');
 
             $table->string('nomor_telepon')
