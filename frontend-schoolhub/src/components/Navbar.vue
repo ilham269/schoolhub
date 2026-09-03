@@ -21,25 +21,34 @@
       </router-link>
       <nav>
         <ul class="nav-links" :class="{ 'open': isMenuOpen }">
-          <li><router-link class="active" to="/">Beranda</router-link></li>
-          <li><router-link to="/berita">Berita</router-link></li>
-          <li><router-link to="/pengumuman">Pengumuman</router-link></li>
-          <li><router-link to="/ppdb">PPDB</router-link></li>
-          <li><router-link to="/kontak">Kontak</router-link></li>
+          <li>
+            <router-link to="/" exact-active-class="active">Beranda</router-link>
+          </li>
+          <li>
+            <router-link to="/berita" active-class="active">Berita</router-link>
+          </li>
+          <li>
+            <router-link to="/pengumuman" active-class="active">Pengumuman</router-link>
+          </li>
+          <li>
+            <router-link to="/ppdb" active-class="active">PPDB</router-link>
+          </li>
+          <li>
+            <router-link to="/kontak" active-class="active">Kontak</router-link>
+          </li>
 
           <li class="has-dropdown" :class="{ 'open': isDropdownOpen }">
             <a href="#" @click.prevent="toggleDropdown">Lainnya</a>
             <div class="dropdown">
-              <router-link to="/profil">Profil Sekolah</router-link>
-              <router-link to="/visi-misi">Visi & Misi</router-link>
-              <router-link to="/pendaftaran">Pendaftaran Siswa Baru</router-link>
-              <router-link to="/components">Komponen UI (Demo)</router-link>
-              <router-link to="/login">Login / Sign Up</router-link>
+              <router-link to="/profil" active-class="active">Profil Sekolah</router-link>
+              <router-link to="/visi-misi" active-class="active">Visi &amp; Misi</router-link>
+              <router-link to="/pendaftaran" active-class="active">Pendaftaran Siswa Baru</router-link>
+              <router-link to="/components" active-class="active">Komponen UI (Demo)</router-link>
+              <router-link to="/login" active-class="active">Login / Sign Up</router-link>
             </div>
           </li>
         </ul>
       </nav>
-      
     </div>
   </header>
 </template>

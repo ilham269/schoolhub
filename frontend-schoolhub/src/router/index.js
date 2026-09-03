@@ -21,6 +21,11 @@ const router = createRouter({
       name: 'pengumuman',
       component: () => import('../views/PengumumanView.vue') // Sesuaikan dengan lokasi file komponen Vue-mu
     },
+    {
+      path: '/kontak',
+      name: 'kontak',
+      component: () => import('../views/KontakView.vue') // Sesuaikan dengan lokasi file komponen Vue-mu
+    }
     // Tambahkan route lain sesuai kebutuhan
     /*
     {
