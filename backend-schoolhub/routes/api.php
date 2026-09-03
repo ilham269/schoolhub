@@ -43,6 +43,15 @@ Route::prefix('public')->group(function () {
     Route::get('/berita/{id}', [BeritaController::class, 'show']);
 });
 
+    // Guru Routes
+    Route::prefix('guru')->group(function () {
+        Route::get('/', [GuruController::class, 'index']);
+        Route::post('/', [GuruController::class, 'store']);
+        Route::get('/{id}', [GuruController::class, 'show']);
+        Route::put('/{id}', [GuruController::class, 'update']);
+        Route::delete('/{id}', [GuruController::class, 'destroy']);
+    });
+
 // Protected API Routes
 Route::middleware('auth:sanctum')->group(function () {
     
@@ -88,14 +97,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/reset/{key}', [SettingController::class, 'reset']);
     });
     
-    // Guru Routes
-    Route::prefix('guru')->group(function () {
-        Route::get('/', [GuruController::class, 'index']);
-        Route::post('/', [GuruController::class, 'store']);
-        Route::get('/{id}', [GuruController::class, 'show']);
-        Route::put('/{id}', [GuruController::class, 'update']);
-        Route::delete('/{id}', [GuruController::class, 'destroy']);
-    });
 
     // Murid Routes
     Route::prefix('murid')->group(function () {
