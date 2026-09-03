@@ -16,6 +16,11 @@ const router = createRouter({
       name: 'login',
       component: () => import('../views/auth/LoginView.vue')
     },
+    {
+      path: '/pengumuman',
+      name: 'pengumuman',
+      component: () => import('../views/PengumumanView.vue') // Sesuaikan dengan lokasi file komponen Vue-mu
+    },
     // Tambahkan route lain sesuai kebutuhan
     /*
     {
