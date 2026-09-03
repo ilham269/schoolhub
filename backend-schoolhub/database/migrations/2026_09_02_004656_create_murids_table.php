@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nis')->unique();
             $table->string('Nama_lengkap_murid');
+            $table->string('gambar_murid')->nullable();
             $table->enum('gender', ['L','P',]);
             $table->date('tanggal_lahir');
             $table->text('alamat')->nullable();
