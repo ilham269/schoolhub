@@ -47,8 +47,20 @@ api.interceptors.response.use(
     const isUnauthorized = error.response?.status === 401
     const requestUrl = error.config?.url ?? ''
     const isLoginRequest = requestUrl.includes('/login')
+    
+    // Daftar path public yang tidak perlu redirect ke login
+    const publicPaths = ['/', '/login', '/pendaftaran', '/profil', '/ppdb']
+    const currentPath = window.location.pathname
+    const isPublicPage = publicPaths.some(path => currentPath === path || currentPath.startsWith(path))
 
-    if (isUnauthorized && !isLoginRequest) {
+    // Hanya redirect ke login jika:
+    // 1. Response 401 (Unauthorized)
+    // 2. Bukan request login
+    // 3. User punya token (berarti token expired/invalid)
+    // 4. Bukan di public page
+    const hasToken = localStorage.getItem('token') || sessionStorage.getItem('token')
+    
+    if (isUnauthorized && !isLoginRequest && hasToken && !isPublicPage) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       sessionStorage.removeItem('token')

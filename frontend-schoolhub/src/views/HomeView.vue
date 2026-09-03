@@ -62,7 +62,19 @@
       <div class="container">
         <p class="eyebrow-dot" style="text-align:center;">Guru Kami</p>
         <h2 style="text-align:center; margin-bottom:44px;">Kenali Para Pengajar Terbaik Kami</h2>
-        <div class="people-grid">
+        
+        <!-- Loading state -->
+        <div v-if="loadingGuru" style="text-align:center; padding:40px;">
+          <p>Memuat data guru...</p>
+        </div>
+        
+        <!-- Error state (optional) -->
+        <div v-else-if="errorGuru && daftarGuru.length === 0" style="text-align:center; padding:40px;">
+          <p style="color: var(--slate-400);">Data guru belum tersedia saat ini.</p>
+        </div>
+        
+        <!-- Data guru -->
+        <div v-else-if="daftarGuru.length > 0" class="people-grid">
           <div class="person-card" v-for="guru in daftarGuru.slice(0, 4)" :key="guru.id">
             <div class="photo"><img :src="guru.gambar_guru" :alt="guru.nama_lengkap_guru" /></div>
             <div class="info">
@@ -70,6 +82,12 @@
             </div>
           </div>
         </div>
+        
+        <!-- Fallback jika data kosong -->
+        <div v-else style="text-align:center; padding:40px;">
+          <p style="color: var(--slate-400);">Data guru akan segera ditampilkan.</p>
+        </div>
+        
         <div style="text-align:center; margin-top:36px;">
           <router-link class="btn btn-primary" to="/profil">Lihat Semua Guru &rarr;</router-link>
         </div>
@@ -156,8 +174,13 @@ const setFilter = (filterName) => {
 }
 
 const daftarGuru = ref([])
+const loadingGuru = ref(false)
+const errorGuru = ref(null)
 
 const fetchGuru = async () => {
+  loadingGuru.value = true
+  errorGuru.value = null
+  
   try {
     // Menggunakan axios instance dari utils/api.js
     // Request akan otomatis di-proxy ke http://localhost:8000/api/guru
@@ -173,6 +196,12 @@ const fetchGuru = async () => {
     }
   } catch (error) {
     console.error('Gagal mengambil data guru:', error)
+    errorGuru.value = error.message
+    // Jangan throw error, biar page tetap bisa diakses
+    // Set daftarGuru jadi empty array supaya page tidak crash
+    daftarGuru.value = []
+  } finally {
+    loadingGuru.value = false
   }
 }
 
