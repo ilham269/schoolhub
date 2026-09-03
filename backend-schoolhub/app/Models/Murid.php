@@ -14,7 +14,6 @@ class Murid extends Model
         'user_id',
         'Kelas_id',
         'nis',
-        'Nama_lengkap_murid',
         'gambar_murid',
         'gender',
         'tanggal_lahir',

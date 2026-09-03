@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('nip')
                 ->nullable()
                 ->unique();
-
-            $table->string('nama_lengkap_karyawan');
             $table->string('gambar_karyawan')->nullable();
             $table->string('bagian');
 
