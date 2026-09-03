@@ -23,6 +23,7 @@ return new class extends Migration
                 'Murid',
                 'Karyawan',
             ])->default('Murid');
+            $table->string('gambar_murid')->nullable();
             $table->boolean('is_active')
                 ->default(true);
 
