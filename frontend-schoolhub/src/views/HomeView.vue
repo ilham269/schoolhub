@@ -184,7 +184,7 @@ const fetchGuru = async () => {
   try {
     // Menggunakan axios instance dari utils/api.js
     // Request akan otomatis di-proxy ke http://localhost:8000/api/guru
-    const response = await api.get('/guru')
+    const response = await api.get('/public/guru')
     const result = response.data
 
     console.log('Hasil API:', result)
