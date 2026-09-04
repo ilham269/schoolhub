@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             GuruSeeder::class,      // Guru
             MuridSeeder::class,     // Murid
             KaryawanSeeder::class,  // Karyawan
+            NewsSeeder::class,      // Berita publik
         ]);
 
         $this->command->info('');

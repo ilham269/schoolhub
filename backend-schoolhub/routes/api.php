@@ -73,10 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('berita')->group(function () {
         Route::get('/', [BeritaController::class, 'index']);
         Route::post('/', [BeritaController::class, 'store']);
+        Route::get('/kategori/{kategori}', [BeritaController::class, 'byKategori']);
         Route::get('/{id}', [BeritaController::class, 'show']);
         Route::put('/{id}', [BeritaController::class, 'update']);
         Route::delete('/{id}', [BeritaController::class, 'destroy']);
-        Route::get('/kategori/{kategori}', [BeritaController::class, 'byKategori']);
     });
 
       Route::prefix('guru')->group(function () {
@@ -158,4 +158,3 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 });
-

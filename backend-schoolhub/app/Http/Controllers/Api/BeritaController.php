@@ -3,285 +3,136 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\News;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class BeritaController extends Controller
 {
-    /**
-     * Display a listing of berita.
-     */
     public function index(): JsonResponse
     {
-        // Simulasi data berita
-        $beritas = [
-            [
-                'id' => 1,
-                'judul' => 'Siswa SMK Raih Juara Lomba Programming',
-                'slug' => 'siswa-smk-raih-juara-lomba-programming',
-                'konten' => 'Siswa kelas XI RPL berhasil meraih juara 1 dalam lomba programming tingkat nasional',
-                'excerpt' => 'Siswa kelas XI RPL berhasil meraih juara 1 dalam lomba programming',
-                'gambar' => '/images/berita1.jpg',
-                'tanggal' => '2026-08-25',
-                'kategori' => 'Prestasi',
-                'penulis' => 'Admin',
-                'views' => 150,
-                'is_published' => true,
-            ],
-            [
-                'id' => 2,
-                'judul' => 'Workshop Teknologi AI untuk Siswa',
-                'slug' => 'workshop-teknologi-ai-untuk-siswa',
-                'konten' => 'Sekolah mengadakan workshop tentang teknologi AI untuk siswa kelas XII',
-                'excerpt' => 'Sekolah mengadakan workshop tentang teknologi AI',
-                'gambar' => '/images/berita2.jpg',
-                'tanggal' => '2026-08-20',
-                'kategori' => 'Kegiatan',
-                'penulis' => 'Admin',
-                'views' => 89,
-                'is_published' => true,
-            ],
-        ];
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data berita berhasil diambil',
-            'data' => $beritas,
-        ]);
+        return $this->success(News::latest('published_at')->latest()->get());
     }
 
-    /**
-     * Store a newly created berita.
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'judul' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:beritas,slug',
-            'konten' => 'required|string',
-            'excerpt' => 'nullable|string|max:500',
-            'gambar' => 'nullable|string',
-            'tanggal' => 'required|date',
-            'kategori' => 'required|in:Prestasi,Kegiatan,Akademik,Umum',
-            'is_published' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        // Simulasi create
-        $berita = [
-            'id' => rand(100, 999),
-            'judul' => $request->judul,
-            'slug' => $request->slug,
-            'konten' => $request->konten,
-            'excerpt' => $request->excerpt,
-            'gambar' => $request->gambar,
-            'tanggal' => $request->tanggal,
-            'kategori' => $request->kategori,
-            'penulis' => auth()->user()->name ?? 'Admin',
-            'views' => 0,
-            'is_published' => $request->is_published ?? true,
-            'created_at' => now(),
-        ];
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Berita berhasil dibuat',
-            'data' => $berita,
-        ], 201);
-    }
-
-    /**
-     * Display the specified berita.
-     */
-    public function show($id): JsonResponse
-    {
-        // Simulasi find by id (increment views)
-        $berita = [
-            'id' => $id,
-            'judul' => 'Siswa SMK Raih Juara Lomba Programming',
-            'slug' => 'siswa-smk-raih-juara-lomba-programming',
-            'konten' => 'Siswa kelas XI RPL berhasil meraih juara 1 dalam lomba programming tingkat nasional. Prestasi ini merupakan yang pertama kali diraih oleh sekolah.',
-            'excerpt' => 'Siswa kelas XI RPL berhasil meraih juara 1 dalam lomba programming',
-            'gambar' => '/images/berita1.jpg',
-            'tanggal' => '2026-08-25',
-            'kategori' => 'Prestasi',
-            'penulis' => 'Admin',
-            'views' => 151, // incremented
-            'is_published' => true,
-            'created_at' => '2026-08-25 10:00:00',
-        ];
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Detail berita berhasil diambil',
-            'data' => $berita,
-        ]);
-    }
-
-    /**
-     * Display the specified berita by slug.
-     */
-    public function showBySlug($slug): JsonResponse
-    {
-        // Simulasi find by slug
-        $berita = [
-            'id' => 1,
-            'judul' => 'Siswa SMK Raih Juara Lomba Programming',
-            'slug' => $slug,
-            'konten' => 'Siswa kelas XI RPL berhasil meraih juara 1 dalam lomba programming tingkat nasional.',
-            'excerpt' => 'Siswa kelas XI RPL berhasil meraih juara 1 dalam lomba programming',
-            'gambar' => '/images/berita1.jpg',
-            'tanggal' => '2026-08-25',
-            'kategori' => 'Prestasi',
-            'penulis' => 'Admin',
-            'views' => 151,
-            'is_published' => true,
-        ];
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Detail berita berhasil diambil',
-            'data' => $berita,
-        ]);
-    }
-
-    /**
-     * Update the specified berita.
-     */
-    public function update(Request $request, $id): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'judul' => 'sometimes|string|max:255',
-            'slug' => 'sometimes|string|max:255',
-            'konten' => 'sometimes|string',
-            'excerpt' => 'nullable|string|max:500',
-            'gambar' => 'nullable|string',
-            'tanggal' => 'sometimes|date',
-            'kategori' => 'sometimes|in:Prestasi,Kegiatan,Akademik,Umum',
-            'is_published' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        // Simulasi update
-        $berita = [
-            'id' => $id,
-            'judul' => $request->judul ?? 'Updated Title',
-            'slug' => $request->slug ?? 'updated-slug',
-            'konten' => $request->konten ?? 'Updated content',
-            'excerpt' => $request->excerpt,
-            'gambar' => $request->gambar,
-            'tanggal' => $request->tanggal ?? '2026-08-25',
-            'kategori' => $request->kategori ?? 'Prestasi',
-            'is_published' => $request->is_published ?? true,
-            'updated_at' => now(),
-        ];
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Berita berhasil diupdate',
-            'data' => $berita,
-        ]);
-    }
-
-    /**
-     * Remove the specified berita.
-     */
-    public function destroy($id): JsonResponse
-    {
-        return response()->json([
-            'success' => true,
-            'message' => 'Berita berhasil dihapus',
-        ]);
-    }
-
-    /**
-     * Get berita by kategori.
-     */
-    public function byKategori($kategori): JsonResponse
-    {
-        $beritas = [
-            [
-                'id' => 1,
-                'judul' => 'Siswa SMK Raih Juara Lomba Programming',
-                'slug' => 'siswa-smk-raih-juara-lomba-programming',
-                'excerpt' => 'Siswa kelas XI RPL berhasil meraih juara 1',
-                'gambar' => '/images/berita1.jpg',
-                'tanggal' => '2026-08-25',
-                'kategori' => $kategori,
-                'views' => 150,
-            ],
-        ];
-
-        return response()->json([
-            'success' => true,
-            'message' => "Data berita kategori {$kategori} berhasil diambil",
-            'data' => $beritas,
-        ]);
-    }
-
-    /**
-     * Get published berita only.
-     */
     public function published(): JsonResponse
     {
-        $beritas = [
-            [
-                'id' => 1,
-                'judul' => 'Siswa SMK Raih Juara Lomba Programming',
-                'slug' => 'siswa-smk-raih-juara-lomba-programming',
-                'excerpt' => 'Siswa kelas XI RPL berhasil meraih juara 1',
-                'gambar' => '/images/berita1.jpg',
-                'tanggal' => '2026-08-25',
-                'kategori' => 'Prestasi',
-                'views' => 150,
-                'is_published' => true,
-            ],
-        ];
+        return $this->success($this->publishedQuery()->get());
+    }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data berita yang dipublikasi berhasil diambil',
-            'data' => $beritas,
+    public function latest(int $limit = 5): JsonResponse
+    {
+        $limit = max(1, min($limit, 20));
+
+        return $this->success($this->publishedQuery()->limit($limit)->get());
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $data = $this->validated($request);
+        $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['title']);
+        $data['excerpt'] = $data['excerpt'] ?? Str::limit($data['content'], 180);
+        $data['author'] = $request->user()?->name ?? 'Admin Sekolah';
+        $data['is_published'] = $data['is_published'] ?? true;
+        $data['published_at'] = $data['published_at'] ?? ($data['is_published'] ? now() : null);
+
+        $news = News::create($data);
+
+        return response()->json(['success' => true, 'message' => 'Berita berhasil dibuat', 'data' => $news], 201);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        $news = News::findOrFail($id);
+        $news->increment('views');
+
+        return $this->success($news->fresh());
+    }
+
+    public function showBySlug(string $slug): JsonResponse
+    {
+        $news = News::where('slug', $slug)->firstOrFail();
+        $news->increment('views');
+
+        return $this->success($news->fresh());
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $news = News::findOrFail($id);
+        $data = $this->validated($request, true, $news->id);
+
+        if (array_key_exists('slug', $data)) {
+            $data['slug'] = $this->uniqueSlug($data['slug'], $news->id);
+        }
+        if (isset($data['title']) && !isset($data['excerpt'])) {
+            $data['excerpt'] = $news->excerpt ?? Str::limit($data['content'] ?? $news->content, 180);
+        }
+        if (($data['is_published'] ?? $news->is_published) && !$news->published_at && !isset($data['published_at'])) {
+            $data['published_at'] = now();
+        }
+
+        $news->update($data);
+
+        return $this->success($news->fresh(), 'Berita berhasil diperbarui');
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        News::findOrFail($id)->delete();
+
+        return response()->json(['success' => true, 'message' => 'Berita berhasil dihapus']);
+    }
+
+    public function byKategori(string $kategori): JsonResponse
+    {
+        return $this->success($this->publishedQuery()->where('category', $kategori)->get());
+    }
+
+    private function publishedQuery()
+    {
+        return News::query()
+            ->where('is_published', true)
+            ->where(function ($query) {
+                $query->whereNull('published_at')->orWhere('published_at', '<=', now());
+            })
+            ->orderByDesc('published_at')
+            ->orderByDesc('created_at');
+    }
+
+    private function validated(Request $request, bool $partial = false, ?int $ignoreId = null): array
+    {
+        $required = $partial ? 'sometimes' : 'required';
+
+        return $request->validate([
+            'title' => [$required, 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('news', 'slug')->ignore($ignoreId)],
+            'excerpt' => ['nullable', 'string', 'max:500'],
+            'content' => [$required, 'string'],
+            'image' => ['nullable', 'string', 'max:2048'],
+            'category' => ['nullable', Rule::in(['Akademik', 'Kegiatan', 'Prestasi', 'Umum'])],
+            'published_at' => ['nullable', 'date'],
+            'is_published' => ['nullable', 'boolean'],
         ]);
     }
 
-    /**
-     * Get latest berita.
-     */
-    public function latest($limit = 5): JsonResponse
+    private function uniqueSlug(string $value, ?int $ignoreId = null): string
     {
-        $beritas = [
-            [
-                'id' => 1,
-                'judul' => 'Siswa SMK Raih Juara Lomba Programming',
-                'slug' => 'siswa-smk-raih-juara-lomba-programming',
-                'excerpt' => 'Siswa kelas XI RPL berhasil meraih juara 1',
-                'gambar' => '/images/berita1.jpg',
-                'tanggal' => '2026-08-25',
-                'kategori' => 'Prestasi',
-                'views' => 150,
-            ],
-        ];
+        $base = Str::slug($value) ?: 'berita';
+        $slug = $base;
+        $suffix = 2;
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data berita terbaru berhasil diambil',
-            'data' => array_slice($beritas, 0, $limit),
-        ]);
+        while (News::where('slug', $slug)->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))->exists()) {
+            $slug = "{$base}-{$suffix}";
+            $suffix++;
+        }
+
+        return $slug;
+    }
+
+    private function success(mixed $data, string $message = 'Data berita berhasil diambil'): JsonResponse
+    {
+        return response()->json(['success' => true, 'message' => $message, 'data' => $data]);
     }
 }

@@ -14,6 +14,9 @@ class News extends Model
         'excerpt',
         'content',
         'image',
+        'category',
+        'author',
+        'views',
         'published_at',
         'is_published',
     ];
@@ -23,6 +26,7 @@ class News extends Model
         return [
             'published_at' => 'datetime',
             'is_published' => 'boolean',
+            'views' => 'integer',
         ];
     }
 }
