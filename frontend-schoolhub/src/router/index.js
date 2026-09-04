@@ -19,12 +19,17 @@ const router = createRouter({
     {
       path: '/pengumuman',
       name: 'pengumuman',
-      component: () => import('../views/PengumumanView.vue') // Sesuaikan dengan lokasi file komponen Vue-mu
+      component: () => import('../views/pengumumanview.vue') // Sesuaikan dengan lokasi file komponen Vue-mu
     },
     {
       path: '/kontak',
       name: 'kontak',
-      component: () => import('../views/KontakView.vue') // Sesuaikan dengan lokasi file komponen Vue-mu
+      component: () => import('../views/kontakview.vue') // Sesuaikan dengan lokasi file komponen Vue-mu
+    },
+    {
+      path: '/berita',
+      name: 'berita',
+      component: () => import('../views/BeritaView.vue') // Sesuaikan dengan lokasi file komponen Vue-mu
     }
     // Tambahkan route lain sesuai kebutuhan
     /*
