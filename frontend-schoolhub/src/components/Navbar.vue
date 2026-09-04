@@ -40,7 +40,7 @@
           <li class="has-dropdown" :class="{ 'open': isDropdownOpen }">
             <a href="#" @click.prevent="toggleDropdown">Lainnya</a>
             <div class="dropdown">
-              <router-link to="/profil" active-class="active">Profil Sekolah</router-link>
+              <router-link to="/profile" active-class="active">Profil Sekolah</router-link>
               <router-link to="/visi-misi" active-class="active">Visi &amp; Misi</router-link>
               <router-link to="/pendaftaran" active-class="active">Pendaftaran Siswa Baru</router-link>
               <router-link to="/components" active-class="active">Komponen UI (Demo)</router-link>

@@ -4,8 +4,19 @@
 
     <section class="breadcrumb-hero">
       <div class="container">
-        <h1>Kontak Kami</h1>
-        <div class="breadcrumb">
+        <h1
+          v-motion
+          :initial="{ opacity: 0, y: -20 }"
+          :enter="{ opacity: 1, y: 0, transition: { duration: 600 } }"
+        >
+          Kontak Kami
+        </h1>
+        <div 
+          class="breadcrumb"
+          v-motion
+          :initial="{ opacity: 0 }"
+          :enter="{ opacity: 1, transition: { duration: 600, delay: 200 } }"
+        >
           <router-link to="/">Beranda</router-link><span class="sep">/</span>
           <span class="current">Kontak Kami</span>
         </div>
@@ -14,7 +25,14 @@
 
     <section class="section">
       <div class="container split" style="align-items:flex-start;">
-        <div class="contact-info-card">
+        
+        <!-- Contact Info Card (Kiri) -->
+        <div 
+          class="contact-info-card"
+          v-motion
+          :initial="{ opacity: 0, x: -50 }"
+          :enter="{ opacity: 1, x: 0, transition: { duration: 700, delay: 150 } }"
+        >
           <p class="eyebrow-dot">Hubungi Kami</p>
           <h3>Ada yang bisa kami bantu?</h3>
           <p style="color:#b7c9be;">Tim kami siap membantu pertanyaan seputar akademik, pendaftaran, maupun administrasi sekolah.</p>
@@ -26,7 +44,13 @@
           </ul>
         </div>
 
-        <div class="card">
+        <!-- Form Card (Kanan) -->
+        <div 
+          class="card"
+          v-motion
+          :initial="{ opacity: 0, x: 50 }"
+          :enter="{ opacity: 1, x: 0, transition: { duration: 700, delay: 150 } }"
+        >
           <h3>Kirim Pesan</h3>
           <p>Isi formulir di bawah ini, kami akan membalas dalam 1&ndash;2 hari kerja.</p>
           <form @submit.prevent="handleSubmit">
@@ -94,7 +118,13 @@
       </div>
     </section>
 
-    <section class="section-tight">
+    <!-- Map Section -->
+    <section 
+      class="section-tight"
+      v-motion
+      :initial="{ opacity: 0, y: 30 }"
+      :visible-once="{ opacity: 1, y: 0, transition: { duration: 600 } }"
+    >
       <div class="container">
         <div class="map-frame">
           <iframe src="https://www.google.com/maps?q=Bandung,Jawa%20Barat&output=embed" title="Lokasi Sekolah" loading="lazy"></iframe>

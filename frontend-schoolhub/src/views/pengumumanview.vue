@@ -4,8 +4,19 @@
 
     <section class="breadcrumb-hero">
       <div class="container">
-        <h1>Pengumuman</h1>
-        <div class="breadcrumb">
+        <h1
+          v-motion
+          :initial="{ opacity: 0, y: -20 }"
+          :enter="{ opacity: 1, y: 0, transition: { duration: 600 } }"
+        >
+          Pengumuman
+        </h1>
+        <div 
+          class="breadcrumb"
+          v-motion
+          :initial="{ opacity: 0 }"
+          :enter="{ opacity: 1, transition: { duration: 600, delay: 200 } }"
+        >
           <router-link to="/">Beranda</router-link><span class="sep">/</span>
           <span class="current">Pengumuman</span>
         </div>
@@ -16,10 +27,13 @@
       <div class="container">
         <!-- Alerts -->
         <div
-          v-for="alert in visibleAlerts"
+          v-for="(alert, index) in visibleAlerts"
           :key="alert.id"
           class="alert"
           :class="`alert-${alert.type}`"
+          v-motion
+          :initial="{ opacity: 0, x: -30 }"
+          :enter="{ opacity: 1, x: 0, transition: { duration: 500, delay: index * 150 } }"
         >
           <span>{{ alert.icon }}</span>
           <div><strong>{{ alert.title }}</strong> {{ alert.message }}</div>
@@ -27,7 +41,12 @@
         </div>
 
         <!-- Tabs -->
-        <div class="tabs">
+        <div 
+          class="tabs"
+          v-motion
+          :initial="{ opacity: 0, y: 20 }"
+          :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 200 } }"
+        >
           <button
             v-for="tab in tabs"
             :key="tab.id"
@@ -39,8 +58,19 @@
           </button>
         </div>
 
-        <div v-for="tab in tabs" :key="tab.id" class="tab-panel" :class="{ active: activeTab === tab.id }">
-          <div v-if="activeTab === tab.id" class="table-wrap">
+        <div 
+          v-for="tab in tabs" 
+          :key="tab.id" 
+          class="tab-panel" 
+          :class="{ active: activeTab === tab.id }"
+        >
+          <div 
+            v-if="activeTab === tab.id" 
+            class="table-wrap"
+            v-motion
+            :initial="{ opacity: 0, y: 20 }"
+            :enter="{ opacity: 1, y: 0, transition: { duration: 400 } }"
+          >
             <table class="data-table">
               <thead>
                 <tr>
@@ -63,7 +93,12 @@
         </div>
 
         <!-- Pagination -->
-        <div class="pagination">
+        <div 
+          class="pagination"
+          v-motion
+          :initial="{ opacity: 0 }"
+          :visible-once="{ opacity: 1, transition: { duration: 500, delay: 300 } }"
+        >
           <button class="prev" :disabled="currentPage === 1" @click="currentPage = Math.max(1, currentPage - 1)">&larr;</button>
           <button
             v-for="page in totalPages"

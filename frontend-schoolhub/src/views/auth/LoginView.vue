@@ -59,52 +59,76 @@ const login = async (type) => {
   loading.value = true
 
   try {
+    console.log('🔐 Attempting login with:', form.email)
+    
     const response = await api.post('/auth/login', {
       email: form.email,
       password: form.password,
     })
 
-    const data = response.data
+    console.log('📦 Full response:', response)
+    console.log('📦 Response data:', response.data)
+
+    const result = response.data
+
+    // Check if response is successful
+    if (!result.success) {
+      errorMessage.value = result.message || 'Login gagal.'
+      console.error('❌ Login failed:', result.message)
+      return
+    }
+
+    // Extract data from response
+    const { user, token } = result.data
+
+    console.log('✅ Login success!')
+    console.log('👤 User:', user)
+    console.log('🔑 Token:', token)
 
     // Simpan token
-    if (data.token) {
-      localStorage.setItem('token', data.token)
+    if (token) {
+      localStorage.setItem('token', token)
+      console.log('💾 Token saved to localStorage')
     }
 
     // Simpan user
-    if (data.user) {
-      localStorage.setItem(
-        'user',
-        JSON.stringify(data.user)
-      )
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user))
+      console.log('💾 User saved to localStorage')
     }
 
     // Redirect berdasarkan role
-    const role = data.user?.role
+    const role = user?.role?.toLowerCase()
+    console.log('🎭 User role:', role)
 
     switch (role) {
       case 'admin':
+        console.log('🚀 Redirecting to /dashboard/admin')
         router.push('/dashboard/admin')
         break
 
       case 'guru':
+        console.log('🚀 Redirecting to /dashboard/guru')
         router.push('/dashboard/guru')
         break
 
       case 'murid':
+        console.log('🚀 Redirecting to /dashboard/murid')
         router.push('/dashboard/murid')
         break
 
       case 'karyawan':
+        console.log('🚀 Redirecting to /dashboard/karyawan')
         router.push('/dashboard/karyawan')
         break
 
       default:
+        console.log('🚀 Redirecting to /dashboard (default)')
         router.push('/dashboard')
     }
 
   } catch (error) {
-    console.error(error)
+    console.error('❌ Login error:', error)
 
     if (error.response?.status === 422) {
       errorMessage.value =

@@ -2,11 +2,21 @@
   <div class="berita-view">
     <Navbar />
 
-    <!-- Breadcrumb Hero -->
     <section class="breadcrumb-hero">
       <div class="container">
-        <h1>Berita Sekolah</h1>
-        <div class="breadcrumb">
+        <h1
+          v-motion
+          :initial="{ opacity: 0, y: -20 }"
+          :enter="{ opacity: 1, y: 0, transition: { duration: 600 } }"
+        >
+          Berita Sekolah
+        </h1>
+        <div 
+          class="breadcrumb"
+          v-motion
+          :initial="{ opacity: 0 }"
+          :enter="{ opacity: 1, transition: { duration: 600, delay: 200 } }"
+        >
           <router-link to="/">Beranda</router-link>
           <span class="sep">/</span>
           <span class="current">Berita Sekolah</span>
@@ -14,15 +24,17 @@
       </div>
     </section>
 
-    <!-- Main Content -->
     <section class="section">
       <div class="container layout-with-sidebar sidebar-right">
         
-        <!-- Main Content Area -->
         <div>
           
-          <!-- Filter Pills -->
-          <div class="filter-pills">
+          <div 
+            class="filter-pills"
+            v-motion
+            :initial="{ opacity: 0, y: 20 }"
+            :enter="{ opacity: 1, y: 0, transition: { duration: 500, delay: 300 } }"
+          >
             <button 
               :class="{ active: activeFilter === 'Semua' }" 
               @click="setFilter('Semua')"
@@ -49,22 +61,22 @@
             </button>
           </div>
 
-          <!-- Loading State -->
           <div v-if="loading" style="text-align: center; padding: 40px;">
             <p>Memuat berita...</p>
           </div>
 
-          <!-- Error State -->
           <div v-else-if="error" style="text-align: center; padding: 40px;">
             <p style="color: var(--slate-500);">{{ error }}</p>
           </div>
 
-          <!-- News Grid -->
           <div v-else class="news-grid">
             <div 
-              v-for="berita in filteredBerita" 
+              v-for="(berita, index) in filteredBerita" 
               :key="berita.id" 
               class="news-card"
+              v-motion
+              :initial="{ opacity: 0, y: 40 }"
+              :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: index * 100 } }"
             >
               <img 
                 :src="berita.gambar || berita.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=700&auto=format&fit=crop'" 
@@ -89,13 +101,11 @@
               </div>
             </div>
 
-            <!-- Empty State -->
             <div v-if="filteredBerita.length === 0" style="text-align: center; padding: 40px; grid-column: 1 / -1;">
               <p style="color: var(--slate-500);">Tidak ada berita untuk kategori ini.</p>
             </div>
           </div>
 
-          <!-- Pagination -->
           <div v-if="totalPages > 1" class="pagination">
             <button 
               class="prev" 
@@ -134,10 +144,13 @@
 
         </div>
 
-        <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside 
+          class="sidebar"
+          v-motion
+          :initial="{ opacity: 0, x: 30 }"
+          :visible-once="{ opacity: 1, x: 0, transition: { duration: 600, delay: 200 } }"
+        >
           
-          <!-- Search -->
           <h4>Cari Berita</h4>
           <input 
             v-model="searchQuery"
@@ -149,7 +162,6 @@
 
           <div class="sidebar-divider"></div>
 
-          <!-- Recent News -->
           <h4>Berita Terbaru</h4>
           <ul>
             <li v-for="berita in recentNews" :key="berita.id">
@@ -161,7 +173,6 @@
 
           <div class="sidebar-divider"></div>
 
-          <!-- Popular Tags -->
           <h4>Tag Populer</h4>
           <div class="tag-cloud">
             <a href="#" @click.prevent="searchQuery = 'PPDB'">PPDB</a>
