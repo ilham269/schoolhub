@@ -24,6 +24,7 @@ class DashboardController extends Controller
                 'guru' => User::where('role', 'Guru')->count(),
                 'murid' => User::where('role', 'Murid')->count(),
                 'karyawan' => User::where('role', 'Karyawan')->count(),
+                'calon_siswa' => User::where('role', 'Calon_Siswa')->count(),
                 'active' => User::where('is_active', true)->count(),
                 'inactive' => User::where('is_active', false)->count(),
             ],

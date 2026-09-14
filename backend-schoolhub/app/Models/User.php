@@ -70,6 +70,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Karyawan::class);
     }
+    public function calonSiswa()
+    {
+        return $this->hasOne(CalonSiswa::class);
+    }
     public function announcements()
     {
     return $this->hasMany(
