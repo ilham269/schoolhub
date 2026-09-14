@@ -1,39 +1,27 @@
 <template>
   <section class="login-shell">
     <div class="login-card">
-      
       <!-- BRAND -->
       <div class="brand">
         <span class="brand-mark">HB</span>
         SMA Harapan Bangsa
       </div>
 
-      <h2 style="margin-top: 1rem; margin-bottom: 0.5rem;">Pendaftaran Siswa Baru</h2>
-      <p class="sub">
-        Daftar sebagai calon siswa SMA Harapan Bangsa.
-      </p>
+      <h2 style="margin-top: 1rem; margin-bottom: 0.5rem">Pendaftaran Siswa Baru</h2>
+      <p class="sub">Daftar sebagai calon siswa SMA Harapan Bangsa.</p>
 
       <!-- SUCCESS MESSAGE -->
-      <div
-        v-if="successMessage"
-        class="form-success"
-        style="margin-bottom: 14px;"
-      >
+      <div v-if="successMessage" class="form-success" style="margin-bottom: 14px">
         {{ successMessage }}
       </div>
 
       <!-- ERROR MESSAGE -->
-      <div
-        v-if="errorMessage"
-        class="form-feedback"
-        style="margin-bottom: 14px;"
-      >
+      <div v-if="errorMessage" class="form-feedback" style="margin-bottom: 14px">
         {{ errorMessage }}
       </div>
 
       <!-- FORM -->
       <form @submit.prevent="handleSubmit">
-        
         <!-- NAMA LENGKAP -->
         <div class="form-group">
           <label for="nama">Nama Lengkap *</label>
@@ -44,7 +32,20 @@
             type="text"
             placeholder="Nama lengkap sesuai ijazah"
             required
-          >
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="documents">Dokumen pendukung</label>
+          <input
+            id="documents"
+            class="input"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            multiple
+            @change="form.documents = [...$event.target.files]"
+          />
+          <small>PDF/JPG/PNG, maksimal 5 MB per berkas. Contoh: kartu keluarga atau rapor.</small>
         </div>
 
         <!-- EMAIL -->
@@ -57,7 +58,7 @@
             type="email"
             placeholder="email@contoh.com"
             required
-          >
+          />
         </div>
 
         <!-- NISN -->
@@ -71,7 +72,7 @@
             placeholder="10 digit NISN"
             maxlength="10"
             required
-          >
+          />
         </div>
 
         <!-- NO HP -->
@@ -84,7 +85,7 @@
             type="tel"
             placeholder="08xxxxxxxxxx"
             required
-          >
+          />
         </div>
 
         <!-- ASAL SEKOLAH -->
@@ -97,18 +98,13 @@
             type="text"
             placeholder="Nama SMP"
             required
-          >
+          />
         </div>
 
         <!-- JURUSAN PILIHAN -->
         <div class="form-group">
           <label for="jurusan">Jurusan Pilihan *</label>
-          <select
-            id="jurusan"
-            v-model="form.jurusan"
-            class="input"
-            required
-          >
+          <select id="jurusan" v-model="form.jurusan" class="input" required>
             <option value="">-- Pilih Jurusan --</option>
             <option value="RPL">Rekayasa Perangkat Lunak (RPL)</option>
             <option value="TKR">Teknik Kendaraan Ringan (TKR)</option>
@@ -116,58 +112,27 @@
           </select>
         </div>
 
-        <!-- PASSWORD -->
-        <div class="form-group">
-          <label for="password">Password *</label>
-          <input
-            id="password"
-            v-model="form.password"
-            class="input"
-            type="password"
-            placeholder="Minimal 6 karakter"
-            required
-          >
-        </div>
-
-        <!-- CONFIRM PASSWORD -->
-        <div class="form-group">
-          <label for="password_confirm">Konfirmasi Password *</label>
-          <input
-            id="password_confirm"
-            v-model="form.password_confirm"
-            class="input"
-            type="password"
-            placeholder="Ketik ulang password"
-            required
-          >
-        </div>
+        <p class="account-note">
+          Setelah data diverifikasi, admin akan membuat akun untuk login dan ujian seleksi.
+        </p>
 
         <!-- SUBMIT BUTTON -->
-        <button
-          type="submit"
-          class="btn btn-primary btn-block"
-          :disabled="loading"
-        >
+        <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
           <span v-if="loading">Memproses...</span>
           <span v-else>Daftar Sekarang</span>
         </button>
-
       </form>
 
       <!-- DIVIDER -->
       <div class="divider-or">atau</div>
 
       <!-- BACK TO LOGIN -->
-      <p style="text-align: center; font-size: 0.88rem;">
+      <p style="text-align: center; font-size: 0.88rem">
         Sudah punya akun?
-        <router-link
-          to="/login"
-          style="color: var(--leaf-600); font-weight: 600;"
-        >
+        <router-link to="/login" style="color: var(--leaf-600); font-weight: 600">
           Login di sini
         </router-link>
       </p>
-
     </div>
   </section>
 </template>
@@ -175,6 +140,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '../../utils/api'
 
 const router = useRouter()
 
@@ -185,8 +151,7 @@ const form = ref({
   no_hp: '',
   asal_sekolah: '',
   jurusan: '',
-  password: '',
-  password_confirm: ''
+  documents: [],
 })
 
 const loading = ref(false)
@@ -197,17 +162,6 @@ const handleSubmit = async () => {
   errorMessage.value = ''
   successMessage.value = ''
 
-  // Validasi
-  if (form.value.password !== form.value.password_confirm) {
-    errorMessage.value = 'Password dan konfirmasi password tidak cocok.'
-    return
-  }
-
-  if (form.value.password.length < 6) {
-    errorMessage.value = 'Password minimal 6 karakter.'
-    return
-  }
-
   if (form.value.nisn.length !== 10) {
     errorMessage.value = 'NISN harus 10 digit.'
     return
@@ -216,14 +170,14 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    // TODO: Implement registration API call
-    // const response = await api.post('/auth/register', form.value)
+    const payload = new FormData()
+    for (const [key, value] of Object.entries(form.value)) {
+      if (key !== 'documents') payload.append(key, value)
+    }
+    form.value.documents.forEach((file) => payload.append('documents[]', file))
+    const response = await api.post('/public/ppdb/register', payload)
+    successMessage.value = response.data.message
 
-    // Simulate success
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    successMessage.value = 'Pendaftaran berhasil! Akun Anda sedang diverifikasi. Silakan cek email untuk konfirmasi.'
-    
     // Reset form
     form.value = {
       nama: '',
@@ -232,18 +186,16 @@ const handleSubmit = async () => {
       no_hp: '',
       asal_sekolah: '',
       jurusan: '',
-      password: '',
-      password_confirm: ''
+      documents: [],
     }
 
-    // Redirect to login after 3 seconds
-    setTimeout(() => {
-      router.push('/login')
-    }, 3000)
-
+    setTimeout(() => router.push('/login'), 2500)
   } catch (error) {
     console.error(error)
-    errorMessage.value = 'Terjadi kesalahan saat pendaftaran. Silakan coba lagi.'
+    errorMessage.value =
+      error.response?.data?.message ||
+      Object.values(error.response?.data?.errors || {})[0]?.[0] ||
+      'Terjadi kesalahan saat pendaftaran. Silakan coba lagi.'
   } finally {
     loading.value = false
   }
@@ -264,7 +216,7 @@ const handleSubmit = async () => {
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -397,5 +349,18 @@ select.input {
   padding: 0.75rem;
   border-radius: 6px;
   font-size: 0.9rem;
+}
+.account-note {
+  padding: 0.75rem;
+  background: #eef7ff;
+  color: #265b82;
+  border-radius: 6px;
+  font-size: 0.86rem;
+}
+.form-group small {
+  display: block;
+  margin-top: 5px;
+  color: #667085;
+  font-size: 0.78rem;
 }
 </style>

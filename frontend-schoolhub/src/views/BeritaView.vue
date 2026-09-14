@@ -11,7 +11,7 @@
         >
           Berita Sekolah
         </h1>
-        <div 
+        <div
           class="breadcrumb"
           v-motion
           :initial="{ opacity: 0 }"
@@ -26,64 +26,58 @@
 
     <section class="section">
       <div class="container layout-with-sidebar sidebar-right">
-        
         <div>
-          
-          <div 
+          <div
             class="filter-pills"
             v-motion
             :initial="{ opacity: 0, y: 20 }"
             :enter="{ opacity: 1, y: 0, transition: { duration: 500, delay: 300 } }"
           >
-            <button 
-              :class="{ active: activeFilter === 'Semua' }" 
-              @click="setFilter('Semua')"
-            >
+            <button :class="{ active: activeFilter === 'Semua' }" @click="setFilter('Semua')">
               Semua Berita
             </button>
-            <button 
-              :class="{ active: activeFilter === 'Akademik' }" 
-              @click="setFilter('Akademik')"
-            >
+            <button :class="{ active: activeFilter === 'Akademik' }" @click="setFilter('Akademik')">
               Akademik
             </button>
-            <button 
-              :class="{ active: activeFilter === 'Kegiatan' }" 
-              @click="setFilter('Kegiatan')"
-            >
+            <button :class="{ active: activeFilter === 'Kegiatan' }" @click="setFilter('Kegiatan')">
               Kegiatan
             </button>
-            <button 
-              :class="{ active: activeFilter === 'Prestasi' }" 
-              @click="setFilter('Prestasi')"
-            >
+            <button :class="{ active: activeFilter === 'Prestasi' }" @click="setFilter('Prestasi')">
               Prestasi
             </button>
           </div>
 
-          <div v-if="loading" style="text-align: center; padding: 40px;">
+          <div v-if="loading" style="text-align: center; padding: 40px">
             <p>Memuat berita...</p>
           </div>
 
-          <div v-else-if="error" style="text-align: center; padding: 40px;">
-            <p style="color: var(--slate-500);">{{ error }}</p>
+          <div v-else-if="error" style="text-align: center; padding: 40px">
+            <p style="color: var(--slate-500)">{{ error }}</p>
           </div>
 
           <div v-else class="news-grid">
-            <div 
-              v-for="(berita, index) in filteredBerita" 
-              :key="berita.id" 
+            <div
+              v-for="(berita, index) in filteredBerita"
+              :key="berita.id"
               class="news-card"
               v-motion
               :initial="{ opacity: 0, y: 40 }"
-              :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: index * 100 } }"
+              :visible-once="{
+                opacity: 1,
+                y: 0,
+                transition: { duration: 500, delay: index * 100 },
+              }"
             >
-              <img 
-                :src="berita.gambar || berita.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=700&auto=format&fit=crop'" 
+              <img
+                :src="
+                  berita.gambar ||
+                  berita.image ||
+                  'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=700&auto=format&fit=crop'
+                "
                 :alt="berita.judul || berita.title"
               />
               <div class="body">
-                <h3 style="font-size: 1.05rem; margin-top: 0;">
+                <h3 style="font-size: 1.05rem; margin-top: 0">
                   {{ berita.judul || berita.title }}
                 </h3>
                 <p>
@@ -92,48 +86,41 @@
                 <div class="news-meta">
                   <span>&#128197; {{ formatDate(berita.tanggal || berita.published_at) }}</span>
                 </div>
-                <router-link 
-                  :to="`/berita/${berita.slug || berita.id}`" 
-                  class="link-arrow"
-                >
+                <router-link :to="`/berita/${berita.slug || berita.id}`" class="link-arrow">
                   Baca selengkapnya &rarr;
                 </router-link>
               </div>
             </div>
 
-            <div v-if="filteredBerita.length === 0" style="text-align: center; padding: 40px; grid-column: 1 / -1;">
-              <p style="color: var(--slate-500);">Tidak ada berita untuk kategori ini.</p>
+            <div
+              v-if="filteredBerita.length === 0"
+              style="text-align: center; padding: 40px; grid-column: 1 / -1"
+            >
+              <p style="color: var(--slate-500)">Tidak ada berita untuk kategori ini.</p>
             </div>
           </div>
 
           <div v-if="totalPages > 1" class="pagination">
-            <button 
-              class="prev" 
-              :disabled="currentPage === 1"
-              @click="changePage(currentPage - 1)"
-            >
+            <button class="prev" :disabled="currentPage === 1" @click="changePage(currentPage - 1)">
               &larr;
             </button>
-            
-            <button 
-              v-for="page in visiblePages" 
+
+            <button
+              v-for="page in visiblePages"
               :key="page"
               :class="{ active: currentPage === page }"
               @click="changePage(page)"
             >
               {{ page }}
             </button>
-            
+
             <span v-if="totalPages > 5" class="dots">&hellip;</span>
-            
-            <button 
-              v-if="totalPages > 5"
-              @click="changePage(totalPages)"
-            >
+
+            <button v-if="totalPages > 5" @click="changePage(totalPages)">
               {{ totalPages }}
             </button>
-            
-            <button 
+
+            <button
               class="next"
               :disabled="currentPage === totalPages"
               @click="changePage(currentPage + 1)"
@@ -141,21 +128,19 @@
               &rarr;
             </button>
           </div>
-
         </div>
 
-        <aside 
+        <aside
           class="sidebar"
           v-motion
           :initial="{ opacity: 0, x: 30 }"
           :visible-once="{ opacity: 1, x: 0, transition: { duration: 600, delay: 200 } }"
         >
-          
           <h4>Cari Berita</h4>
-          <input 
+          <input
             v-model="searchQuery"
-            class="input" 
-            type="text" 
+            class="input"
+            type="text"
             placeholder="Kata kunci..."
             @input="handleSearch"
           />
@@ -181,9 +166,7 @@
             <a href="#" @click.prevent="searchQuery = 'Beasiswa'">Beasiswa</a>
             <a href="#" @click.prevent="searchQuery = 'Ujian'">Ujian</a>
           </div>
-
         </aside>
-
       </div>
     </section>
 
@@ -215,35 +198,34 @@ const recentNews = computed(() => {
 const fetchBerita = async () => {
   loading.value = true
   error.value = null
-  
+
   try {
     // Try public endpoint first
     const response = await api.get('/public/berita')
     const result = response.data
-    
+
     console.log('Hasil API Berita:', result)
-    
+
     let rawData = []
-    
+
     // Nampung data dari response API
     if (result.data) {
       rawData = result.data
     } else if (Array.isArray(result)) {
       rawData = result
     }
-    
+
     // URUTKAN BERDASARKAN TANGGAL TERBARU (DESCENDING)
     rawData.sort((a, b) => {
       // Pastikan ngecek field tanggal, published_at, atau created_at
       const dateA = new Date(a.tanggal || a.published_at || a.created_at || 0)
       const dateB = new Date(b.tanggal || b.published_at || b.created_at || 0)
-      
+
       return dateB - dateA
     })
 
     // Masukin data yang udah berurut ke state utama
     daftarBerita.value = rawData
-
   } catch (err) {
     console.error('Gagal mengambil data berita:', err)
     error.value = 'Gagal memuat berita dari database.'
@@ -256,50 +238,50 @@ const fetchBerita = async () => {
 // Filter berita berdasarkan kategori dan search
 const filteredBerita = computed(() => {
   let filtered = daftarBerita.value
-  
+
   // Filter by category
   if (activeFilter.value !== 'Semua') {
-    filtered = filtered.filter(berita => 
-      (berita.kategori || berita.category) === activeFilter.value
+    filtered = filtered.filter(
+      (berita) => (berita.kategori || berita.category) === activeFilter.value,
     )
   }
-  
+
   // Filter by search query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(berita => {
+    filtered = filtered.filter((berita) => {
       const judul = (berita.judul || berita.title || '').toLowerCase()
       const konten = (berita.konten || berita.content || '').toLowerCase()
       return judul.includes(query) || konten.includes(query)
     })
   }
-  
+
   // Pagination
   const start = (currentPage.value - 1) * itemsPerPage
   const end = start + itemsPerPage
-  
+
   return filtered.slice(start, end)
 })
 
 // Total pages
 const totalPages = computed(() => {
   let filtered = daftarBerita.value
-  
+
   if (activeFilter.value !== 'Semua') {
-    filtered = filtered.filter(berita => 
-      (berita.kategori || berita.category) === activeFilter.value
+    filtered = filtered.filter(
+      (berita) => (berita.kategori || berita.category) === activeFilter.value,
     )
   }
-  
+
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(berita => {
+    filtered = filtered.filter((berita) => {
       const judul = (berita.judul || berita.title || '').toLowerCase()
       const konten = (berita.konten || berita.content || '').toLowerCase()
       return judul.includes(query) || konten.includes(query)
     })
   }
-  
+
   return Math.ceil(filtered.length / itemsPerPage)
 })
 
@@ -308,7 +290,7 @@ const visiblePages = computed(() => {
   const pages = []
   const total = totalPages.value
   const current = currentPage.value
-  
+
   if (total <= 5) {
     for (let i = 1; i <= total; i++) {
       pages.push(i)
@@ -322,7 +304,7 @@ const visiblePages = computed(() => {
       pages.push(current - 1, current, current + 1)
     }
   }
-  
+
   return pages
 })
 
@@ -344,31 +326,28 @@ const changePage = (page) => {
 }
 
 const countByCategory = (category) => {
-  return daftarBerita.value.filter(berita => 
-    (berita.kategori || berita.category) === category
-  ).length
+  return daftarBerita.value.filter((berita) => (berita.kategori || berita.category) === category)
+    .length
 }
 
 const getBadgeClass = (category) => {
   const categoryMap = {
-    'Akademik': 'badge-green',
-    'Kegiatan': 'badge-amber',
-    'Prestasi': 'badge-dark',
-    'Pengumuman': 'badge-blue'
+    Akademik: 'badge-green',
+    Kegiatan: 'badge-amber',
+    Prestasi: 'badge-dark',
+    Pengumuman: 'badge-blue',
   }
   return categoryMap[category] || 'badge-green'
 }
 
 const truncateText = (text, maxLength) => {
   if (!text) return ''
-  return text.length > maxLength 
-    ? text.substring(0, maxLength) + '...' 
-    : text
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
 }
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
-  
+
   const date = new Date(dateString)
   const options = { day: 'numeric', month: 'short', year: 'numeric' }
   return date.toLocaleDateString('id-ID', options)

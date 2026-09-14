@@ -1,11 +1,13 @@
 import axios from 'axios'
 
 // Buat instance axios dengan base URL API Laravel
-// Menggunakan proxy Vite untuk menghindari CORS
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
   timeout: 15000,
-  // Tidak set headers default, biar bisa dinamis per request
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
 })
 
 const getCache = new Map()
@@ -32,12 +34,12 @@ api.interceptors.request.use((config) => {
     // Otomatis tambahkan header Authorization ke setiap request
     config.headers.Authorization = `Bearer ${token}`
   }
-  
+
   // Jika data adalah FormData, hapus Content-Type biar browser set sendiri
   if (config.data instanceof FormData) {
     delete config.headers['Content-Type']
   }
-  
+
   return config
 })
 
@@ -47,11 +49,13 @@ api.interceptors.response.use(
     const isUnauthorized = error.response?.status === 401
     const requestUrl = error.config?.url ?? ''
     const isLoginRequest = requestUrl.includes('/login')
-    
+
     // Daftar path public yang tidak perlu redirect ke login
     const publicPaths = ['/', '/login', '/pendaftaran', '/profil', '/ppdb']
     const currentPath = window.location.pathname
-    const isPublicPage = publicPaths.some(path => currentPath === path || currentPath.startsWith(path))
+    const isPublicPage = publicPaths.some(
+      (path) => currentPath === path || currentPath.startsWith(path),
+    )
 
     // Hanya redirect ke login jika:
     // 1. Response 401 (Unauthorized)
@@ -59,7 +63,7 @@ api.interceptors.response.use(
     // 3. User punya token (berarti token expired/invalid)
     // 4. Bukan di public page
     const hasToken = localStorage.getItem('token') || sessionStorage.getItem('token')
-    
+
     if (isUnauthorized && !isLoginRequest && hasToken && !isPublicPage) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
@@ -74,6 +78,5 @@ api.interceptors.response.use(
     return Promise.reject(error)
   },
 )
-
 
 export default api

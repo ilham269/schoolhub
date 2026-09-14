@@ -11,7 +11,7 @@
         >
           Pengumuman
         </h1>
-        <div 
+        <div
           class="breadcrumb"
           v-motion
           :initial="{ opacity: 0 }"
@@ -36,12 +36,16 @@
           :enter="{ opacity: 1, x: 0, transition: { duration: 500, delay: index * 150 } }"
         >
           <span>{{ alert.icon }}</span>
-          <div><strong>{{ alert.title }}</strong> {{ alert.message }}</div>
-          <button class="alert-close" aria-label="Tutup" @click="closeAlert(alert.id)">&times;</button>
+          <div>
+            <strong>{{ alert.title }}</strong> {{ alert.message }}
+          </div>
+          <button class="alert-close" aria-label="Tutup" @click="closeAlert(alert.id)">
+            &times;
+          </button>
         </div>
 
         <!-- Tabs -->
-        <div 
+        <div
           class="tabs"
           v-motion
           :initial="{ opacity: 0, y: 20 }"
@@ -58,14 +62,14 @@
           </button>
         </div>
 
-        <div 
-          v-for="tab in tabs" 
-          :key="tab.id" 
-          class="tab-panel" 
+        <div
+          v-for="tab in tabs"
+          :key="tab.id"
+          class="tab-panel"
           :class="{ active: activeTab === tab.id }"
         >
-          <div 
-            v-if="activeTab === tab.id" 
+          <div
+            v-if="activeTab === tab.id"
             class="table-wrap"
             v-motion
             :initial="{ opacity: 0, y: 20 }"
@@ -85,7 +89,9 @@
                   <td>{{ item.tanggal }}</td>
                   <td>{{ item.judul }}</td>
                   <td v-if="tab.id === 'tab-semua'">{{ item.kategori }}</td>
-                  <td><span class="badge" :class="badgeClass(item.status)">{{ item.status }}</span></td>
+                  <td>
+                    <span class="badge" :class="badgeClass(item.status)">{{ item.status }}</span>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -93,13 +99,19 @@
         </div>
 
         <!-- Pagination -->
-        <div 
+        <div
           class="pagination"
           v-motion
           :initial="{ opacity: 0 }"
           :visible-once="{ opacity: 1, transition: { duration: 500, delay: 300 } }"
         >
-          <button class="prev" :disabled="currentPage === 1" @click="currentPage = Math.max(1, currentPage - 1)">&larr;</button>
+          <button
+            class="prev"
+            :disabled="currentPage === 1"
+            @click="currentPage = Math.max(1, currentPage - 1)"
+          >
+            &larr;
+          </button>
           <button
             v-for="page in totalPages"
             :key="page"
@@ -108,7 +120,9 @@
           >
             {{ page }}
           </button>
-          <button class="next" @click="currentPage = Math.min(totalPages, currentPage + 1)">&rarr;</button>
+          <button class="next" @click="currentPage = Math.min(totalPages, currentPage + 1)">
+            &rarr;
+          </button>
         </div>
       </div>
     </section>
@@ -129,19 +143,20 @@ const alerts = ref([
     type: 'info',
     icon: '\u2139',
     title: 'Jadwal Ujian Tengah Semester',
-    message: 'Pelaksanaan UTS ganjil dimulai 15 September 2026. Kartu ujian dapat diunduh melalui portal siswa.'
+    message:
+      'Pelaksanaan UTS ganjil dimulai 15 September 2026. Kartu ujian dapat diunduh melalui portal siswa.',
   },
   {
     id: 2,
     type: 'warning',
     icon: '\u26A0',
     title: 'Pembayaran SPP Bulan September',
-    message: 'Batas akhir pembayaran adalah tanggal 10. Keterlambatan dikenai denda administrasi.'
-  }
+    message: 'Batas akhir pembayaran adalah tanggal 10. Keterlambatan dikenai denda administrasi.',
+  },
 ])
 
 const closeAlert = (id) => {
-  alerts.value = alerts.value.filter(a => a.id !== id)
+  alerts.value = alerts.value.filter((a) => a.id !== id)
 }
 const visibleAlerts = computed(() => alerts.value)
 
@@ -149,22 +164,47 @@ const visibleAlerts = computed(() => alerts.value)
 const tabs = [
   { id: 'tab-semua', label: 'Semua' },
   { id: 'tab-akademik', label: 'Akademik' },
-  { id: 'tab-umum', label: 'Umum' }
+  { id: 'tab-umum', label: 'Umum' },
 ]
 const activeTab = ref('tab-semua')
 
 // ===== Data pengumuman =====
 const pengumumanList = [
-  { tanggal: '01 Sep 2026', judul: 'Libur Nasional Peringatan Hari Raya', kategori: 'Umum', status: 'Aktif' },
-  { tanggal: '28 Agu 2026', judul: 'Jadwal Ujian Tengah Semester Ganjil', kategori: 'Akademik', status: 'Aktif' },
-  { tanggal: '20 Agu 2026', judul: 'Pembayaran SPP Bulan September', kategori: 'Umum', status: 'Segera Berakhir' },
-  { tanggal: '15 Agu 2026', judul: 'Pendaftaran Ekstrakurikuler Semester Baru', kategori: 'Umum', status: 'Berakhir' },
-  { tanggal: '10 Agu 2026', judul: 'Pengumpulan Tugas Proyek Kelas XII', kategori: 'Akademik', status: 'Berakhir' }
+  {
+    tanggal: '01 Sep 2026',
+    judul: 'Libur Nasional Peringatan Hari Raya',
+    kategori: 'Umum',
+    status: 'Aktif',
+  },
+  {
+    tanggal: '28 Agu 2026',
+    judul: 'Jadwal Ujian Tengah Semester Ganjil',
+    kategori: 'Akademik',
+    status: 'Aktif',
+  },
+  {
+    tanggal: '20 Agu 2026',
+    judul: 'Pembayaran SPP Bulan September',
+    kategori: 'Umum',
+    status: 'Segera Berakhir',
+  },
+  {
+    tanggal: '15 Agu 2026',
+    judul: 'Pendaftaran Ekstrakurikuler Semester Baru',
+    kategori: 'Umum',
+    status: 'Berakhir',
+  },
+  {
+    tanggal: '10 Agu 2026',
+    judul: 'Pengumpulan Tugas Proyek Kelas XII',
+    kategori: 'Akademik',
+    status: 'Berakhir',
+  },
 ]
 
 const filteredItems = (tabId) => {
-  if (tabId === 'tab-akademik') return pengumumanList.filter(i => i.kategori === 'Akademik')
-  if (tabId === 'tab-umum') return pengumumanList.filter(i => i.kategori === 'Umum')
+  if (tabId === 'tab-akademik') return pengumumanList.filter((i) => i.kategori === 'Akademik')
+  if (tabId === 'tab-umum') return pengumumanList.filter((i) => i.kategori === 'Umum')
   return pengumumanList
 }
 
@@ -179,5 +219,4 @@ const currentPage = ref(1)
 const totalPages = 2
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

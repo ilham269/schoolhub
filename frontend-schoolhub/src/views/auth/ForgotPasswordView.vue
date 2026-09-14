@@ -1,39 +1,27 @@
 <template>
   <section class="login-shell">
     <div class="login-card">
-      
       <!-- BRAND -->
       <div class="brand">
         <span class="brand-mark">HB</span>
         SMA Harapan Bangsa
       </div>
 
-      <h2 style="margin-top: 1rem; margin-bottom: 0.5rem;">Lupa Kata Sandi?</h2>
-      <p class="sub">
-        Masukkan email Anda dan kami akan mengirimkan link untuk reset password.
-      </p>
+      <h2 style="margin-top: 1rem; margin-bottom: 0.5rem">Lupa Kata Sandi?</h2>
+      <p class="sub">Masukkan email Anda dan kami akan mengirimkan link untuk reset password.</p>
 
       <!-- SUCCESS MESSAGE -->
-      <div
-        v-if="successMessage"
-        class="form-success"
-        style="margin-bottom: 14px;"
-      >
+      <div v-if="successMessage" class="form-success" style="margin-bottom: 14px">
         {{ successMessage }}
       </div>
 
       <!-- ERROR MESSAGE -->
-      <div
-        v-if="errorMessage"
-        class="form-feedback"
-        style="margin-bottom: 14px;"
-      >
+      <div v-if="errorMessage" class="form-feedback" style="margin-bottom: 14px">
         {{ errorMessage }}
       </div>
 
       <!-- FORM -->
       <form @submit.prevent="handleSubmit">
-        
         <!-- EMAIL -->
         <div class="form-group">
           <label for="email">Email *</label>
@@ -44,35 +32,26 @@
             type="email"
             placeholder="nama@email.com"
             required
-          >
+          />
         </div>
 
         <!-- SUBMIT BUTTON -->
-        <button
-          type="submit"
-          class="btn btn-primary btn-block"
-          :disabled="loading"
-        >
+        <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
           <span v-if="loading">Mengirim...</span>
           <span v-else>Kirim Link Reset Password</span>
         </button>
-
       </form>
 
       <!-- DIVIDER -->
       <div class="divider-or">atau</div>
 
       <!-- BACK TO LOGIN -->
-      <p style="text-align: center; font-size: 0.88rem;">
+      <p style="text-align: center; font-size: 0.88rem">
         Sudah ingat password?
-        <router-link
-          to="/login"
-          style="color: var(--leaf-600); font-weight: 600;"
-        >
+        <router-link to="/login" style="color: var(--leaf-600); font-weight: 600">
           Kembali ke Login
         </router-link>
       </p>
-
     </div>
   </section>
 </template>
@@ -103,11 +82,11 @@ const handleSubmit = async () => {
     // })
 
     // Simulate success
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    successMessage.value = 'Link reset password telah dikirim ke email Anda. Silakan cek inbox atau spam folder.'
-    email.value = ''
+    await new Promise((resolve) => setTimeout(resolve, 1500))
 
+    successMessage.value =
+      'Link reset password telah dikirim ke email Anda. Silakan cek inbox atau spam folder.'
+    email.value = ''
   } catch (error) {
     console.error(error)
     errorMessage.value = 'Terjadi kesalahan. Email tidak ditemukan atau server sedang bermasalah.'
@@ -131,7 +110,7 @@ const handleSubmit = async () => {
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   width: 100%;
   max-width: 450px;
 }

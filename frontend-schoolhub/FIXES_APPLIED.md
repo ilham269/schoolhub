@@ -3,9 +3,11 @@
 ## 🔧 Issues Fixed
 
 ### 1. ✅ Chart.js Missing Error
+
 **Error:** `Failed to resolve import "chart.js/auto"`
 
 **Solution:**
+
 ```bash
 npm install chart.js --legacy-peer-deps
 ```
@@ -15,11 +17,13 @@ npm install chart.js --legacy-peer-deps
 ---
 
 ### 2. ✅ Missing /dashboard Route
+
 **Error:** `No match found for location with path "/dashboard"`
 
 **Solution:** Added dashboard routes in `src/router/index.js`
 
 **Routes Added:**
+
 - `/dashboard` - Auto redirect based on user role
 - `/dashboard/admin` - Admin dashboard
 - `/dashboard/guru` - Guru dashboard
@@ -27,6 +31,7 @@ npm install chart.js --legacy-peer-deps
 - `/dashboard/karyawan` - Karyawan dashboard
 
 **Files Created:**
+
 - ✅ `src/views/admin/dashboard_admin.vue`
 - ✅ `src/views/murid/dashboard_murid.vue`
 - ✅ `src/views/karyawan/dashboard_karyawan.vue`
@@ -37,17 +42,21 @@ When user logs in, they will be redirected to `/dashboard`, which will automatic
 ---
 
 ### 3. ✅ Missing /forgot-password Route
+
 **Error:** `No match found for location with path "/forgot-password"`
 
 **Solution:** Added forgot password route and component
 
 **Routes Added:**
+
 - `/forgot-password` - Forgot password page
 
 **Files Created:**
+
 - ✅ `src/views/auth/ForgotPasswordView.vue`
 
 **Features:**
+
 - Email input for password reset
 - Success/error message display
 - Link back to login page
@@ -55,17 +64,21 @@ When user logs in, they will be redirected to `/dashboard`, which will automatic
 ---
 
 ### 4. ✅ Missing /pendaftaran Route
+
 **Error:** `No match found for location with path "/pendaftaran"`
 
 **Solution:** Added registration route and component
 
 **Routes Added:**
+
 - `/pendaftaran` - Student registration page
 
 **Files Created:**
+
 - ✅ `src/views/auth/PendaftaranView.vue`
 
 **Features:**
+
 - Full registration form (nama, email, NISN, HP, asal sekolah, jurusan)
 - Password validation
 - Jurusan selection (RPL, TKR, TSM)
@@ -74,13 +87,16 @@ When user logs in, they will be redirected to `/dashboard`, which will automatic
 ---
 
 ### 5. ✅ Berita Page Updated
+
 **What Changed:**
+
 - Updated `BeritaController.php` to fetch data from database instead of dummy data
 - Updated `BeritaView.vue` to use real data from API endpoint `/api/public/berita`
 - Removed category filter (since News table doesn't have category field yet)
 - Added recent news sidebar
 
 **API Endpoints Available:**
+
 - `GET /api/public/berita` - Get all published news
 - `GET /api/public/berita/{id}` - Get news by ID
 - `GET /api/public/berita/slug/{slug}` - Get news by slug
@@ -106,17 +122,21 @@ Role: Admin
 ## 🚀 How to Start Development
 
 ### Backend (Laravel)
+
 ```bash
 cd backend-schoolhub
 php artisan serve
 ```
+
 Backend will run on: http://localhost:8000
 
 ### Frontend (Vue.js)
+
 ```bash
 cd frontend-schoolhub
 npm run dev
 ```
+
 Frontend will run on: http://localhost:5173
 
 ---
@@ -163,6 +183,7 @@ frontend-schoolhub/src/
 ## 📝 All Available Routes
 
 ### Public Routes
+
 - `/` - Home page
 - `/login` - Login page
 - `/forgot-password` - Forgot password page ✨ NEW
@@ -174,6 +195,7 @@ frontend-schoolhub/src/
 - `/ppdb` - PPDB page
 
 ### Protected Routes (Requires Auth)
+
 - `/dashboard` - Auto redirect to role-based dashboard
 - `/dashboard/admin` - Admin dashboard
 - `/dashboard/guru` - Teacher dashboard

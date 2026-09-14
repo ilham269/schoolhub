@@ -11,7 +11,7 @@
         >
           Kontak Kami
         </h1>
-        <div 
+        <div
           class="breadcrumb"
           v-motion
           :initial="{ opacity: 0 }"
@@ -24,10 +24,9 @@
     </section>
 
     <section class="section">
-      <div class="container split" style="align-items:flex-start;">
-        
+      <div class="container split" style="align-items: flex-start">
         <!-- Contact Info Card (Kiri) -->
-        <div 
+        <div
           class="contact-info-card"
           v-motion
           :initial="{ opacity: 0, x: -50 }"
@@ -35,17 +34,42 @@
         >
           <p class="eyebrow-dot">Hubungi Kami</p>
           <h3>Ada yang bisa kami bantu?</h3>
-          <p style="color:#b7c9be;">Tim kami siap membantu pertanyaan seputar akademik, pendaftaran, maupun administrasi sekolah.</p>
+          <p style="color: #b7c9be">
+            Tim kami siap membantu pertanyaan seputar akademik, pendaftaran, maupun administrasi
+            sekolah.
+          </p>
           <ul class="contact-info-list">
-            <li><span class="ic">&#128205;</span><div><strong style="display:block; color:#fff;">Alamat</strong>Jl. Pendidikan No. 45, Bandung, Jawa Barat</div></li>
-            <li><span class="ic">&#128222;</span><div><strong style="display:block; color:#fff;">Telepon</strong>+62 812-3456-7890</div></li>
-            <li><span class="ic">&#9993;</span><div><strong style="display:block; color:#fff;">Email</strong>info@harapanbangsa.sch.id</div></li>
-            <li><span class="ic">&#128337;</span><div><strong style="display:block; color:#fff;">Jam Layanan</strong>Senin&ndash;Jumat, 07.00&ndash;15.00 WIB</div></li>
+            <li>
+              <span class="ic">&#128205;</span>
+              <div>
+                <strong style="display: block; color: #fff">Alamat</strong>Jl. Pendidikan No. 45,
+                Bandung, Jawa Barat
+              </div>
+            </li>
+            <li>
+              <span class="ic">&#128222;</span>
+              <div>
+                <strong style="display: block; color: #fff">Telepon</strong>+62 812-3456-7890
+              </div>
+            </li>
+            <li>
+              <span class="ic">&#9993;</span>
+              <div>
+                <strong style="display: block; color: #fff">Email</strong>info@harapanbangsa.sch.id
+              </div>
+            </li>
+            <li>
+              <span class="ic">&#128337;</span>
+              <div>
+                <strong style="display: block; color: #fff">Jam Layanan</strong>Senin&ndash;Jumat,
+                07.00&ndash;15.00 WIB
+              </div>
+            </li>
           </ul>
         </div>
 
         <!-- Form Card (Kanan) -->
-        <div 
+        <div
           class="card"
           v-motion
           :initial="{ opacity: 0, x: 50 }"
@@ -64,7 +88,7 @@
                   placeholder="Nama Anda"
                   v-model="form.nama"
                   :style="{ borderColor: errors.nama ? 'var(--red)' : 'var(--line)' }"
-                >
+                />
               </div>
               <div class="form-group">
                 <label for="cemail">Email *</label>
@@ -75,7 +99,7 @@
                   placeholder="nama@email.com"
                   v-model="form.email"
                   :style="{ borderColor: errors.email ? 'var(--red)' : 'var(--line)' }"
-                >
+                />
               </div>
             </div>
             <div class="form-group">
@@ -108,7 +132,7 @@
               v-if="feedback.show"
               class="alert form-feedback"
               :class="feedback.success ? 'alert-info' : 'alert-danger'"
-              style="margin-bottom:14px;"
+              style="margin-bottom: 14px"
             >
               {{ feedback.message }}
             </div>
@@ -119,7 +143,7 @@
     </section>
 
     <!-- Map Section -->
-    <section 
+    <section
       class="section-tight"
       v-motion
       :initial="{ opacity: 0, y: 30 }"
@@ -127,7 +151,11 @@
     >
       <div class="container">
         <div class="map-frame">
-          <iframe src="https://www.google.com/maps?q=Bandung,Jawa%20Barat&output=embed" title="Lokasi Sekolah" loading="lazy"></iframe>
+          <iframe
+            src="https://www.google.com/maps?q=Bandung,Jawa%20Barat&output=embed"
+            title="Lokasi Sekolah"
+            loading="lazy"
+          ></iframe>
         </div>
       </div>
     </section>
@@ -145,20 +173,20 @@ const form = reactive({
   nama: '',
   email: '',
   topik: '',
-  pesan: ''
+  pesan: '',
 })
 
 const errors = reactive({
   nama: false,
   email: false,
   topik: false,
-  pesan: false
+  pesan: false,
 })
 
 const feedback = reactive({
   show: false,
   success: false,
-  message: ''
+  message: '',
 })
 
 const handleSubmit = () => {
@@ -184,5 +212,4 @@ const handleSubmit = () => {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

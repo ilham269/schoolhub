@@ -8,12 +8,9 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode`
   const env = loadEnv(mode, process.cwd(), '')
-  
+
   return {
-    plugins: [
-      vue(),
-      vueDevTools(),
-    ],
+    plugins: [vue(), vueDevTools()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -26,8 +23,8 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           // rewrite: (path) => path.replace(/^\/api/, '') // Uncomment jika Laravel tidak pakai prefix /api
-        }
-      }
-    }
+        },
+      },
+    },
   }
 })
