@@ -22,6 +22,7 @@ return new class extends Migration
                 'Guru',
                 'Murid',
                 'Karyawan',
+                'Calon_Siswa',
             ])->default('Murid');
             $table->string('gambar_murid')->nullable();
             $table->boolean('is_active')

@@ -11,8 +11,7 @@ use App\Http\Controllers\Api\PengumumanController;
 use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\MapelController;
-use App\Http\Controllers\Api\JadwalController;
+use App\Http\Controllers\Api\PpdbController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -32,6 +31,11 @@ Route::prefix('auth')->group(function () {
 
 // Public Routes (tanpa auth)
 Route::prefix('public')->group(function () {
+    Route::post('/ppdb/register', [PpdbController::class, 'register']);
+    
+    // Public Guru Route (Mengatasi error 404 di HomeView.vue)
+    Route::get('/guru', [GuruController::class, 'index']);
+
     // Pengumuman
     Route::get('/pengumuman', [PengumumanController::class, 'published']);
     Route::get('/pengumuman/{id}', [PengumumanController::class, 'show']);
@@ -48,6 +52,49 @@ Route::prefix('public')->group(function () {
 
 // Protected API Routes
 Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('ppdb')->group(function () {
+        // Routes for calon siswa only
+        Route::middleware('role:murid,calon_siswa')->group(function () {
+            Route::get('/profile', [PpdbController::class, 'profile']);
+            Route::get('/exams', [PpdbController::class, 'exams']);
+            
+            // Exam session endpoints with rate limiting
+            Route::post('/exams/{exam}/start', [PpdbController::class, 'start'])
+                ->middleware('rate_limit_exam:5');
+            Route::post('/exams/{exam}/submit', [PpdbController::class, 'submit'])
+                ->middleware('rate_limit_exam:3');
+            
+            // Session management for students
+            Route::post('/auto-save', [PpdbController::class, 'autoSave'])
+                ->middleware('rate_limit_exam:120');
+            Route::post('/log-activity', [PpdbController::class, 'logActivity'])
+                ->middleware('rate_limit_exam:180');
+            Route::get('/session/{sessionId}/status', [PpdbController::class, 'sessionStatus'])
+                ->middleware('rate_limit_exam:30');
+        });
+        
+        // Teacher/Admin management
+        Route::middleware('role:admin,guru')->group(function () {
+            Route::get('/manage/exams', [PpdbController::class, 'manageExams']);
+            Route::post('/manage/exams', [PpdbController::class, 'storeExam']);
+            Route::patch('/manage/exams/{exam}', [PpdbController::class, 'updateExam']);
+            Route::post('/manage/exams/{exam}/questions', [PpdbController::class, 'storeQuestion']);
+            Route::get('/manage/candidates', [PpdbController::class, 'candidates']);
+            Route::patch('/manage/candidates/{calon}', [PpdbController::class, 'updateCandidate']);
+            
+            // Monitoring (teachers/admin)
+            Route::get('/manage/security-dashboard', [PpdbController::class, 'securityDashboard']);
+            Route::get('/manage/sessions/{sessionId}/logs', [PpdbController::class, 'sessionActivityLogs']);
+            Route::get('/manage/exams/{exam}/monitor', [PpdbController::class, 'monitorSessions']);
+            Route::get('/manage/sessions/{sessionId}/activity-log', [PpdbController::class, 'sessionActivityLog']);
+        });
+        
+        // Admin only routes
+        Route::middleware('role:admin')->group(function () {
+            Route::post('/manage/candidates/{calon}/account', [PpdbController::class, 'createAccount']);
+            Route::post('/manage/sessions/{sessionId}/suspend', [PpdbController::class, 'suspendSession']);
+        });
+    });
     
     // Dashboard Routes
     Route::prefix('dashboard')->group(function () {
@@ -130,31 +177,4 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/jurusan/{jurusan}', [KelasController::class, 'byJurusan']);
         Route::get('/tingkat/{tingkat}', [KelasController::class, 'byTingkat']);
     });
-
-    // Mapel Routes
-    Route::prefix('mapel')->group(function () {
-        Route::get('/', [MapelController::class, 'index']);
-        Route::post('/', [MapelController::class, 'store']);
-        Route::get('/active', [MapelController::class, 'active']);
-        Route::get('/{id}', [MapelController::class, 'show']);
-        Route::put('/{id}', [MapelController::class, 'update']);
-        Route::delete('/{id}', [MapelController::class, 'destroy']);
-        Route::post('/assign-kelas', [MapelController::class, 'assignToKelas']);
-        Route::post('/assign-guru', [MapelController::class, 'assignToGuru']);
-        Route::get('/kelas/{kelasId}', [MapelController::class, 'byKelas']);
-        Route::get('/guru/{guruId}', [MapelController::class, 'byGuru']);
-    });
-
-    // Jadwal Routes
-    Route::prefix('jadwal')->group(function () {
-        Route::get('/', [JadwalController::class, 'index']);
-        Route::post('/', [JadwalController::class, 'store']);
-        Route::get('/{id}', [JadwalController::class, 'show']);
-        Route::put('/{id}', [JadwalController::class, 'update']);
-        Route::delete('/{id}', [JadwalController::class, 'destroy']);
-        Route::get('/kelas/{kelasId}', [JadwalController::class, 'byKelas']);
-        Route::get('/guru/{guruId}', [JadwalController::class, 'byGuru']);
-        Route::get('/hari/{hari}', [JadwalController::class, 'byHari']);
-    });
-
 });

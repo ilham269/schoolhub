@@ -11,22 +11,25 @@ Frontend Vue.js untuk sistem manajemen sekolah dengan backend Laravel.
 ## Setup & Installation
 
 1. **Install dependencies**
+
    ```bash
    npm install --legacy-peer-deps
    ```
 
 2. **Konfigurasi Environment**
-   
+
    Edit file `.env` dan sesuaikan URL backend Laravel:
+
    ```env
    VITE_API_BASE_URL=http://localhost:8000
    ```
 
 3. **Jalankan Development Server**
+
    ```bash
    npm run dev
    ```
-   
+
    Aplikasi akan berjalan di http://localhost:5173
 
 ## Koneksi ke Backend Laravel
@@ -38,22 +41,22 @@ Pastikan Laravel backend sudah dikonfigurasi untuk menerima request dari fronten
 ```php
 return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
-    
+
     'allowed_methods' => ['*'],
-    
+
     'allowed_origins' => [
         'http://localhost:5173', // Vue dev server
         'http://127.0.0.1:5173',
     ],
-    
+
     'allowed_origins_patterns' => [],
-    
+
     'allowed_headers' => ['*'],
-    
+
     'exposed_headers' => [],
-    
+
     'max_age' => 0,
-    
+
     'supports_credentials' => true,
 ];
 ```

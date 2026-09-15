@@ -60,6 +60,29 @@ class AuthController extends Controller
             'schoolhub-token'
         )->plainTextToken;
 
+        // Load relasi sesuai role
+        $relations = [];
+        $role = strtolower($user->role);
+        
+        switch ($role) {
+            case 'murid':
+                $relations = ['murid', 'calonSiswa'];
+                break;
+            case 'guru':
+                $relations = ['guru'];
+                break;
+            case 'karyawan':
+                $relations = ['karyawan'];
+                break;
+            case 'calon_siswa':
+                $relations = ['calonSiswa'];
+                break;
+        }
+        
+        if (!empty($relations)) {
+            $user->load($relations);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Login berhasil.',
