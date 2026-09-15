@@ -12,15 +12,26 @@ class Murid extends Model
 
     protected $fillable = [
         'user_id',
-        'Kelas_id',
+        'kelas_id',
         'nis',
         'Nama_lengkap_murid',
         'gambar_murid',
         'gender',
         'tanggal_lahir',
+        'tempat_lahir',
         'alamat',
         'nomor_telepon',
         'nama_orangtua',
+        'nama_ayah',
+        'nama_ibu',
+        'pekerjaan_ayah',
+        'pekerjaan_ibu',
+        'nomor_telepon_ortu',
+        'agama',
+        'anak_ke',
+        'jumlah_saudara',
+        'hobi',
+        'cita_cita',
     ];
 
     protected function casts(): array
@@ -28,6 +39,18 @@ class Murid extends Model
         return [
             'tanggal_lahir' => 'date',
         ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Accessors & Mutators
+    |--------------------------------------------------------------------------
+    */
+
+    // Accessor untuk nama_lengkap_murid (lowercase)
+    public function getNamaLengkapMuridAttribute()
+    {
+        return $this->attributes['Nama_lengkap_murid'] ?? null;
     }
 
     /*

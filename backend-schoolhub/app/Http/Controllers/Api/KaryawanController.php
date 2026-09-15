@@ -33,14 +33,15 @@ class KaryawanController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'nip' => 'nullable|string|unique:karyawans,nip',
+            'nip' => 'required|string|unique:karyawans,nip',
             'nama_lengkap_karyawan' => 'required|string|max:255',
             'bagian' => 'required|string|max:100',
-            'nomor_telepon' => 'nullable|string|max:20',
-            'alamat' => 'nullable|string',
+            'nomor_telepon' => 'required|string|max:20',
+            'alamat' => 'required|string',
+            'tanggal_lahir' => 'nullable|date',
+            'gender' => 'nullable|in:L,P',
         ]);
 
         if ($validator->fails()) {
@@ -55,7 +56,7 @@ class KaryawanController extends Controller
         try {
             // Create user
             $user = User::create([
-                'name' => $request->name,
+                'name' => $request->nama_lengkap_karyawan,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'Karyawan',
@@ -125,14 +126,15 @@ class KaryawanController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $karyawan->user_id,
             'password' => 'sometimes|string|min:8',
-            'nip' => 'nullable|string|unique:karyawans,nip,' . $karyawan->id,
+            'nip' => 'sometimes|string|unique:karyawans,nip,' . $karyawan->id,
             'nama_lengkap_karyawan' => 'sometimes|string|max:255',
             'bagian' => 'sometimes|string|max:100',
-            'nomor_telepon' => 'nullable|string|max:20',
-            'alamat' => 'nullable|string',
+            'nomor_telepon' => 'sometimes|string|max:20',
+            'alamat' => 'sometimes|string',
+            'tanggal_lahir' => 'nullable|date',
+            'gender' => 'nullable|in:L,P',
         ]);
 
         if ($validator->fails()) {
@@ -147,9 +149,9 @@ class KaryawanController extends Controller
         try {
             // Update user
             $userData = [];
-            if ($request->has('name')) $userData['name'] = $request->name;
+            if ($request->has('nama_lengkap_karyawan')) $userData['name'] = $request->nama_lengkap_karyawan;
             if ($request->has('email')) $userData['email'] = $request->email;
-            if ($request->has('password')) $userData['password'] = Hash::make($request->password);
+            if ($request->filled('password')) $userData['password'] = Hash::make($request->password);
 
             if (!empty($userData)) {
                 $karyawan->user->update($userData);
