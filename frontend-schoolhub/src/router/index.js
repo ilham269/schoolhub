@@ -42,6 +42,24 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'admin' },
     },
     {
+      path: '/dashboard/admin/guru',
+      name: 'admin_guru',
+      component: () => import('../views/admin/GuruManagement.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/dashboard/admin/murid',
+      name: 'admin_murid',
+      component: () => import('../views/admin/MuridManagement.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/dashboard/admin/karyawan',
+      name: 'admin_karyawan',
+      component: () => import('../views/admin/KaryawanManagement.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
       path: '/dashboard/casis',
       name: 'dashboard_casis',
       component: () => import('../views/casis/CalonSiswaDashboard.vue'),

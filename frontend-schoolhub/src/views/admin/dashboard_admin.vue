@@ -22,9 +22,9 @@ import DashboardMetrics from '../../components/dashboard/DashboardMetrics.vue'
 import DashboardFeatureGrid from '../../components/dashboard/DashboardFeatureGrid.vue'
 const adminItems = [
   ['Kelola User', 'fas fa-users', 'akun pengguna'],
-  ['Kelola Siswa', 'fas fa-user-graduate', 'data siswa'],
-  ['Kelola Guru', 'fas fa-chalkboard-user', 'data guru'],
-  ['Kelola Karyawan', 'fas fa-id-card', 'data karyawan'],
+  ['Kelola Siswa', 'fas fa-user-graduate', 'murid'],
+  ['Kelola Guru', 'fas fa-chalkboard-user', 'guru'],
+  ['Kelola Karyawan', 'fas fa-id-card', 'karyawan'],
   ['Kelola Kelas', 'fas fa-school', 'kelas'],
   ['Kelola Mata Pelajaran', 'fas fa-book-open', 'mata pelajaran'],
   ['Kelola Ujian', 'fas fa-file-circle-check', 'ujian'],
