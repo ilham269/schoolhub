@@ -177,4 +177,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/jurusan/{jurusan}', [KelasController::class, 'byJurusan']);
         Route::get('/tingkat/{tingkat}', [KelasController::class, 'byTingkat']);
     });
+
+    // Keuangan Routes (Karyawan & Admin)
+    Route::prefix('keuangan')->middleware('role:karyawan,Admin')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [\App\Http\Controllers\Api\KeuanganController::class, 'dashboard']);
+        
+        // Tagihan SPP Management
+        Route::get('/tagihan', [\App\Http\Controllers\Api\KeuanganController::class, 'getTagihanSpp']);
+        Route::post('/tagihan', [\App\Http\Controllers\Api\KeuanganController::class, 'createTagihan']);
+        Route::put('/tagihan/{id}', [\App\Http\Controllers\Api\KeuanganController::class, 'updateTagihan']);
+        Route::delete('/tagihan/{id}', [\App\Http\Controllers\Api\KeuanganController::class, 'deleteTagihan']);
+        
+        // Slip Gaji Management
+        Route::get('/slip-gaji', [\App\Http\Controllers\Api\KeuanganController::class, 'getSlipGaji']);
+        Route::post('/slip-gaji', [\App\Http\Controllers\Api\KeuanganController::class, 'createSlipGaji']);
+        Route::put('/slip-gaji/{id}', [\App\Http\Controllers\Api\KeuanganController::class, 'updateSlipGaji']);
+        Route::post('/slip-gaji/{id}/approve', [\App\Http\Controllers\Api\KeuanganController::class, 'approveSlipGaji']);
+        Route::post('/slip-gaji/{id}/mark-paid', [\App\Http\Controllers\Api\KeuanganController::class, 'markAsPaid']);
+        Route::delete('/slip-gaji/{id}', [\App\Http\Controllers\Api\KeuanganController::class, 'deleteSlipGaji']);
+    });
 });

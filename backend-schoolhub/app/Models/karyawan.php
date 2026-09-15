@@ -31,4 +31,20 @@ class Karyawan extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the slip gaji for the karyawan.
+     */
+    public function slipGajis()
+    {
+        return $this->hasMany(SlipGaji::class, 'karyawan_id');
+    }
+
+    /**
+     * Get slip gaji by periode.
+     */
+    public function slipGajiByPeriode(string $periode)
+    {
+        return $this->slipGajis()->where('periode', $periode)->first();
+    }
 }

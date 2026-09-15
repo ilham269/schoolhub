@@ -69,9 +69,33 @@ class Murid extends Model
     }
     public function pengumpulanTugas()
     {
-    return $this->hasMany(
-        PengumpulanTugas::class,
-        'murid_id'
-    );
+        return $this->hasMany(
+            PengumpulanTugas::class,
+            'murid_id'
+        );
+    }
+
+    /**
+     * Get the tagihan SPP for the murid.
+     */
+    public function tagihanSpps()
+    {
+        return $this->hasMany(TagihanSpp::class, 'murid_id');
+    }
+
+    /**
+     * Get unpaid tagihan SPP.
+     */
+    public function tagihanUnpaid()
+    {
+        return $this->tagihanSpps()->where('status', 'UNPAID');
+    }
+
+    /**
+     * Get lunas tagihan SPP.
+     */
+    public function tagihanLunas()
+    {
+        return $this->tagihanSpps()->where('status', 'LUNAS');
     }
 }

@@ -85,9 +85,33 @@ class User extends Authenticatable
 
     public function news()
     {
-    return $this->hasMany(
-        News::class,
-        'created_by'
-    );
+        return $this->hasMany(
+            News::class,
+            'created_by'
+        );
+    }
+
+    /**
+     * Get tagihan SPP created by this user.
+     */
+    public function tagihanSppsCreated()
+    {
+        return $this->hasMany(TagihanSpp::class, 'created_by');
+    }
+
+    /**
+     * Get slip gaji created by this user.
+     */
+    public function slipGajisCreated()
+    {
+        return $this->hasMany(SlipGaji::class, 'dibuat_oleh');
+    }
+
+    /**
+     * Get slip gaji approved by this user.
+     */
+    public function slipGajisApproved()
+    {
+        return $this->hasMany(SlipGaji::class, 'approved_oleh');
     }
 }
