@@ -9,7 +9,7 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       redirect: () => {
-        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        const user = JSON.parse(sessionStorage.getItem('user') || '{}')
         const role = user.role?.toLowerCase()
 
         switch (role) {
@@ -169,8 +169,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const token = localStorage.getItem('token')
-  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  const token = sessionStorage.getItem('token')
+  const user = JSON.parse(sessionStorage.getItem('user') || '{}')
   const userRole = user.role?.toLowerCase()
 
   if (to.meta.requiresAuth && !token) {
