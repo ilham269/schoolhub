@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Contracts\PaymentGatewayInterface;
 use App\Services\MidtransService;
+use App\Models\TagihanSpp;
+use App\Policies\TagihanSppPolicy;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +28,6 @@ public function register(): void
      */
     public function boot(): void
     {
-        //
+        Gate::policy(TagihanSpp::class, TagihanSppPolicy::class);
     }
 }

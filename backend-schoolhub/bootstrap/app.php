@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->validateCsrfTokens(except: ['api/payment/callback']);
         // Register custom middleware aliases
         $middleware->alias([
             'rate_limit_exam' => \App\Http\Middleware\RateLimitExamActions::class,

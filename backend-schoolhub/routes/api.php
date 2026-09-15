@@ -12,6 +12,10 @@ use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PpdbController;
+use App\Http\Controllers\Api\PaymentCallbackController;
+
+// No session/auth middleware: notification is sent server-to-server by Midtrans.
+Route::post('/payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
 
 Route::get('/user', function (Request $request) {
     return $request->user();
