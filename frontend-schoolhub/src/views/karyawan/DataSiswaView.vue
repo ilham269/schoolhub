@@ -552,7 +552,15 @@ const loadSiswa = async () => {
     }
   } catch (err) {
     console.error('Error loading siswa:', err)
-    error.value = err.response?.data?.message || 'Gagal memuat data siswa'
+    if (err.response?.status === 401) {
+      error.value = 'Sesi Anda telah berakhir. Silakan login kembali.'
+      setTimeout(() => {
+        sessionStorage.clear()
+        window.location.href = '/login'
+      }, 2000)
+    } else {
+      error.value = err.response?.data?.message || 'Gagal memuat data siswa'
+    }
   } finally {
     loading.value = false
   }
@@ -566,6 +574,10 @@ const loadKelas = async () => {
     }
   } catch (err) {
     console.error('Error loading kelas:', err)
+    if (err.response?.status === 401) {
+      // Token expired, akan redirect otomatis
+      return
+    }
   }
 }
 

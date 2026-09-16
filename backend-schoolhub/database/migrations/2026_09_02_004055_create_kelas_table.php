@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('kelas');
             $table->string('jurusan')->nullable();
             $table->string('angkatan')->nullable();
+            $table->foreignId('wali_kelas')->nullable()->constrained('users')->onDelete('set null');
+            $table->integer('kapasitas')->default(36)->comment('Daya tampung kelas');
             $table->timestamps();
         });
     }

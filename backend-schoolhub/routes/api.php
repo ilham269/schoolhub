@@ -41,9 +41,6 @@ Route::prefix('auth')->group(function () {
 Route::prefix('public')->group(function () {
     Route::post('/ppdb/register', [PpdbController::class, 'register']);
     
-    // Public Guru Route (Mengatasi error 404 di HomeView.vue)
-    Route::get('/guru', [GuruController::class, 'index']);
-
     // Pengumuman
     Route::get('/pengumuman', [PengumumanController::class, 'published']);
     Route::get('/pengumuman/{id}', [PengumumanController::class, 'show']);

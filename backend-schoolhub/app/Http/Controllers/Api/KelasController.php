@@ -15,7 +15,19 @@ class KelasController extends Controller
      */
     public function index(): JsonResponse
     {
-        $kelas = Kelas::with('murids')->get();
+        $kelas = Kelas::with(['murids', 'waliKelas'])->get()->map(function ($k) {
+            return [
+                'id' => $k->id,
+                'name' => $k->name,
+                'kelas' => $k->kelas,
+                'jurusan' => $k->jurusan,
+                'angkatan' => $k->angkatan,
+                'wali_kelas' => $k->waliKelas ? $k->waliKelas->name : null,
+                'wali_kelas_id' => $k->wali_kelas,
+                'kapasitas' => $k->kapasitas ?? 36,
+                'jumlah_siswa' => $k->murids->count(),
+            ];
+        });
 
         return response()->json([
             'success' => true,
@@ -34,6 +46,8 @@ class KelasController extends Controller
             'kelas' => 'required|string|max:10',
             'jurusan' => 'required|string|max:50',
             'angkatan' => 'required|integer|min:2000|max:2100',
+            'wali_kelas' => 'nullable|exists:users,id',
+            'kapasitas' => 'nullable|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -45,11 +59,22 @@ class KelasController extends Controller
         }
 
         $kelas = Kelas::create($request->all());
+        $kelas->load(['murids', 'waliKelas']);
 
         return response()->json([
             'success' => true,
             'message' => 'Kelas berhasil ditambahkan',
-            'data' => $kelas,
+            'data' => [
+                'id' => $kelas->id,
+                'name' => $kelas->name,
+                'kelas' => $kelas->kelas,
+                'jurusan' => $kelas->jurusan,
+                'angkatan' => $kelas->angkatan,
+                'wali_kelas' => $kelas->waliKelas ? $kelas->waliKelas->name : null,
+                'wali_kelas_id' => $kelas->wali_kelas,
+                'kapasitas' => $kelas->kapasitas ?? 36,
+                'jumlah_siswa' => $kelas->murids->count(),
+            ],
         ], 201);
     }
 
@@ -93,6 +118,8 @@ class KelasController extends Controller
             'kelas' => 'sometimes|string|max:10',
             'jurusan' => 'sometimes|string|max:50',
             'angkatan' => 'sometimes|integer|min:2000|max:2100',
+            'wali_kelas' => 'nullable|exists:users,id',
+            'kapasitas' => 'nullable|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -104,11 +131,22 @@ class KelasController extends Controller
         }
 
         $kelas->update($request->all());
+        $kelas->load(['murids', 'waliKelas']);
 
         return response()->json([
             'success' => true,
             'message' => 'Kelas berhasil diupdate',
-            'data' => $kelas,
+            'data' => [
+                'id' => $kelas->id,
+                'name' => $kelas->name,
+                'kelas' => $kelas->kelas,
+                'jurusan' => $kelas->jurusan,
+                'angkatan' => $kelas->angkatan,
+                'wali_kelas' => $kelas->waliKelas ? $kelas->waliKelas->name : null,
+                'wali_kelas_id' => $kelas->wali_kelas,
+                'kapasitas' => $kelas->kapasitas ?? 36,
+                'jumlah_siswa' => $kelas->murids->count(),
+            ],
         ]);
     }
 

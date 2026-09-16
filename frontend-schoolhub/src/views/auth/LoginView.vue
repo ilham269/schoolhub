@@ -71,14 +71,23 @@ const login = async (type) => {
     // Extract data from response
     const { user, token } = result.data
 
+    // Log untuk debugging
+    console.log('Login successful!')
+    console.log('Token received:', token ? 'YES' : 'NO')
+    console.log('User:', user?.name, 'Role:', user?.role)
+
     // Token hanya hidup selama browser session; jangan simpan di persistent storage.
     if (token) {
       sessionStorage.setItem('token', token)
+      console.log('✅ Token saved to sessionStorage')
+    } else {
+      console.error('❌ No token received from server!')
     }
 
     // Data UI mengikuti masa hidup token.
     if (user) {
       sessionStorage.setItem('user', JSON.stringify(user))
+      console.log('✅ User saved to sessionStorage')
     }
 
     // Bersihkan token lama yang mungkin tersisa dari versi sebelumnya.
@@ -88,6 +97,17 @@ const login = async (type) => {
     // Redirect berdasarkan role
     const role = user?.role?.toLowerCase()
 
+    // Cek apakah ada intended URL dari sebelumnya
+    const intendedUrl = sessionStorage.getItem('intendedUrl')
+    if (intendedUrl) {
+      sessionStorage.removeItem('intendedUrl')
+      console.log('Redirecting to intended URL:', intendedUrl)
+      router.push(intendedUrl)
+      return
+    }
+
+    // Default redirect berdasarkan role
+    console.log('Redirecting based on role:', role)
     switch (role) {
       case 'admin':
         router.push('/dashboard/admin')

@@ -16,6 +16,8 @@ class Kelas extends Model
         'kelas',
         'jurusan',
         'angkatan',
+        'wali_kelas',
+        'kapasitas',
     ];
 
     // Satu kelas mempunyai banyak murid
@@ -23,6 +25,13 @@ class Kelas extends Model
     {
         return $this->hasMany(Murid::class, 'kelas_id');
     }
+    
+    // Relasi ke user wali kelas
+    public function waliKelas()
+    {
+        return $this->belongsTo(User::class, 'wali_kelas');
+    }
+
     public function jadwals()
     {
         return $this->hasMany(Jadwal::class, 'kelas_id');

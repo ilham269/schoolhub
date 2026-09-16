@@ -21,7 +21,7 @@
       </UiCard>
       <UiCard>
         <p class="text-sm text-slate-400">Jurusan aktif</p>
-        <p class="mt-1 text-3xl font-semibold text-slate-800">{{ jurusanOptions.length }}</p>
+        <p class="mt-1 text-3xl font-semibold text-slate-800">{{ jurusanFilterOptions.length }}</p>
         <div class="mt-2 flex gap-1.5">
           <UiBadge v-for="j in jurusanFilterOptions" :key="j.value" :variant="jurusanTone[j.value]">{{ j.label }}</UiBadge>
         </div>
@@ -135,7 +135,8 @@
         <UiInput v-model="form.angkatan" label="Angkatan" type="number" placeholder="2026" :error="errors.angkatan" required />
         <UiInput v-model="form.kapasitas" label="Daya tampung" type="number" hint="Jumlah kursi maksimal" :error="errors.kapasitas" />
         <div class="sm:col-span-2">
-          <UiInput v-model="form.wali_kelas" label="Wali kelas" placeholder="Contoh: Ahmad Fauzi, S.Pd" />
+          <UiSelect v-model="form.wali_kelas" label="Wali kelas" :options="waliKelasOptions"
+                    :placeholder="guruLoading ? 'Memuat daftar guru...' : 'Pilih wali kelas'" />
         </div>
       </form>
 
@@ -193,10 +194,10 @@ import UiPagination from '@/components/ui/UiPagination.vue'
 import UiProgress from '@/components/ui/UiProgress.vue'
 import UiDropdown from '@/components/ui/UiDropdown.vue'
 import UiDropdownItem from '@/components/ui/UiDropdownItem.vue'
-import { useKelas } from '@/composables/useKelas'
+import { kelasApi } from '@/services/kelasApi'
+import { guruApi } from '@/services/guruApi'
 
-// Menu sama persis seperti di dashboard_guru.vue, supaya sidebar konsisten
-// di semua halaman portal guru.
+// Menu sama persis seperti di dashboard_guru.vue.
 const navigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/guru' },
   { label: 'Data Kelas', icon: 'fas fa-users', to: '/dashboard/guru/kelas' },
@@ -205,7 +206,70 @@ const navigation = [
   { label: 'Ujian PPDB & Soal', icon: 'fas fa-file-circle-check', to: '/dashboard/guru/ujian-ppdb' },
 ]
 
-const { items, loading, error, fetchAll, store, update, destroy } = useKelas()
+/* =====================================================================
+   Semua data di bawah ini diambil LANGSUNG dari API Laravel (kelasApi,
+   guruApi) yang membaca tabel MySQL `kelas` dan `gurus`. Tidak ada lagi
+   data mock atau lapisan composable — request dan pengelolaan state
+   dilakukan langsung di komponen ini.
+   ===================================================================== */
+
+const items = ref([])
+const loading = ref(false)
+const error = ref('')
+
+const fetchAll = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    // Log untuk debugging
+    const token = sessionStorage.getItem('token')
+    console.log('Fetching kelas... Token exists:', token ? 'YES' : 'NO')
+    
+    const res = await kelasApi.list()
+    items.value = res.data ?? res
+    console.log('✅ Kelas data loaded:', items.value.length, 'items')
+  } catch (e) {
+    console.error('❌ Error fetching kelas:', e)
+    if (e.response?.status === 401) {
+      error.value = 'Sesi Anda telah berakhir. Silakan login kembali.'
+      console.error('401 Unauthorized - Token might be expired or invalid')
+      // Jangan langsung redirect, biarkan user lihat error message dulu
+      // Redirect dilakukan oleh interceptor di api.js
+    } else {
+      error.value = e.response?.data?.message ?? 'Data kelas gagal dimuat dari server. Periksa koneksi API.'
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+/* ---------- daftar guru untuk pilihan wali kelas ---------- */
+const guruList = ref([])
+const guruLoading = ref(false)
+const fetchGuru = async () => {
+  guruLoading.value = true
+  try {
+    console.log('Fetching guru list...')
+    const res = await guruApi.list()
+    guruList.value = res.data ?? res
+    console.log('✅ Guru data loaded:', guruList.value.length, 'gurus')
+  } catch (e) {
+    console.error('❌ Error fetching guru:', e)
+    if (e.response?.status === 401) {
+      console.error('401 Unauthorized when fetching guru')
+      // Interceptor will handle redirect
+      return
+    }
+    // Tidak menghentikan halaman kalau daftar guru gagal dimuat,
+    // wali kelas cukup dibiarkan kosong dulu.
+    guruList.value = []
+  } finally {
+    guruLoading.value = false
+  }
+}
+const waliKelasOptions = computed(() =>
+  guruList.value.map((g) => ({ value: g.user_id, label: g.nama ?? g.nama_lengkap_guru })),
+)
 
 /* ---------- opsi form ---------- */
 const tingkatOptions = [
@@ -305,7 +369,14 @@ const openCreate = () => { editingId.value = null; resetForm(); formOpen.value =
 const openEdit = (row) => {
   editingId.value = row.id
   resetForm()
-  Object.assign(form, { ...row })
+  Object.assign(form, {
+    name: row.name,
+    kelas: row.kelas,
+    jurusan: row.jurusan,
+    angkatan: row.angkatan,
+    wali_kelas: row.wali_kelas_id || row.wali_kelas, // Use wali_kelas_id (user ID)
+    kapasitas: row.kapasitas,
+  })
   formOpen.value = true
 }
 
@@ -337,14 +408,17 @@ const submit = async () => {
       kelas: form.kelas,
       jurusan: form.jurusan,
       angkatan: Number(form.angkatan),
-      wali_kelas: form.wali_kelas.trim(),
+      wali_kelas: form.wali_kelas,
       kapasitas: Number(form.kapasitas),
     }
     if (editingId.value) {
-      await update(editingId.value, payload)
+      const updated = await kelasApi.update(editingId.value, payload)
+      const i = items.value.findIndex((k) => k.id === editingId.value)
+      items.value[i] = updated.data ?? updated
       notify('success', `Kelas ${payload.name} diperbarui.`)
     } else {
-      await store(payload)
+      const created = await kelasApi.create(payload)
+      items.value.unshift(created.data ?? created)
       notify('success', `Kelas ${payload.name} ditambahkan.`)
     }
     formOpen.value = false
@@ -355,6 +429,7 @@ const submit = async () => {
   }
 }
 
+/* ---------- detail & hapus ---------- */
 const detail = ref(null)
 const detailOpen = ref(false)
 const openDetail = (row) => { detail.value = row; detailOpen.value = true }
@@ -366,17 +441,19 @@ const askDelete = (row) => { deleteTarget.value = row; deleteOpen.value = true }
 const confirmDelete = async () => {
   deleting.value = true
   try {
-    await destroy(deleteTarget.value.id)
+    await kelasApi.remove(deleteTarget.value.id)
+    items.value = items.value.filter((k) => k.id !== deleteTarget.value.id)
     notify('success', `Kelas ${deleteTarget.value.name} dihapus.`)
     deleteOpen.value = false
     if (page.value > 1 && !paged.value.length) page.value--
   } catch (e) {
-    notify('danger', 'Kelas gagal dihapus. Coba lagi.')
+    notify('danger', e.response?.data?.message ?? 'Kelas gagal dihapus. Coba lagi.')
   } finally {
     deleting.value = false
   }
 }
 
+/* ---------- notifikasi ---------- */
 const alert = reactive({ show: false, type: 'success', message: '' })
 let alertTimer
 const notify = (type, message) => {
@@ -398,5 +475,8 @@ const exportCsv = () => {
   notify('success', 'Data kelas diunduh sebagai CSV.')
 }
 
-onMounted(fetchAll)
+onMounted(() => {
+  fetchAll()
+  fetchGuru()
+})
 </script>

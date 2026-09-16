@@ -17,7 +17,7 @@
     <div class="container">
       <router-link class="brand" to="/">
         <span class="brand-mark">HB</span>
-        SMA Harapan Bangsa
+        SMK Harapan Bangsa
       </router-link>
       <nav>
         <ul class="nav-links" :class="{ open: isMenuOpen }">

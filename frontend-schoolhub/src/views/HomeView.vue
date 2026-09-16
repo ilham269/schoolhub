@@ -2,129 +2,272 @@
   <div class="home-view">
     <Navbar />
 
+    <!-- =========================
+         HERO
+    ========================== -->
     <section class="hero">
       <div class="container">
         <p
           class="eyebrow-dot"
           v-motion
           :initial="{ opacity: 0, y: -20 }"
-          :enter="{ opacity: 1, y: 0, transition: { duration: 600 } }"
+          :enter="{
+            opacity: 1,
+            y: 0,
+            transition: { duration: 600 }
+          }"
         >
-          Selamat Datang di SMA Harapan Bangsa
+          Selamat Datang di SMK harapan Bangsa
         </p>
+
         <h1
           v-motion
           :initial="{ opacity: 0, y: 30 }"
-          :enter="{ opacity: 1, y: 0, transition: { duration: 600, delay: 150 } }"
+          :enter="{
+            opacity: 1,
+            y: 0,
+            transition: {
+              duration: 600,
+              delay: 150
+            }
+          }"
         >
-          Memimpin Jalan Menuju Pendidikan Tinggi Berkualitas
+          {{ home.school.hero_title }}
         </h1>
+
         <p
           v-motion
           :initial="{ opacity: 0, y: 30 }"
-          :enter="{ opacity: 1, y: 0, transition: { duration: 600, delay: 300 } }"
+          :enter="{
+            opacity: 1,
+            y: 0,
+            transition: {
+              duration: 600,
+              delay: 300
+            }
+          }"
         >
-          Tempat keunggulan akademik bertemu dengan pembentukan karakter, membekali setiap siswa
-          untuk masa depan yang mereka pilih sendiri.
+          {{ home.school.hero_description }}
         </p>
+
         <div
           class="hero-cta"
           v-motion
           :initial="{ opacity: 0, scale: 0.9 }"
-          :enter="{ opacity: 1, scale: 1, transition: { duration: 500, delay: 450 } }"
+          :enter="{
+            opacity: 1,
+            scale: 1,
+            transition: {
+              duration: 500,
+              delay: 450
+            }
+          }"
         >
-          <router-link class="btn btn-primary" to="/profil">Selengkapnya &rarr;</router-link>
-          <router-link class="btn btn-outline-light" to="/ppdb">Info PPDB</router-link>
+          <router-link
+            class="btn btn-primary"
+            to="/profil"
+          >
+            Selengkapnya &rarr;
+          </router-link>
+
+          <router-link
+            class="btn btn-outline-light"
+            to="/ppdb"
+          >
+            Info PPDB
+          </router-link>
         </div>
       </div>
     </section>
 
+    <!-- =========================
+         FEATURE
+    ========================== -->
     <div class="container">
       <div class="feature-row">
         <div
           class="feature-card hi"
           v-motion
           :initial="{ opacity: 0, y: 50 }"
-          :visible-once="{ opacity: 1, y: 0, transition: { duration: 500 } }"
+          :visible-once="{
+            opacity: 1,
+            y: 0,
+            transition: { duration: 500 }
+          }"
         >
           <div class="feature-icon">&#128218;</div>
-          <h3>Perpustakaan &amp; Buku</h3>
-          <p>Koleksi lebih dari 12.000 judul buku fisik dan digital untuk menunjang riset siswa.</p>
-        </div>
-        <div
-          class="feature-card"
-          v-motion
-          :initial="{ opacity: 0, y: 50 }"
-          :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 100 } }"
-        >
-          <div class="feature-icon">&#127891;</div>
-          <h3>Pengajar Berpengalaman</h3>
-          <p>Tenaga pendidik tersertifikasi dengan rata-rata 10 tahun pengalaman mengajar.</p>
-        </div>
-        <div
-          class="feature-card"
-          v-motion
-          :initial="{ opacity: 0, y: 50 }"
-          :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 200 } }"
-        >
-          <div class="feature-icon">&#127942;</div>
-          <h3>Beasiswa Prestasi</h3>
+
+          <h3>
+            Perpustakaan &amp; Buku
+          </h3>
+
           <p>
-            Program beasiswa penuh dan sebagian bagi siswa berprestasi akademik maupun non-akademik.
+            Koleksi lebih dari 12.000 judul buku fisik
+            dan digital untuk menunjang riset siswa.
           </p>
         </div>
+
         <div
           class="feature-card"
           v-motion
           :initial="{ opacity: 0, y: 50 }"
-          :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 300 } }"
+          :visible-once="{
+            opacity: 1,
+            y: 0,
+            transition: {
+              duration: 500,
+              delay: 100
+            }
+          }"
+        >
+          <div class="feature-icon">&#127891;</div>
+
+          <h3>
+            Pengajar Berpengalaman
+          </h3>
+
+          <p>
+            Tenaga pendidik tersertifikasi dengan rata-rata
+            10 tahun pengalaman mengajar.
+          </p>
+        </div>
+
+        <div
+          class="feature-card"
+          v-motion
+          :initial="{ opacity: 0, y: 50 }"
+          :visible-once="{
+            opacity: 1,
+            y: 0,
+            transition: {
+              duration: 500,
+              delay: 200
+            }
+          }"
+        >
+          <div class="feature-icon">&#127942;</div>
+
+          <h3>
+            Beasiswa Prestasi
+          </h3>
+
+          <p>
+            Program beasiswa penuh dan sebagian bagi siswa
+            berprestasi akademik maupun non-akademik.
+          </p>
+        </div>
+
+        <div
+          class="feature-card"
+          v-motion
+          :initial="{ opacity: 0, y: 50 }"
+          :visible-once="{
+            opacity: 1,
+            y: 0,
+            transition: {
+              duration: 500,
+              delay: 300
+            }
+          }"
         >
           <div class="feature-icon">&#128179;</div>
-          <h3>Pembayaran Daring</h3>
+
+          <h3>
+            Pembayaran Daring
+          </h3>
+
           <p>
-            Gerbang pembayaran SPP dan biaya sekolah yang aman, cepat, dan dapat dipantau orang tua.
+            Gerbang pembayaran SPP dan biaya sekolah yang
+            aman, cepat, dan dapat dipantau orang tua.
           </p>
         </div>
       </div>
     </div>
 
+    <!-- =========================
+         ABOUT
+    ========================== -->
     <section class="section">
       <div class="container split">
         <div
           v-motion
           :initial="{ opacity: 0, x: -50 }"
-          :visible-once="{ opacity: 1, x: 0, transition: { duration: 700 } }"
+          :visible-once="{
+            opacity: 1,
+            x: 0,
+            transition: { duration: 700 }
+          }"
         >
           <img
-            src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=900&auto=format&fit=crop"
-            alt="Siswa lulusan SMA Harapan Bangsa"
+            :src="home.school.about_image"
+            :alt="`Siswa ${home.school.name}`"
           />
         </div>
+
         <div
           v-motion
           :initial="{ opacity: 0, x: 50 }"
-          :visible-once="{ opacity: 1, x: 0, transition: { duration: 700 } }"
+          :visible-once="{
+            opacity: 1,
+            x: 0,
+            transition: { duration: 700 }
+          }"
         >
-          <p class="eyebrow-dot dark">Tentang Sekolah Kami</p>
-          <h2>Kami Akan Memberikan Masa Depan Untukmu</h2>
-          <p>
-            Sudah menjadi kepercayaan luas bahwa pembaca akan teralihkan oleh isi bacaan yang mudah
-            dibaca dan menarik, dibandingkan hanya melihat tata letaknya. Di SMA Harapan Bangsa,
-            kami memadukan kurikulum nasional dengan pendekatan pembelajaran berbasis proyek.
+          <p class="eyebrow-dot dark">
+            Tentang Sekolah Kami
           </p>
+
+          <h2>
+            {{ home.school.about_title }}
+          </h2>
+
           <p>
-            Kami percaya setiap siswa memiliki potensi unik. Karena itu, kami menyediakan ruang
-            eksplorasi minat lewat lebih dari 20 ekstrakurikuler dan kelas peminatan sejak kelas 10.
+            {{ home.school.about_description }}
           </p>
+
+          <p v-if="home.school.about_description_2">
+            {{ home.school.about_description_2 }}
+          </p>
+
+          <!-- Statistik dari backend -->
           <div class="stat-row">
-            <div class="stat"><b>1.240+</b><span>Siswa Aktif</span></div>
-            <div class="stat"><b>86</b><span>Tenaga Pengajar</span></div>
-            <div class="stat"><b>98%</b><span>Kelulusan PTN</span></div>
+            <div class="stat">
+              <b>
+                {{ formatNumber(home.statistics.students) }}+
+              </b>
+
+              <span>
+                Siswa Aktif
+              </span>
+            </div>
+
+            <div class="stat">
+              <b>
+                {{ formatNumber(home.statistics.teachers) }}
+              </b>
+
+              <span>
+                Tenaga Pengajar
+              </span>
+            </div>
+
+            <div class="stat">
+              <b>
+                {{ home.statistics.ptn_percentage }}%
+              </b>
+
+              <span>
+                Kelulusan PTN
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- =========================
+         GURU
+    ========================== -->
     <section class="section section-dark">
       <div class="container">
         <p
@@ -132,170 +275,514 @@
           style="text-align: center"
           v-motion
           :initial="{ opacity: 0 }"
-          :visible-once="{ opacity: 1, transition: { duration: 500 } }"
+          :visible-once="{
+            opacity: 1,
+            transition: { duration: 500 }
+          }"
         >
           Guru Kami
         </p>
+
         <h2
           style="text-align: center; margin-bottom: 44px"
           v-motion
           :initial="{ opacity: 0, y: 20 }"
-          :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 100 } }"
+          :visible-once="{
+            opacity: 1,
+            y: 0,
+            transition: {
+              duration: 500,
+              delay: 100
+            }
+          }"
         >
           Kenali Para Pengajar Terbaik Kami
         </h2>
 
-        <div v-if="loadingGuru" style="text-align: center; padding: 40px">
-          <p>Memuat data guru...</p>
-        </div>
-
+        <!-- Loading -->
         <div
-          v-else-if="errorGuru && daftarGuru.length === 0"
-          style="text-align: center; padding: 40px"
+          v-if="loadingGuru"
+          style="
+            text-align: center;
+            padding: 40px;
+          "
         >
-          <p style="color: var(--slate-400)">Data guru belum tersedia saat ini.</p>
+          <p>
+            Memuat data guru...
+          </p>
         </div>
 
-        <div v-else-if="daftarGuru.length > 0" class="people-grid">
+        <!-- Error -->
+        <div
+          v-else-if="
+            errorGuru &&
+            daftarGuru.length === 0
+          "
+          style="
+            text-align: center;
+            padding: 40px;
+          "
+        >
+          <p
+            style="
+              color: var(--slate-400);
+            "
+          >
+            Data guru belum tersedia saat ini.
+          </p>
+        </div>
+
+        <!-- Data guru -->
+        <div
+          v-else-if="daftarGuru.length > 0"
+          class="people-grid"
+        >
           <div
             class="person-card"
             v-for="(guru, index) in daftarGuru.slice(0, 4)"
             :key="guru.id"
             v-motion
-            :initial="{ opacity: 0, scale: 0.8 }"
+            :initial="{
+              opacity: 0,
+              scale: 0.8
+            }"
             :visible-once="{
               opacity: 1,
               scale: 1,
-              transition: { duration: 500, delay: index * 150 },
+              transition: {
+                duration: 500,
+                delay: index * 150
+              }
             }"
           >
-            <div class="photo"><img :src="guru.gambar_guru" :alt="guru.nama_lengkap_guru" /></div>
+            <div class="photo">
+              <img
+                :src="getGuruImage(guru)"
+                :alt="
+                  guru.nama_lengkap_guru ||
+                  guru.nama ||
+                  'Guru'
+                "
+                @error="handleImageError"
+              />
+            </div>
+
             <div class="info">
-              <h4>{{ guru.nama_lengkap_guru }}</h4>
+              <h4>
+                {{
+                  guru.nama_lengkap_guru ||
+                  guru.nama ||
+                  'Nama Guru'
+                }}
+              </h4>
             </div>
           </div>
         </div>
 
-        <div v-else style="text-align: center; padding: 40px">
-          <p style="color: var(--slate-400)">Data guru akan segera ditampilkan.</p>
-        </div>
-
+        <!-- Data kosong -->
         <div
-          style="text-align: center; margin-top: 36px"
-          v-motion
-          :initial="{ opacity: 0 }"
-          :visible-once="{ opacity: 1, transition: { duration: 500, delay: 600 } }"
+          v-else
+          style="
+            text-align: center;
+            padding: 40px;
+          "
         >
-          <router-link class="btn btn-primary" to="/profil">Lihat Semua Guru &rarr;</router-link>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div
-          v-motion
-          :initial="{ opacity: 0, y: 30 }"
-          :visible-once="{ opacity: 1, y: 0, transition: { duration: 600 } }"
-        >
-          <p class="eyebrow-dot dark" style="text-align: center">Temukan Sekolah Kami</p>
-          <h2 style="text-align: center; margin-bottom: 12px">Jenjang &amp; Program Peminatan</h2>
-          <p style="text-align: center; max-width: 560px; margin-inline: auto 36px">
-            Pilih jalur peminatan yang paling sesuai dengan minat dan rencana masa depanmu.
+          <p
+            style="
+              color: var(--slate-400);
+            "
+          >
+            Data guru akan segera ditampilkan.
           </p>
         </div>
 
         <div
-          class="filter-pills"
-          style="justify-content: center; margin-top: 28px"
+          style="
+            text-align: center;
+            margin-top: 36px;
+          "
           v-motion
           :initial="{ opacity: 0 }"
-          :visible-once="{ opacity: 1, transition: { duration: 600, delay: 200 } }"
+          :visible-once="{
+            opacity: 1,
+            transition: {
+              duration: 500,
+              delay: 600
+            }
+          }"
         >
-          <button :class="{ active: activeFilter === 'Semua' }" @click="setFilter('Semua')">
+          <router-link
+            class="btn btn-primary"
+            to="/profil"
+          >
+            Lihat Semua Guru &rarr;
+          </router-link>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================
+         PROGRAM PEMINATAN
+    ========================== -->
+    <section class="section">
+      <div class="container">
+        <div
+          v-motion
+          :initial="{
+            opacity: 0,
+            y: 30
+          }"
+          :visible-once="{
+            opacity: 1,
+            y: 0,
+            transition: {
+              duration: 600
+            }
+          }"
+        >
+          <p
+            class="eyebrow-dot dark"
+            style="text-align: center"
+          >
+            Temukan Sekolah Kami
+          </p>
+
+          <h2
+            style="
+              text-align: center;
+              margin-bottom: 12px;
+            "
+          >
+            Jenjang &amp; Program Peminatan
+          </h2>
+
+          <p
+            style="
+              text-align: center;
+              max-width: 560px;
+              margin-inline: auto 36px;
+            "
+          >
+            Pilih jalur peminatan yang paling sesuai
+            dengan minat dan rencana masa depanmu.
+          </p>
+        </div>
+
+        <!-- Filter -->
+        <div
+          class="filter-pills"
+          style="
+            justify-content: center;
+            margin-top: 28px;
+          "
+          v-motion
+          :initial="{ opacity: 0 }"
+          :visible-once="{
+            opacity: 1,
+            transition: {
+              duration: 600,
+              delay: 200
+            }
+          }"
+        >
+          <button
+            :class="{
+              active: activeFilter === 'Semua'
+            }"
+            @click="setFilter('Semua')"
+          >
             Semua
           </button>
-          <button :class="{ active: activeFilter === 'MIPA' }" @click="setFilter('MIPA')">
+
+          <button
+            :class="{
+              active: activeFilter === 'MIPA'
+            }"
+            @click="setFilter('MIPA')"
+          >
             MIPA
           </button>
-          <button :class="{ active: activeFilter === 'IPS' }" @click="setFilter('IPS')">IPS</button>
-          <button :class="{ active: activeFilter === 'Bahasa' }" @click="setFilter('Bahasa')">
+
+          <button
+            :class="{
+              active: activeFilter === 'IPS'
+            }"
+            @click="setFilter('IPS')"
+          >
+            IPS
+          </button>
+
+          <button
+            :class="{
+              active: activeFilter === 'Bahasa'
+            }"
+            @click="setFilter('Bahasa')"
+          >
             Bahasa
           </button>
         </div>
 
-        <div class="news-grid">
+        <!-- Program dari backend -->
+        <div
+          v-if="loadingPrograms"
+          style="
+            text-align: center;
+            padding: 40px;
+          "
+        >
+          <p>
+            Memuat program peminatan...
+          </p>
+        </div>
+
+        <div
+          v-else-if="filteredPrograms.length > 0"
+          class="news-grid"
+        >
           <div
+            v-for="(program, index) in filteredPrograms"
+            :key="program.id || index"
             class="news-card"
-            v-show="activeFilter === 'Semua' || activeFilter === 'MIPA'"
             v-motion
-            :initial="{ opacity: 0, y: 30 }"
-            :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 100 } }"
+            :initial="{
+              opacity: 0,
+              y: 30
+            }"
+            :visible-once="{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 500,
+                delay: (index + 1) * 100
+              }
+            }"
           >
             <img
-              src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=700&auto=format&fit=crop"
-              alt=""
+              :src="
+                program.gambar ||
+                program.image ||
+                defaultProgramImage
+              "
+              :alt="
+                program.nama ||
+                program.name ||
+                'Program Peminatan'
+              "
+              @error="handleImageError"
             />
+
             <div class="body">
-              <span class="badge badge-green">MIPA</span>
-              <h3 style="font-size: 1.1rem">Sains &amp; Teknologi</h3>
-              <p>Fokus pada matematika, fisika, kimia, dan biologi dengan laboratorium lengkap.</p>
-              <a class="link-arrow" href="#">Pelajari program &rarr;</a>
+              <span
+                class="badge"
+                :class="
+                  getProgramBadgeClass(program.kategori)
+                "
+              >
+                {{
+                  program.kategori ||
+                  program.category ||
+                  'Program'
+                }}
+              </span>
+
+              <h3 style="font-size: 1.1rem">
+                {{
+                  program.nama ||
+                  program.name ||
+                  'Program Peminatan'
+                }}
+              </h3>
+
+              <p>
+                {{
+                  program.deskripsi ||
+                  program.description ||
+                  'Informasi program belum tersedia.'
+                }}
+              </p>
+
+              <router-link
+                class="link-arrow"
+                :to="
+                  program.slug
+                    ? `/program/${program.slug}`
+                    : '/profil'
+                "
+              >
+                Pelajari program &rarr;
+              </router-link>
             </div>
           </div>
+        </div>
+
+        <!-- Fallback jika backend belum menyediakan program -->
+        <div
+          v-else
+          class="news-grid"
+        >
+         
+          <!-- IPS -->
           <div
+            v-show="
+              activeFilter === 'Semua' ||
+              activeFilter === 'IPS'
+            "
             class="news-card"
-            v-show="activeFilter === 'Semua' || activeFilter === 'IPS'"
             v-motion
-            :initial="{ opacity: 0, y: 30 }"
-            :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 200 } }"
+            :initial="{
+              opacity: 0,
+              y: 30
+            }"
+            :visible-once="{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 500,
+                delay: 200
+              }
+            }"
           >
             <img
               src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=700&auto=format&fit=crop"
-              alt=""
+              alt="Program IPS"
             />
+
             <div class="body">
-              <span class="badge badge-amber">IPS</span>
-              <h3 style="font-size: 1.1rem">Ilmu Sosial</h3>
-              <p>Ekonomi, sosiologi, dan geografi untuk memahami dinamika masyarakat.</p>
-              <a class="link-arrow" href="#">Pelajari program &rarr;</a>
+              <span class="badge badge-amber">
+                IPS
+              </span>
+
+              <h3 style="font-size: 1.1rem">
+                Ilmu Sosial
+              </h3>
+
+              <p>
+                Ekonomi, sosiologi, dan geografi untuk
+                memahami dinamika masyarakat.
+              </p>
+
+              <router-link
+                class="link-arrow"
+                to="/profil"
+              >
+                Pelajari program &rarr;
+              </router-link>
             </div>
           </div>
+
+          <!-- Bahasa -->
           <div
+            v-show="
+              activeFilter === 'Semua' ||
+              activeFilter === 'Bahasa'
+            "
             class="news-card"
-            v-show="activeFilter === 'Semua' || activeFilter === 'Bahasa'"
             v-motion
-            :initial="{ opacity: 0, y: 30 }"
-            :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 300 } }"
+            :initial="{
+              opacity: 0,
+              y: 30
+            }"
+            :visible-once="{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 500,
+                delay: 300
+              }
+            }"
           >
             <img
               src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=700&auto=format&fit=crop"
-              alt=""
+              alt="Program Bahasa"
             />
+
             <div class="body">
-              <span class="badge badge-dark">Bahasa</span>
-              <h3 style="font-size: 1.1rem">Bahasa &amp; Budaya</h3>
-              <p>Penguasaan bahasa asing dan sastra untuk komunikasi global.</p>
-              <a class="link-arrow" href="#">Pelajari program &rarr;</a>
+              <span class="badge badge-dark">
+                Bahasa
+              </span>
+
+              <h3 style="font-size: 1.1rem">
+                Bahasa &amp; Budaya
+              </h3>
+
+              <p>
+                Penguasaan bahasa asing dan sastra
+                untuk komunikasi global.
+              </p>
+
+              <router-link
+                class="link-arrow"
+                to="/profil"
+              >
+                Pelajari program &rarr;
+              </router-link>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section-tight" style="background: var(--cream)">
+    <!-- =========================
+         PPDB CTA
+    ========================== -->
+    <section
+      class="section-tight"
+      style="background: var(--cream)"
+    >
       <div
         class="container"
         style="text-align: center"
         v-motion
-        :initial="{ opacity: 0, scale: 0.9 }"
-        :visible-once="{ opacity: 1, scale: 1, transition: { duration: 600 } }"
+        :initial="{
+          opacity: 0,
+          scale: 0.9
+        }"
+        :visible-once="{
+          opacity: 1,
+          scale: 1,
+          transition: {
+            duration: 600
+          }
+        }"
       >
-        <h2>Siap Bergabung dengan Kami?</h2>
-        <p style="max-width: 480px; margin-inline: auto 24px">
-          Pendaftaran siswa baru tahun ajaran 2027/2028 telah dibuka. Amankan kursimu sekarang.
+        <h2>
+          {{
+            home.ppdb.is_open
+              ? 'Siap Bergabung dengan Kami?'
+              : 'Informasi PPDB'
+          }}
+        </h2>
+
+        <p
+          style="
+            max-width: 480px;
+            margin-inline: auto 24px;
+          "
+        >
+          <template v-if="home.ppdb.is_open">
+            Pendaftaran siswa baru tahun ajaran
+            {{ home.ppdb.year }} telah dibuka.
+            Amankan kursimu sekarang.
+          </template>
+
+          <template v-else>
+            Informasi pendaftaran siswa baru
+            tahun ajaran {{ home.ppdb.year || 'mendatang' }}
+            akan segera tersedia.
+          </template>
         </p>
-        <router-link class="btn btn-primary" to="/pendaftaran">Daftar Sekarang &rarr;</router-link>
+
+        <router-link
+          class="btn btn-primary"
+          to="/pendaftaran"
+        >
+          {{
+            home.ppdb.is_open
+              ? 'Daftar Sekarang'
+              : 'Lihat Informasi'
+          }}
+          &rarr;
+        </router-link>
       </div>
     </section>
 
@@ -304,46 +791,444 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import {
+  ref,
+  computed,
+  onMounted
+} from 'vue'
+
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import api from '@/utils/api'
 
-// State untuk Filter Jurusan
+/*
+|--------------------------------------------------------------------------
+| Default Data
+|--------------------------------------------------------------------------
+| Digunakan supaya halaman tidak error ketika API belum mengembalikan
+| semua field.
+|--------------------------------------------------------------------------
+*/
+
+const defaultProgramImage =
+  'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=700&auto=format&fit=crop'
+
+const defaultGuruImage =
+  'https://ui-avatars.com/api/?name=Guru&background=e2e8f0&color=475569'
+
+const home = ref({
+  school: {
+    name: 'SMA Harapan Bangsa',
+
+    hero_title:
+      'Memimpin Jalan Menuju Pendidikan Tinggi Berkualitas',
+
+    hero_description:
+      'Tempat keunggulan akademik bertemu dengan pembentukan karakter, membekali setiap siswa untuk masa depan yang mereka pilih sendiri.',
+
+    about_title:
+      'Kami Akan Memberikan Masa Depan Untukmu',
+
+    about_description:
+      'Sudah menjadi kepercayaan luas bahwa pembaca akan teralihkan oleh isi bacaan yang mudah dibaca dan menarik, dibandingkan hanya melihat tata letaknya.',
+
+    about_description_2:
+      'Kami percaya setiap siswa memiliki potensi unik. Karena itu, kami menyediakan ruang eksplorasi minat lewat lebih dari 20 ekstrakurikuler dan kelas peminatan sejak kelas 10.',
+
+    about_image:
+      'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=900&auto=format&fit=crop'
+  },
+
+  statistics: {
+    students: 0,
+    teachers: 0,
+    ptn_percentage: 0
+  },
+
+  teachers: [],
+
+  programs: [],
+
+  news: [],
+
+  ppdb: {
+    year: '2027/2028',
+    is_open: true
+  }
+})
+
+/*
+|--------------------------------------------------------------------------
+| Loading / Error
+|--------------------------------------------------------------------------
+*/
+
+const loadingHome = ref(false)
+const errorHome = ref(null)
+
+const loadingGuru = ref(false)
+const errorGuru = ref(null)
+
+const loadingPrograms = ref(false)
+const errorPrograms = ref(null)
+
+/*
+|--------------------------------------------------------------------------
+| Guru
+|--------------------------------------------------------------------------
+*/
+
+const daftarGuru = ref([])
+
+/*
+|--------------------------------------------------------------------------
+| Filter Program
+|--------------------------------------------------------------------------
+*/
+
 const activeFilter = ref('Semua')
+
 const setFilter = (filterName) => {
   activeFilter.value = filterName
 }
 
-const daftarGuru = ref([])
-const loadingGuru = ref(false)
-const errorGuru = ref(null)
+/*
+|--------------------------------------------------------------------------
+| Format Number
+|--------------------------------------------------------------------------
+*/
+
+const formatNumber = (number) => {
+  return new Intl.NumberFormat('id-ID').format(
+    Number(number) || 0
+  )
+}
+
+/*
+|--------------------------------------------------------------------------
+| Ambil URL gambar guru
+|--------------------------------------------------------------------------
+*/
+
+const getGuruImage = (guru) => {
+  return (
+    guru.gambar_guru ||
+    guru.foto ||
+    guru.image ||
+    guru.foto_guru ||
+    defaultGuruImage
+  )
+}
+
+/*
+|--------------------------------------------------------------------------
+| Filter Programs
+|--------------------------------------------------------------------------
+*/
+
+const filteredPrograms = computed(() => {
+  if (!Array.isArray(home.value.programs)) {
+    return []
+  }
+
+  if (activeFilter.value === 'Semua') {
+    return home.value.programs
+  }
+
+  return home.value.programs.filter((program) => {
+    const kategori =
+      program.kategori ||
+      program.category ||
+      program.jurusan ||
+      program.nama_jurusan ||
+      ''
+
+    return (
+      String(kategori).toLowerCase() ===
+      activeFilter.value.toLowerCase()
+    )
+  })
+})
+
+/*
+|--------------------------------------------------------------------------
+| Badge Program
+|--------------------------------------------------------------------------
+*/
+
+const getProgramBadgeClass = (kategori) => {
+  const value = String(
+    kategori || ''
+  ).toLowerCase()
+
+  if (value === 'mipa') {
+    return 'badge-green'
+  }
+
+  if (value === 'ips') {
+    return 'badge-amber'
+  }
+
+  if (value === 'bahasa') {
+    return 'badge-dark'
+  }
+
+  return 'badge-dark'
+}
+
+/*
+|--------------------------------------------------------------------------
+| Image Error Handler
+|--------------------------------------------------------------------------
+*/
+
+const handleImageError = (event) => {
+  if (
+    event.target.src !== defaultGuruImage
+  ) {
+    event.target.src = defaultGuruImage
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Fetch Homepage
+|--------------------------------------------------------------------------
+*/
+
+const fetchHome = async () => {
+  loadingHome.value = true
+  errorHome.value = null
+
+  try {
+    const response =
+      await api.get('/public/home')
+
+    const result =
+      response.data?.data ??
+      response.data
+
+    if (!result) {
+      throw new Error(
+        'Response homepage kosong.'
+      )
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Merge dengan default object
+    |--------------------------------------------------------------------------
+    | Jadi kalau backend hanya mengirim sebagian field,
+    | field lainnya tidak menjadi undefined.
+    |--------------------------------------------------------------------------
+    */
+
+    home.value = {
+      ...home.value,
+
+      ...result,
+
+      school: {
+        ...home.value.school,
+        ...(result.school || {})
+      },
+
+      statistics: {
+        ...home.value.statistics,
+        ...(result.statistics || {})
+      },
+
+      teachers:
+        Array.isArray(result.teachers)
+          ? result.teachers
+          : home.value.teachers,
+
+      programs:
+        Array.isArray(result.programs)
+          ? result.programs
+          : home.value.programs,
+
+      news:
+        Array.isArray(result.news)
+          ? result.news
+          : home.value.news,
+
+      ppdb: {
+        ...home.value.ppdb,
+        ...(result.ppdb || {})
+      }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Kalau endpoint home mengirim teachers,
+    | langsung gunakan tanpa request kedua.
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      Array.isArray(result.teachers)
+    ) {
+      daftarGuru.value =
+        result.teachers
+    }
+  } catch (error) {
+    console.error(
+      'Gagal mengambil data homepage:',
+      error
+    )
+
+    errorHome.value =
+      error.response?.data?.message ||
+      error.message ||
+      'Gagal mengambil data homepage.'
+  } finally {
+    loadingHome.value = false
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Fetch Guru
+|--------------------------------------------------------------------------
+| Hanya dipanggil jika /public/home tidak mengirim teachers.
+|--------------------------------------------------------------------------
+*/
 
 const fetchGuru = async () => {
+  /*
+  |--------------------------------------------------------------------------
+  | Jangan request ulang kalau Home sudah memberikan data guru.
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    Array.isArray(home.value.teachers) &&
+    home.value.teachers.length > 0
+  ) {
+    daftarGuru.value =
+      home.value.teachers
+
+    return
+  }
+
   loadingGuru.value = true
   errorGuru.value = null
 
   try {
-    const response = await api.get('/public/guru')
-    const result = response.data
+    const response =
+      await api.get('/public/guru')
 
-    console.log('Hasil API:', result)
+    const result =
+      response.data?.data ??
+      response.data
 
-    if (result.data) {
-      daftarGuru.value = result.data
-    } else {
+    if (Array.isArray(result)) {
       daftarGuru.value = result
+    } else {
+      daftarGuru.value = []
     }
   } catch (error) {
-    console.error('Gagal mengambil data guru:', error)
-    errorGuru.value = error.message
+    console.error(
+      'Gagal mengambil data guru:',
+      error
+    )
+
+    errorGuru.value =
+      error.response?.data?.message ||
+      error.message ||
+      'Gagal mengambil data guru.'
+
     daftarGuru.value = []
   } finally {
     loadingGuru.value = false
   }
 }
 
-onMounted(() => {
-  fetchGuru()
+/*
+|--------------------------------------------------------------------------
+| Fetch Program
+|--------------------------------------------------------------------------
+| Endpoint opsional.
+|--------------------------------------------------------------------------
+*/
+
+const fetchPrograms = async () => {
+  /*
+  |--------------------------------------------------------------------------
+  | Kalau /public/home sudah mengirim programs,
+  | tidak perlu request tambahan.
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    Array.isArray(home.value.programs) &&
+    home.value.programs.length > 0
+  ) {
+    return
+  }
+
+  loadingPrograms.value = true
+  errorPrograms.value = null
+
+  try {
+    const response =
+      await api.get('/public/programs')
+
+    const result =
+      response.data?.data ??
+      response.data
+
+    if (Array.isArray(result)) {
+      home.value.programs =
+        result
+    }
+  } catch (error) {
+    /*
+    |--------------------------------------------------------------------------
+    | Program bersifat optional.
+    |--------------------------------------------------------------------------
+    | Jangan membuat seluruh Home error hanya karena endpoint program
+    | belum tersedia.
+    |--------------------------------------------------------------------------
+    */
+
+    console.warn(
+      'Endpoint program belum tersedia:',
+      error
+    )
+
+    errorPrograms.value =
+      error.response?.data?.message ||
+      error.message
+  } finally {
+    loadingPrograms.value = false
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Lifecycle
+|--------------------------------------------------------------------------
+*/
+
+onMounted(async () => {
+  await fetchHome()
+
+  /*
+  |--------------------------------------------------------------------------
+  | Ambil guru hanya jika belum ada dari endpoint Home.
+  |--------------------------------------------------------------------------
+  */
+
+  await fetchGuru()
+
+  /*
+  |--------------------------------------------------------------------------
+  | Ambil program jika belum ada dari endpoint Home.
+  |--------------------------------------------------------------------------
+  */
+
+  await fetchPrograms()
 })
 </script>

@@ -6,7 +6,9 @@ const http = axios.create({
 })
 
 http.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
+  // Login menyimpan token pada sessionStorage. Fallback localStorage menjaga
+  // kompatibilitas dengan sesi dari versi aplikasi sebelumnya.
+  const token = sessionStorage.getItem('token') ?? localStorage.getItem('token')
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })

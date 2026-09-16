@@ -4,7 +4,7 @@
       <div class="footer-grid">
         <div>
           <router-link class="brand" to="/" style="color: #fff; margin-bottom: 14px">
-            <span class="brand-mark">HB</span> SMA Harapan Bangsa
+            <span class="brand-mark">HB</span> SMK Harapan Bangsa
           </router-link>
           <p>
             Membentuk generasi unggul melalui pendidikan berkarakter, akademik yang kuat, dan

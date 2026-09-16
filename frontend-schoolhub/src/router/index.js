@@ -234,11 +234,26 @@ router.beforeEach((to) => {
   const user = JSON.parse(sessionStorage.getItem('user') || '{}')
   const userRole = user.role?.toLowerCase()
 
+  // Jika halaman memerlukan autentikasi tapi tidak ada token
   if (to.meta.requiresAuth && !token) {
+    // Simpan intended URL untuk redirect setelah login
+    sessionStorage.setItem('intendedUrl', to.fullPath)
     return { name: 'login' }
   }
 
+  // Jika ada token tapi tidak ada data user, mungkin session corrupt
+  if (token && to.meta.requiresAuth && !userRole) {
+    sessionStorage.clear()
+    return { name: 'login' }
+  }
+
+  // Jika halaman memerlukan role tertentu dan role tidak sesuai
   if (to.meta.role && to.meta.role !== userRole) {
+    return { name: 'dashboard' }
+  }
+
+  // Jika user sudah login dan mencoba akses halaman login, redirect ke dashboard
+  if (token && to.name === 'login') {
     return { name: 'dashboard' }
   }
 })

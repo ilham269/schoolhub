@@ -18,7 +18,20 @@ class GuruController extends Controller
      */
     public function index(): JsonResponse
     {
-        $gurus = Guru::with('user')->get();
+        $gurus = Guru::with('user')->get()->map(function ($guru) {
+            return [
+                'id' => $guru->id,
+                'user_id' => $guru->user_id,
+                'nip' => $guru->nip,
+                'nama' => $guru->user->name,
+                'nama_lengkap_guru' => $guru->nama_lengkap_guru,
+                'email' => $guru->user->email,
+                'gender' => $guru->gender,
+                'tanggal_lahir' => $guru->tanggal_lahir,
+                'alamat' => $guru->alamat,
+                'nomor_telepon' => $guru->nomor_telepon,
+            ];
+        });
 
         return response()->json([
             'success' => true,
