@@ -1,6 +1,7 @@
 export const muridNavigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/murid' },
   { label: 'Profil', icon: 'fas fa-user', to: '/dashboard/murid/profil' },
+  { label: 'Materi', icon: 'fas fa-book-open', to: '/dashboard/murid/materi' },
   { label: 'Tugas', icon: 'fas fa-book-open', to: '/dashboard/murid/tugas' },
   { label: 'Nilai', icon: 'fas fa-chart-bar', to: '/dashboard/murid/nilai' },
   { label: 'Jadwal', icon: 'fas fa-calendar-days', to: '/dashboard/murid/jadwal' },

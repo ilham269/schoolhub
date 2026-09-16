@@ -19,6 +19,8 @@ use App\Http\Controllers\Api\SubjekKelasController;
 use App\Http\Controllers\Api\JadwalController;
 use App\Http\Controllers\Api\MuridNilaiController;
 use App\Http\Controllers\Api\PublicHomeController;
+use App\Http\Controllers\Api\MateriController;
+use App\Http\Controllers\Api\MuridTugasController;
 
 // No session/auth middleware: notification is sent server-to-server by Midtrans.
 Route::post('/payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
@@ -116,6 +118,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/report', [DashboardController::class, 'report']);
     });
 
+    // Materi is deliberately separate from Tugas: only its creator may manage it.
+    Route::prefix('guru')->middleware('role:guru')->group(function () {
+        Route::get('/materi', [MateriController::class, 'index']);
+        Route::post('/materi', [MateriController::class, 'store']);
+        Route::get('/materi/{materi}', [MateriController::class, 'show']);
+        Route::put('/materi/{materi}', [MateriController::class, 'update']);
+        Route::delete('/materi/{materi}', [MateriController::class, 'destroy']);
+    });
+
     // Pengumuman Routes
     Route::prefix('pengumuman')->group(function () {
         Route::get('/', [PengumumanController::class, 'index']);
@@ -159,6 +170,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Murid Routes
     Route::prefix('murid')->group(function () {
+        Route::middleware('role:murid')->group(function () {
+            Route::get('/tugas', [MuridTugasController::class, 'index']);
+            Route::post('/tugas/{tugas}/kumpulkan', [MuridTugasController::class, 'submit']);
+            Route::get('/materi', [MateriController::class, 'index']);
+            Route::get('/materi/{materi}', [MateriController::class, 'show']);
+            Route::get('/materi/{materi}/download', [MateriController::class, 'download']);
+        });
         Route::get('/', [MuridController::class, 'index']);
         Route::post('/', [MuridController::class, 'store']);
         Route::get('/profile', [MuridController::class, 'myProfile']);
@@ -169,6 +187,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [MuridController::class, 'destroy']);
         Route::get('/kelas/{kelasId}', [MuridController::class, 'byKelas']);
     });
+
 
     // Karyawan Routes
     Route::prefix('karyawan')->group(function () {

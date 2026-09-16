@@ -12,10 +12,10 @@ class Pengumpulantugas extends Model
     protected $fillable = [
         'tugas_id',
         'murid_id',
-        'file',
+        'file_path',
         'link',
         'catatan',
-        'dikumpulkan_at',
+        'tanggal_pengumpulan',
         'nilai',
         'feedback',
         'status',
@@ -24,7 +24,7 @@ class Pengumpulantugas extends Model
     protected function casts(): array
     {
         return [
-            'dikumpulkan_at' => 'datetime',
+            'tanggal_pengumpulan' => 'datetime',
             'nilai' => 'decimal:2',
         ];
     }

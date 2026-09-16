@@ -29,6 +29,8 @@ const router = createRouter({
       },
       meta: { requiresAuth: true },
     },
+
+    // ===================== ADMIN =====================
     {
       path: '/dashboard/admin/pendaftaran',
       name: 'admin_ppdb',
@@ -60,6 +62,39 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'admin' },
     },
     {
+      path: '/dashboard/admin/keuangan',
+      name: 'admin_keuangan',
+      component: () => import('../views/karyawan/KeuanganDashboard.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/dashboard/admin/keuangan/tagihan',
+      name: 'admin_tagihan_spp',
+      component: () => import('../views/karyawan/TagihanSppView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/dashboard/admin/keuangan/slip-gaji',
+      name: 'admin_slip_gaji',
+      component: () => import('../views/karyawan/SlipGajiView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/dashboard/admin/data-siswa',
+      name: 'admin_data_siswa',
+      component: () => import('../views/karyawan/DataSiswaView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      // CRUD generik: /dashboard/admin/berita, /dashboard/admin/pengumuman
+      path: '/dashboard/admin/:resource(berita|pengumuman)',
+      name: 'admin_crud_content',
+      component: () => import('../views/admin/AdminCrudView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+
+    // ===================== CALON SISWA =====================
+    {
       path: '/dashboard/casis',
       name: 'dashboard_casis',
       component: () => import('../views/casis/CalonSiswaDashboard.vue'),
@@ -71,6 +106,8 @@ const router = createRouter({
       component: () => import('../views/casis/CalonSiswaExam.vue'),
       meta: { requiresAuth: true, role: 'calon_siswa' },
     },
+
+    // ===================== GURU =====================
     {
       path: '/dashboard/guru',
       name: 'dashboard_guru',
@@ -102,6 +139,16 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'guru' },
     },
     {
+      path: '/dashboard/guru/materi',
+      name: 'guru_materi',
+      component: () => import('../views/guru/Materi.vue'),
+      meta: { requiresAuth: true, role: 'guru' },
+    },
+
+    // ===================== MURID =====================
+    // Route eksplisit satu-satu (bukan dynamic catch-all) supaya tiap
+    // halaman jelas komponennya dan gampang ditelusuri kalau error.
+    {
       path: '/dashboard/murid',
       name: 'dashboard_murid',
       component: () => import('../views/murid/dashboard_murid.vue'),
@@ -113,13 +160,50 @@ const router = createRouter({
       component: () => import('../views/murid/Profil.vue'),
       meta: { requiresAuth: true, role: 'murid' },
     },
-    
     {
       path: '/dashboard/murid/nilai',
       name: 'murid_nilai',
       component: () => import('../views/murid/Nilai.vue'),
       meta: { requiresAuth: true, role: 'murid' },
     },
+    {
+      path: '/dashboard/murid/tugas',
+      name: 'murid_tugas',
+      component: () => import('../views/murid/Tugas.vue'),
+      meta: { requiresAuth: true, role: 'murid' },
+    },
+    {
+      path: '/dashboard/murid/materi',
+      name: 'murid_materi',
+      component: () => import('../views/murid/Materi.vue'),
+      meta: { requiresAuth: true, role: 'murid' },
+    },
+    {
+      path: '/dashboard/murid/jadwal',
+      name: 'murid_jadwal',
+      component: () => import('../views/murid/Jadwal.vue'),
+      meta: { requiresAuth: true, role: 'murid' },
+    },
+    {
+      path: '/dashboard/murid/ujian',
+      name: 'murid_ujian',
+      component: () => import('../views/murid/Ujian.vue'),
+      meta: { requiresAuth: true, role: 'murid' },
+    },
+    {
+      path: '/dashboard/murid/administrasi',
+      name: 'murid_administrasi',
+      component: () => import('../views/murid/Administrasi.vue'),
+      meta: { requiresAuth: true, role: 'murid' },
+    },
+    {
+      path: '/dashboard/murid/keuangan',
+      name: 'murid_keuangan',
+      component: () => import('../views/murid/Keuangan.vue'),
+      meta: { requiresAuth: true, role: 'murid' },
+    },
+
+    // ===================== KARYAWAN =====================
     {
       path: '/dashboard/karyawan',
       name: 'dashboard_karyawan',
@@ -150,43 +234,8 @@ const router = createRouter({
       component: () => import('../views/karyawan/DataSiswaView.vue'),
       meta: { requiresAuth: true, role: 'karyawan' },
     },
-    // Admin Keuangan Routes (reuse karyawan components)
-    {
-      path: '/dashboard/admin/keuangan',
-      name: 'admin_keuangan',
-      component: () => import('../views/karyawan/KeuanganDashboard.vue'),
-      meta: { requiresAuth: true, role: 'admin' },
-    },
-    {
-      path: '/dashboard/admin/keuangan/tagihan',
-      name: 'admin_tagihan_spp',
-      component: () => import('../views/karyawan/TagihanSppView.vue'),
-      meta: { requiresAuth: true, role: 'admin' },
-    },
-    {
-      path: '/dashboard/admin/keuangan/slip-gaji',
-      name: 'admin_slip_gaji',
-      component: () => import('../views/karyawan/SlipGajiView.vue'),
-      meta: { requiresAuth: true, role: 'admin' },
-    },
-    {
-      path: '/dashboard/admin/data-siswa',
-      name: 'admin_data_siswa',
-      component: () => import('../views/karyawan/DataSiswaView.vue'),
-      meta: { requiresAuth: true, role: 'admin' },
-    },
-    {
-      path: '/dashboard/murid/:feature(profil|tugas|nilai|jadwal|ujian|administrasi|keuangan)',
-      name: 'murid_feature',
-      component: () => import('../views/murid/MuridFeatureView.vue'),
-      meta: { requiresAuth: true, role: 'murid' },
-    },
-    {
-      path: '/dashboard/admin/:resource(berita|pengumuman)',
-      name: 'admin_crud_content',
-      component: () => import('../views/admin/AdminCrudView.vue'),
-      meta: { requiresAuth: true, role: 'admin' },
-    },
+
+    // ===================== PUBLIC =====================
     {
       path: '/',
       name: 'home',
@@ -239,6 +288,16 @@ const router = createRouter({
       name: 'ppdb',
       component: () => import('../views/ppdbviews.vue'),
     },
+
+    // ===================== FALLBACK =====================
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      redirect: () => {
+        const token = sessionStorage.getItem('token')
+        return token ? { name: 'dashboard' } : { name: 'home' }
+      },
+    },
   ],
 })
 
@@ -247,25 +306,24 @@ router.beforeEach((to) => {
   const user = JSON.parse(sessionStorage.getItem('user') || '{}')
   const userRole = user.role?.toLowerCase()
 
-  // Jika halaman memerlukan autentikasi tapi tidak ada token
+  // Halaman butuh auth tapi tidak ada token -> ke login
   if (to.meta.requiresAuth && !token) {
-    // Simpan intended URL untuk redirect setelah login
     sessionStorage.setItem('intendedUrl', to.fullPath)
     return { name: 'login' }
   }
 
-  // Jika ada token tapi tidak ada data user, mungkin session corrupt
+  // Ada token tapi data user rusak/kosong -> bersihkan & ke login
   if (token && to.meta.requiresAuth && !userRole) {
     sessionStorage.clear()
     return { name: 'login' }
   }
 
-  // Jika halaman memerlukan role tertentu dan role tidak sesuai
+  // Halaman butuh role tertentu tapi tidak sesuai -> balik ke dashboard sesuai role user
   if (to.meta.role && to.meta.role !== userRole) {
     return { name: 'dashboard' }
   }
 
-  // Jika user sudah login dan mencoba akses halaman login, redirect ke dashboard
+  // Sudah login tapi coba akses /login -> lempar ke dashboard
   if (token && to.name === 'login') {
     return { name: 'dashboard' }
   }

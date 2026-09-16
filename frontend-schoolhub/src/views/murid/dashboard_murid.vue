@@ -64,6 +64,12 @@ const features = [
     to: '/dashboard/murid/profil',
   },
   {
+    title: 'Materi',
+    description: 'Baca atau unduh materi pembelajaran dari guru.',
+    icon: 'fas fa-book-open',
+    to: '/dashboard/murid/materi',
+  },
+  {
     title: 'Tugas',
     description: 'Lihat, kerjakan, dan kumpulkan tugas.',
     icon: 'fas fa-book-open',
