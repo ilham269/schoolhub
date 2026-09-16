@@ -29,7 +29,7 @@ api.getCached = async (url, config = {}, cacheDuration = 30000) => {
 
 // Interceptor: otomatis tambahkan token di setiap request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+  const token = sessionStorage.getItem('token')
   if (token) {
     // Otomatis tambahkan header Authorization ke setiap request
     config.headers.Authorization = `Bearer ${token}`
@@ -62,11 +62,9 @@ api.interceptors.response.use(
     // 2. Bukan request login
     // 3. User punya token (berarti token expired/invalid)
     // 4. Bukan di public page
-    const hasToken = localStorage.getItem('token') || sessionStorage.getItem('token')
+  const hasToken = sessionStorage.getItem('token')
 
     if (isUnauthorized && !isLoginRequest && hasToken && !isPublicPage) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
       sessionStorage.removeItem('token')
       sessionStorage.removeItem('user')
 

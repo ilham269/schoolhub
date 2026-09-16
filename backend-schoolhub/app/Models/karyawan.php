@@ -15,7 +15,6 @@ class Karyawan extends Model
     protected $fillable = [
         'user_id',
         'nip',
-        'nama_lengkap_karyawan',
         'gambar_karyawan',
         'bagian',
         'nomor_telepon',
@@ -31,5 +30,21 @@ class Karyawan extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the slip gaji for the karyawan.
+     */
+    public function slipGajis()
+    {
+        return $this->hasMany(SlipGaji::class, 'karyawan_id');
+    }
+
+    /**
+     * Get slip gaji by periode.
+     */
+    public function slipGajiByPeriode(string $periode)
+    {
+        return $this->slipGajis()->where('periode', $periode)->first();
     }
 }

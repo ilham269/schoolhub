@@ -25,7 +25,17 @@ class Kelas extends Model
     }
     public function jadwals()
     {
-    return $this->hasMany(Jadwal::class, 'kelas_id');
+        return $this->hasMany(Jadwal::class, 'kelas_id');
     }
-    
+
+    public function subjekkelas()
+    {
+        return $this->hasMany(Subjekkelas::class, 'kelas_id');
+    }
+
+    public function subjeks()
+    {
+        return $this->belongsToMany(Subjek::class, 'class_subjects', 'kelas_id', 'mapel_id')
+            ->withTimestamps();
+    }
 }

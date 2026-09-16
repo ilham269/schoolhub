@@ -55,76 +55,60 @@ const login = async (type) => {
   loading.value = true
 
   try {
-    console.log('🔐 Attempting login with:', form.email)
-
     const response = await api.post('/auth/login', {
       email: form.email,
       password: form.password,
     })
-
-    console.log('📦 Full response:', response)
-    console.log('📦 Response data:', response.data)
 
     const result = response.data
 
     // Check if response is successful
     if (!result.success) {
       errorMessage.value = result.message || 'Login gagal.'
-      console.error('❌ Login failed:', result.message)
       return
     }
 
     // Extract data from response
     const { user, token } = result.data
 
-    console.log('✅ Login success!')
-    console.log('👤 User:', user)
-    console.log('🔑 Token:', token)
-
-    // Simpan token
+    // Token hanya hidup selama browser session; jangan simpan di persistent storage.
     if (token) {
-      localStorage.setItem('token', token)
-      console.log('💾 Token saved to localStorage')
+      sessionStorage.setItem('token', token)
     }
 
-    // Simpan user
+    // Data UI mengikuti masa hidup token.
     if (user) {
-      localStorage.setItem('user', JSON.stringify(user))
-      console.log('💾 User saved to localStorage')
+      sessionStorage.setItem('user', JSON.stringify(user))
     }
+
+    // Bersihkan token lama yang mungkin tersisa dari versi sebelumnya.
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
 
     // Redirect berdasarkan role
     const role = user?.role?.toLowerCase()
-    console.log('🎭 User role:', role)
 
     switch (role) {
       case 'admin':
-        console.log('🚀 Redirecting to /dashboard/admin')
         router.push('/dashboard/admin')
         break
 
       case 'guru':
-        console.log('🚀 Redirecting to /dashboard/guru')
         router.push('/dashboard/guru')
         break
 
       case 'murid':
-        console.log('🚀 Redirecting to /ujian-ppdb (exam page for students)')
         router.push('/ujian-ppdb')
         break
 
       case 'karyawan':
-        console.log('🚀 Redirecting to /dashboard/karyawan')
         router.push('/dashboard/karyawan')
         break
 
       default:
-        console.log('🚀 Redirecting to /dashboard (default)')
         router.push('/dashboard')
     }
   } catch (error) {
-    console.error('❌ Login error:', error)
-
     if (error.response?.status === 422) {
       errorMessage.value = error.response.data.message || 'Data login tidak valid.'
     } else if (error.response?.status === 401) {

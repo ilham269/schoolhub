@@ -25,6 +25,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'profile',
         'email',
         'password',
         'role',
@@ -55,18 +56,17 @@ class User extends Authenticatable
         ];
     }
 
-    //relasi 
-    public function Murid()
+    public function murid()
     {
         return $this->hasOne(Murid::class);
     }
 
-    public function Guru()
+    public function guru()
     {
         return $this->hasOne(Guru::class);
     }
 
-    public function Karyawan()
+    public function karyawan()
     {
         return $this->hasOne(Karyawan::class);
     }
@@ -84,9 +84,33 @@ class User extends Authenticatable
 
     public function news()
     {
-    return $this->hasMany(
-        News::class,
-        'created_by'
-    );
+        return $this->hasMany(
+            News::class,
+            'created_by'
+        );
+    }
+
+    /**
+     * Get tagihan SPP created by this user.
+     */
+    public function tagihanSppsCreated()
+    {
+        return $this->hasMany(TagihanSpp::class, 'created_by');
+    }
+
+    /**
+     * Get slip gaji created by this user.
+     */
+    public function slipGajisCreated()
+    {
+        return $this->hasMany(SlipGaji::class, 'dibuat_oleh');
+    }
+
+    /**
+     * Get slip gaji approved by this user.
+     */
+    public function slipGajisApproved()
+    {
+        return $this->hasMany(SlipGaji::class, 'approved_oleh');
     }
 }

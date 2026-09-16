@@ -68,7 +68,7 @@ const props = defineProps({
 
 const router = useRouter()
 const menuOpen = ref(false)
-const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
+const user = ref(JSON.parse(sessionStorage.getItem('user') || '{}'))
 const initials = computed(() =>
   (user.value.name || props.roleLabel)
     .split(' ')
@@ -79,8 +79,8 @@ const initials = computed(() =>
 )
 
 const logout = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
+  sessionStorage.removeItem('token')
+  sessionStorage.removeItem('user')
   router.push('/login')
 }
 </script>

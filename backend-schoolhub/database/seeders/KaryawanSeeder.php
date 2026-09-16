@@ -55,7 +55,7 @@ class KaryawanSeeder extends Seeder
             Karyawan::create([
                 'user_id' => $user->id,
                 'nip' => $data['nip'],
-                'nama_lengkap_karyawan' => $data['nama'],
+                // nama sudah disimpan di users.name, tidak perlu di karyawans
                 'bagian' => $data['bagian'],
                 'nomor_telepon' => $data['nomor_telepon'],
                 'alamat' => $data['alamat'],

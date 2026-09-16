@@ -12,6 +12,14 @@ use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PpdbController;
+use App\Http\Controllers\Api\PaymentCallbackController;
+use App\Http\Controllers\Api\MapelController;
+use App\Http\Controllers\Api\SubjekGuruController;
+use App\Http\Controllers\Api\SubjekKelasController;
+use App\Http\Controllers\Api\JadwalController;
+
+// No session/auth middleware: notification is sent server-to-server by Midtrans.
+Route::post('/payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -46,6 +54,9 @@ Route::prefix('public')->group(function () {
     Route::get('/berita/slug/{slug}', [BeritaController::class, 'showBySlug']);
     Route::get('/berita/{id}', [BeritaController::class, 'show']);
 });
+
+    // Guru Routes
+  
 
 // Protected API Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -117,10 +128,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('berita')->group(function () {
         Route::get('/', [BeritaController::class, 'index']);
         Route::post('/', [BeritaController::class, 'store']);
+        Route::get('/kategori/{kategori}', [BeritaController::class, 'byKategori']);
         Route::get('/{id}', [BeritaController::class, 'show']);
         Route::put('/{id}', [BeritaController::class, 'update']);
         Route::delete('/{id}', [BeritaController::class, 'destroy']);
-        Route::get('/kategori/{kategori}', [BeritaController::class, 'byKategori']);
+    });
+
+      Route::prefix('guru')->group(function () {
+        Route::get('/', [GuruController::class, 'index']);
+        Route::post('/', [GuruController::class, 'store']);
+        Route::get('/{id}', [GuruController::class, 'show']);
+        Route::put('/{id}', [GuruController::class, 'update']);
+        Route::delete('/{id}', [GuruController::class, 'destroy']);
     });
 
     // Settings Routes
@@ -135,14 +154,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/reset/{key}', [SettingController::class, 'reset']);
     });
     
-    // Guru Routes
-    Route::prefix('guru')->group(function () {
-        Route::get('/', [GuruController::class, 'index']);
-        Route::post('/', [GuruController::class, 'store']);
-        Route::get('/{id}', [GuruController::class, 'show']);
-        Route::put('/{id}', [GuruController::class, 'update']);
-        Route::delete('/{id}', [GuruController::class, 'destroy']);
-    });
 
     // Murid Routes
     Route::prefix('murid')->group(function () {
@@ -173,5 +184,60 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [KelasController::class, 'destroy']);
         Route::get('/jurusan/{jurusan}', [KelasController::class, 'byJurusan']);
         Route::get('/tingkat/{tingkat}', [KelasController::class, 'byTingkat']);
+    });
+
+    // Academic Core — readable by admin, guru, murid
+    Route::middleware('role:admin,guru,murid')->group(function () {
+        Route::get('/mapel', [MapelController::class, 'index']);
+        Route::get('/mapel/active', [MapelController::class, 'active']);
+        Route::get('/mapel/kelas/{kelasId}', [MapelController::class, 'byKelas']);
+        Route::get('/mapel/guru/{guruId}', [MapelController::class, 'byGuru']);
+        Route::get('/mapel/{id}', [MapelController::class, 'show']);
+
+        Route::get('/subjek-guru', [SubjekGuruController::class, 'index']);
+        Route::get('/subjek-kelas', [SubjekKelasController::class, 'index']);
+
+        Route::get('/jadwal', [JadwalController::class, 'index']);
+        Route::get('/jadwal/kelas/{kelasId}', [JadwalController::class, 'byKelas']);
+        Route::get('/jadwal/guru/{guruId}', [JadwalController::class, 'byGuru']);
+        Route::get('/jadwal/hari/{hari}', [JadwalController::class, 'byHari']);
+        Route::get('/jadwal/{id}', [JadwalController::class, 'show']);
+    });
+
+    // Academic Core — admin mutations
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/mapel', [MapelController::class, 'store']);
+        Route::put('/mapel/{id}', [MapelController::class, 'update']);
+        Route::delete('/mapel/{id}', [MapelController::class, 'destroy']);
+
+        Route::post('/subjek-guru', [SubjekGuruController::class, 'store']);
+        Route::delete('/subjek-guru/{id}', [SubjekGuruController::class, 'destroy']);
+
+        Route::post('/subjek-kelas', [SubjekKelasController::class, 'store']);
+        Route::delete('/subjek-kelas/{id}', [SubjekKelasController::class, 'destroy']);
+
+        Route::post('/jadwal', [JadwalController::class, 'store']);
+        Route::put('/jadwal/{id}', [JadwalController::class, 'update']);
+        Route::delete('/jadwal/{id}', [JadwalController::class, 'destroy']);
+    });
+
+    // Keuangan Routes (Karyawan & Admin)
+    Route::prefix('keuangan')->middleware('role:karyawan,Admin')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [\App\Http\Controllers\Api\KeuanganController::class, 'dashboard']);
+        
+        // Tagihan SPP Management
+        Route::get('/tagihan', [\App\Http\Controllers\Api\KeuanganController::class, 'getTagihanSpp']);
+        Route::post('/tagihan', [\App\Http\Controllers\Api\KeuanganController::class, 'createTagihan']);
+        Route::put('/tagihan/{id}', [\App\Http\Controllers\Api\KeuanganController::class, 'updateTagihan']);
+        Route::delete('/tagihan/{id}', [\App\Http\Controllers\Api\KeuanganController::class, 'deleteTagihan']);
+        
+        // Slip Gaji Management
+        Route::get('/slip-gaji', [\App\Http\Controllers\Api\KeuanganController::class, 'getSlipGaji']);
+        Route::post('/slip-gaji', [\App\Http\Controllers\Api\KeuanganController::class, 'createSlipGaji']);
+        Route::put('/slip-gaji/{id}', [\App\Http\Controllers\Api\KeuanganController::class, 'updateSlipGaji']);
+        Route::post('/slip-gaji/{id}/approve', [\App\Http\Controllers\Api\KeuanganController::class, 'approveSlipGaji']);
+        Route::post('/slip-gaji/{id}/mark-paid', [\App\Http\Controllers\Api\KeuanganController::class, 'markAsPaid']);
+        Route::delete('/slip-gaji/{id}', [\App\Http\Controllers\Api\KeuanganController::class, 'deleteSlipGaji']);
     });
 });

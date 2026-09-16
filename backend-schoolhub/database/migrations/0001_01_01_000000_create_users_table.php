@@ -24,6 +24,7 @@ return new class extends Migration
                 'Karyawan',
                 'Calon_Siswa',
             ])->default('Murid');
+            $table->string('gambar_murid')->nullable();
             $table->boolean('is_active')
                 ->default(true);
 

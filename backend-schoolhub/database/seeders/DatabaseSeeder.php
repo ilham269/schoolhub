@@ -19,11 +19,13 @@ class DatabaseSeeder extends Seeder
         
         // Seed in order of dependencies
         $this->call([
-            UserSeeder::class,      // Admin
-            KelasSeeder::class,     // Kelas (X, XI, XII RPL/TKR/TSM)
-            GuruSeeder::class,      // Guru
-            MuridSeeder::class,     // Murid
-            KaryawanSeeder::class,  // Karyawan
+            UserSeeder::class,              // Admin
+            KelasSeeder::class,             // Kelas (X, XI, XII RPL/TKR/TSM)
+            GuruSeeder::class,              // Guru
+            MuridSeeder::class,             // Murid
+            KaryawanSeeder::class,          // Karyawan
+            NewsSeeder::class,              // Berita publik
+            PaymentSettingsSeeder::class,   // Payment & SPP Settings
         ]);
 
         $this->command->info('');

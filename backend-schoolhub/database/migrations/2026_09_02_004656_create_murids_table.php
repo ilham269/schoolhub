@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('murids', function (Blueprint $table) {
             $table->id();
             $table->string('nis')->unique();
-            $table->string('Nama_lengkap_murid');
             $table->string('gambar_murid')->nullable();
             $table->enum('gender', ['L','P',]);
             $table->date('tanggal_lahir');
