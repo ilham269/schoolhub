@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\SubjekGuruController;
 use App\Http\Controllers\Api\SubjekKelasController;
 use App\Http\Controllers\Api\JadwalController;
 use App\Http\Controllers\Api\MuridNilaiController;
+use App\Http\Controllers\Api\PublicHomeController;
 
 // No session/auth middleware: notification is sent server-to-server by Midtrans.
 Route::post('/payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
@@ -40,6 +41,9 @@ Route::prefix('auth')->group(function () {
 
 // Public Routes (tanpa auth)
 Route::prefix('public')->group(function () {
+    Route::get('/home', [PublicHomeController::class, 'home']);
+    Route::get('/guru', [PublicHomeController::class, 'guru']);
+    Route::get('/programs', [PublicHomeController::class, 'programs']);
     Route::post('/ppdb/register', [PpdbController::class, 'register']);
     
     // Pengumuman

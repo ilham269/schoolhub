@@ -65,7 +65,7 @@
         >
           <router-link
             class="btn btn-primary"
-            to="/profil"
+            to="/profile"
           >
             Selengkapnya &rarr;
           </router-link>
@@ -606,7 +606,7 @@
                 :to="
                   program.slug
                     ? `/program/${program.slug}`
-                    : '/profil'
+                    : '/profile'
                 "
               >
                 Pelajari program &rarr;
@@ -663,7 +663,7 @@
 
               <router-link
                 class="link-arrow"
-                to="/profil"
+                to="/profile"
               >
                 Pelajari program &rarr;
               </router-link>
