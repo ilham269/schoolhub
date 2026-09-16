@@ -42,6 +42,14 @@ class KaryawanSeeder extends Seeder
         ];
 
         foreach ($karyawanData as $data) {
+            if (
+                User::where('email', $data['email'])->exists()
+                || Karyawan::where('nip', $data['nip'])->exists()
+            ) {
+                $this->command->info("Karyawan {$data['nama']} sudah ada, dilewati.");
+                continue;
+            }
+
             // Create user
             $user = User::create([
                 'name' => $data['nama'],

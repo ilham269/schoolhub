@@ -156,6 +156,11 @@ class KelasSeeder extends Seeder
         ];
 
         foreach ($kelasData as $kelas) {
+            if (Kelas::where('name', $kelas['name'])->exists()) {
+                $this->command->info("Kelas {$kelas['name']} sudah ada, dilewati.");
+                continue;
+            }
+
             Kelas::create($kelas);
         }
 

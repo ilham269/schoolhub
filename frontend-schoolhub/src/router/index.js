@@ -114,9 +114,15 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'murid' },
     },
     {
+<<<<<<< Updated upstream
       path: '/dashboard/murid/tugas',
       name: 'murid_tugas',
       component: () => import('../views/murid/Tugas.vue'),
+=======
+      path: '/dashboard/murid/nilai',
+      name: 'murid_nilai',
+      component: () => import('../views/murid/Nilai.vue'),
+>>>>>>> Stashed changes
       meta: { requiresAuth: true, role: 'murid' },
     },
     {

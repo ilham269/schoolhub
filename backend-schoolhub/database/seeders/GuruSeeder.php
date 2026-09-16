@@ -63,6 +63,14 @@ class GuruSeeder extends Seeder
         ];
 
         foreach ($guruData as $data) {
+            if (
+                User::where('email', $data['email'])->exists()
+                || Guru::where('nip', $data['nip'])->exists()
+            ) {
+                $this->command->info("Guru {$data['nama']} sudah ada, dilewati.");
+                continue;
+            }
+
             // Create user
             $user = User::create([
                 'name' => $data['nama'],

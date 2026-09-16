@@ -26,6 +26,14 @@ class MuridSeeder extends Seeder
                 'alamat' => 'Jl. Mawar No. 1, Jakarta',
                 'nomor_telepon' => '082111111111',
                 'nama_orangtua' => 'Bapak Ahmad',
+                'nama_ayah' => 'Ahmad Wijaya',
+                'pekerjaan_ayah' => 'Wiraswasta',
+                'nama_ibu' => 'Siti Aminah',
+                'pekerjaan_ibu' => 'Ibu Rumah Tangga',
+                'nomor_telepon_ortu' => '081234567890',
+                'anak_ke' => 1,
+                'jumlah_saudara' => 2,
+                'cita_cita' => 'Software Engineer',
                 'kelas' => 'XI RPL 1',
             ],
             [
@@ -99,6 +107,16 @@ class MuridSeeder extends Seeder
         ];
 
         foreach ($muridData as $data) {
+            // Seeder boleh dijalankan berulang. Jangan buat atau timpa data
+            // murid yang telah ada, baik yang teridentifikasi oleh email maupun NIS.
+            $existingUser = User::where('email', $data['email'])->first();
+            $existingMurid = Murid::where('nis', $data['nis'])->first();
+
+            if ($existingUser || $existingMurid) {
+                $this->command->info("Murid {$data['nama']} sudah ada, dilewati.");
+                continue;
+            }
+
             $kelas = Kelas::where('name', $data['kelas'])->first();
             
             if (!$kelas) {
@@ -126,6 +144,14 @@ class MuridSeeder extends Seeder
                 'alamat' => $data['alamat'],
                 'nomor_telepon' => $data['nomor_telepon'],
                 'nama_orangtua' => $data['nama_orangtua'],
+                'nama_ayah' => $data['nama_ayah'] ?? null,
+                'pekerjaan_ayah' => $data['pekerjaan_ayah'] ?? null,
+                'nama_ibu' => $data['nama_ibu'] ?? null,
+                'pekerjaan_ibu' => $data['pekerjaan_ibu'] ?? null,
+                'nomor_telepon_ortu' => $data['nomor_telepon_ortu'] ?? null,
+                'anak_ke' => $data['anak_ke'] ?? null,
+                'jumlah_saudara' => $data['jumlah_saudara'] ?? null,
+                'cita_cita' => $data['cita_cita'] ?? null,
             ]);
         }
 

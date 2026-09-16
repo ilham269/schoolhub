@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\MapelController;
 use App\Http\Controllers\Api\SubjekGuruController;
 use App\Http\Controllers\Api\SubjekKelasController;
 use App\Http\Controllers\Api\JadwalController;
+use App\Http\Controllers\Api\MuridNilaiController;
 
 // No session/auth middleware: notification is sent server-to-server by Midtrans.
 Route::post('/payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
@@ -158,6 +159,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [MuridController::class, 'store']);
         Route::get('/profile', [MuridController::class, 'myProfile']);
         Route::put('/profile', [MuridController::class, 'updateMyProfile']);
+        Route::get('/nilai', [MuridNilaiController::class, 'index'])->middleware('role:murid');
         Route::get('/{id}', [MuridController::class, 'show']);
         Route::put('/{id}', [MuridController::class, 'update']);
         Route::delete('/{id}', [MuridController::class, 'destroy']);

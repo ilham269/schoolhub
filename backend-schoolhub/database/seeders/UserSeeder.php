@@ -13,6 +13,11 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        if (User::where('email', 'admin@schoolhub.com')->exists()) {
+            $this->command->info('Admin user sudah ada, dilewati.');
+            return;
+        }
+
         // Create Admin
         User::create([
             'name' => 'Administrator',
