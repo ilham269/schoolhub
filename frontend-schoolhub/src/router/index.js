@@ -90,6 +90,18 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'guru' },
     },
     {
+      path: '/dashboard/guru/kelas',
+      name: 'guru_kelola_kelas',
+      component: () => import('../views/guru/kelola_kelas.vue'),
+      meta: { requiresAuth: true, role: 'guru' },
+    },
+    {
+      path: '/dashboard/guru/tugas',
+      name: 'guru_tugas',
+      component: () => import('../views/guru/tugas.vue'),
+      meta: { requiresAuth: true, role: 'guru' },
+    },
+    {
       path: '/dashboard/murid',
       name: 'dashboard_murid',
       component: () => import('../views/murid/dashboard_murid.vue'),
