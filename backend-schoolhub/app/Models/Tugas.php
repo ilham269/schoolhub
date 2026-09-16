@@ -40,7 +40,7 @@ class Tugas extends Model
 
     public function mapel(): BelongsTo
     {
-        return $this->belongsTo(Mapel::class, 'mapel_id');
+        return $this->belongsTo(Subjek::class, 'mapel_id');
     }
 
     public function materi(): BelongsTo

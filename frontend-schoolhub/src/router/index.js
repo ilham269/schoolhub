@@ -102,6 +102,55 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'karyawan' },
     },
     {
+      path: '/dashboard/karyawan/keuangan',
+      name: 'karyawan_keuangan',
+      component: () => import('../views/karyawan/KeuanganDashboard.vue'),
+      meta: { requiresAuth: true, role: 'karyawan' },
+    },
+    {
+      path: '/dashboard/karyawan/keuangan/tagihan',
+      name: 'karyawan_tagihan_spp',
+      component: () => import('../views/karyawan/TagihanSppView.vue'),
+      meta: { requiresAuth: true, role: 'karyawan' },
+    },
+    {
+      path: '/dashboard/karyawan/keuangan/slip-gaji',
+      name: 'karyawan_slip_gaji',
+      component: () => import('../views/karyawan/SlipGajiView.vue'),
+      meta: { requiresAuth: true, role: 'karyawan' },
+    },
+    {
+      path: '/dashboard/karyawan/data-siswa',
+      name: 'karyawan_data_siswa',
+      component: () => import('../views/karyawan/DataSiswaView.vue'),
+      meta: { requiresAuth: true, role: 'karyawan' },
+    },
+    // Admin Keuangan Routes (reuse karyawan components)
+    {
+      path: '/dashboard/admin/keuangan',
+      name: 'admin_keuangan',
+      component: () => import('../views/karyawan/KeuanganDashboard.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/dashboard/admin/keuangan/tagihan',
+      name: 'admin_tagihan_spp',
+      component: () => import('../views/karyawan/TagihanSppView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/dashboard/admin/keuangan/slip-gaji',
+      name: 'admin_slip_gaji',
+      component: () => import('../views/karyawan/SlipGajiView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
+      path: '/dashboard/admin/data-siswa',
+      name: 'admin_data_siswa',
+      component: () => import('../views/karyawan/DataSiswaView.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    {
       path: '/dashboard/murid/:feature(profil|tugas|nilai|jadwal|ujian|administrasi|keuangan)',
       name: 'murid_feature',
       component: () => import('../views/murid/MuridFeatureView.vue'),

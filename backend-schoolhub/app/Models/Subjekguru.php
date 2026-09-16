@@ -11,7 +11,7 @@ class Subjekguru extends Model
 
     protected $fillable = [
         'guru_id',
-        'nama_pelajaran',
+        'mapel_id',
     ];
 
     public function guru(): BelongsTo
@@ -21,6 +21,6 @@ class Subjekguru extends Model
 
     public function subjek(): BelongsTo
     {
-        return $this->belongsTo(Subjek::class, 'nama_pelajaran');
+        return $this->belongsTo(Subjek::class, 'mapel_id');
     }
 }

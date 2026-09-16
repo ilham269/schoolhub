@@ -3,75 +3,64 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreMapelRequest;
+use App\Http\Requests\UpdateMapelRequest;
+use App\Models\Subjek;
+use App\Support\AcademicAccess;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class MapelController extends Controller
 {
-    /**
-     * Display a listing of mapel.
-     */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $mapels = DB::table('mapels')->get();
+        $query = Subjek::query()->orderBy('nama_mapel');
+        $user = $request->user();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data mapel berhasil diambil',
-            'data' => $mapels,
-        ]);
-    }
-
-    /**
-     * Store a newly created mapel.
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'kode_mapel' => 'required|string|unique:mapels,kode_mapel',
-            'nama_mapel' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'jumlah_jam' => 'required|integer|min:1|max:10',
-            'is_active' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 422);
+        if ($search = $request->query('search', $request->query('q'))) {
+            $query->where(function ($q) use ($search) {
+                $q->where('kode_mapel', 'like', "%{$search}%")
+                    ->orWhere('nama_mapel', 'like', "%{$search}%");
+            });
         }
 
-        $mapel = DB::table('mapels')->insertGetId([
-            'kode_mapel' => $request->kode_mapel,
-            'nama_mapel' => $request->nama_mapel,
-            'deskripsi' => $request->deskripsi,
-            'jumlah_jam' => $request->jumlah_jam,
-            'is_active' => $request->is_active ?? true,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if ($request->filled('is_active')) {
+            $query->where('is_active', filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN));
+        }
 
-        $data = DB::table('mapels')->find($mapel);
+        if (AcademicAccess::isGuru($user)) {
+            $guruId = AcademicAccess::guruId($user);
+            $query->whereHas('subjekgurus', fn ($q) => $q->where('guru_id', $guruId ?: 0));
+        } elseif (AcademicAccess::isMurid($user)) {
+            $kelasId = AcademicAccess::kelasId($user);
+            $query->whereHas('subjekkelas', fn ($q) => $q->where('kelas_id', $kelasId ?: 0));
+        }
+
+        return $this->paginated($query, $request, 'Data mapel berhasil diambil');
+    }
+
+    public function store(StoreMapelRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $mapel = Subjek::create([
+            ...$data,
+            'jumlah_jam' => $data['jumlah_jam'] ?? 2,
+            'kkm' => $data['kkm'] ?? 75,
+            'is_active' => $data['is_active'] ?? true,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Mapel berhasil dibuat',
-            'data' => $data,
+            'data' => $mapel,
         ], 201);
     }
 
-    /**
-     * Display the specified mapel.
-     */
-    public function show($id): JsonResponse
+    public function show(Request $request, $id): JsonResponse
     {
-        $mapel = DB::table('mapels')->find($id);
+        $mapel = Subjek::with(['gurus', 'kelas'])->find($id);
 
-        if (!$mapel) {
+        if (! $mapel || ! $this->canViewMapel($request, $mapel)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Mapel tidak ditemukan',
@@ -85,69 +74,52 @@ class MapelController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified mapel.
-     */
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateMapelRequest $request, $id): JsonResponse
     {
-        $mapel = DB::table('mapels')->find($id);
+        $mapel = Subjek::find($id);
 
-        if (!$mapel) {
+        if (! $mapel) {
             return response()->json([
                 'success' => false,
                 'message' => 'Mapel tidak ditemukan',
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'kode_mapel' => 'sometimes|string|unique:mapels,kode_mapel,' . $id,
-            'nama_mapel' => 'sometimes|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'jumlah_jam' => 'sometimes|integer|min:1|max:10',
-            'is_active' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        DB::table('mapels')->where('id', $id)->update([
-            'kode_mapel' => $request->kode_mapel ?? $mapel->kode_mapel,
-            'nama_mapel' => $request->nama_mapel ?? $mapel->nama_mapel,
-            'deskripsi' => $request->deskripsi ?? $mapel->deskripsi,
-            'jumlah_jam' => $request->jumlah_jam ?? $mapel->jumlah_jam,
-            'is_active' => $request->is_active ?? $mapel->is_active,
-            'updated_at' => now(),
-        ]);
-
-        $data = DB::table('mapels')->find($id);
+        $mapel->update($request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Mapel berhasil diupdate',
-            'data' => $data,
+            'data' => $mapel->fresh(),
         ]);
     }
 
-    /**
-     * Remove the specified mapel.
-     */
     public function destroy($id): JsonResponse
     {
-        $mapel = DB::table('mapels')->find($id);
+        $mapel = Subjek::find($id);
 
-        if (!$mapel) {
+        if (! $mapel) {
             return response()->json([
                 'success' => false,
                 'message' => 'Mapel tidak ditemukan',
             ], 404);
         }
 
-        DB::table('mapels')->where('id', $id)->delete();
+        if ($mapel->jadwals()->exists() || $mapel->materis()->exists() || $mapel->tugas()->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mapel tidak dapat dihapus karena masih digunakan. Nonaktifkan mapel sebagai gantinya.',
+            ], 422);
+        }
+
+        if ($mapel->subjekgurus()->exists() || $mapel->subjekkelas()->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mapel tidak dapat dihapus karena masih memiliki mapping guru atau kelas.',
+            ], 422);
+        }
+
+        $mapel->delete();
 
         return response()->json([
             'success' => true,
@@ -155,12 +127,9 @@ class MapelController extends Controller
         ]);
     }
 
-    /**
-     * Get active mapel only.
-     */
     public function active(): JsonResponse
     {
-        $mapels = DB::table('mapels')->where('is_active', true)->get();
+        $mapels = Subjek::where('is_active', true)->orderBy('nama_mapel')->get();
 
         return response()->json([
             'success' => true,
@@ -169,103 +138,17 @@ class MapelController extends Controller
         ]);
     }
 
-    /**
-     * Assign mapel to kelas.
-     */
-    public function assignToKelas(Request $request): JsonResponse
+    public function byKelas(Request $request, $kelasId): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'kelas_id' => 'required|exists:kelas,id',
-            'mapel_id' => 'required|exists:mapels,id',
-        ]);
-
-        if ($validator->fails()) {
+        if (AcademicAccess::isMurid($request->user()) && AcademicAccess::kelasId($request->user()) != $kelasId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 422);
+                'message' => 'Anda tidak memiliki akses ke resource ini.',
+            ], 403);
         }
 
-        // Check if already assigned
-        $exists = DB::table('class_subjects')
-            ->where('kelas_id', $request->kelas_id)
-            ->where('mapel_id', $request->mapel_id)
-            ->exists();
-
-        if ($exists) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Mapel sudah di-assign ke kelas ini',
-            ], 422);
-        }
-
-        DB::table('class_subjects')->insert([
-            'kelas_id' => $request->kelas_id,
-            'mapel_id' => $request->mapel_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Mapel berhasil di-assign ke kelas',
-        ], 201);
-    }
-
-    /**
-     * Assign mapel to guru.
-     */
-    public function assignToGuru(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'guru_id' => 'required|exists:gurus,id',
-            'mapel_id' => 'required|exists:mapels,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        // Check if already assigned
-        $exists = DB::table('teacher_subjects')
-            ->where('guru_id', $request->guru_id)
-            ->where('mapel_id', $request->mapel_id)
-            ->exists();
-
-        if ($exists) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Mapel sudah di-assign ke guru ini',
-            ], 422);
-        }
-
-        DB::table('teacher_subjects')->insert([
-            'guru_id' => $request->guru_id,
-            'mapel_id' => $request->mapel_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Mapel berhasil di-assign ke guru',
-        ], 201);
-    }
-
-    /**
-     * Get mapel by kelas.
-     */
-    public function byKelas($kelasId): JsonResponse
-    {
-        $mapels = DB::table('mapels')
-            ->join('class_subjects', 'mapels.id', '=', 'class_subjects.mapel_id')
-            ->where('class_subjects.kelas_id', $kelasId)
-            ->select('mapels.*')
+        $mapels = Subjek::whereHas('subjekkelas', fn ($q) => $q->where('kelas_id', $kelasId))
+            ->orderBy('nama_mapel')
             ->get();
 
         return response()->json([
@@ -275,21 +158,60 @@ class MapelController extends Controller
         ]);
     }
 
-    /**
-     * Get mapel by guru.
-     */
-    public function byGuru($guruId): JsonResponse
+    public function byGuru(Request $request, $guruId): JsonResponse
     {
-        $mapels = DB::table('mapels')
-            ->join('teacher_subjects', 'mapels.id', '=', 'teacher_subjects.mapel_id')
-            ->where('teacher_subjects.guru_id', $guruId)
-            ->select('mapels.*')
+        if (AcademicAccess::isGuru($request->user()) && AcademicAccess::guruId($request->user()) != $guruId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki akses ke resource ini.',
+            ], 403);
+        }
+
+        $mapels = Subjek::whereHas('subjekgurus', fn ($q) => $q->where('guru_id', $guruId))
+            ->orderBy('nama_mapel')
             ->get();
 
         return response()->json([
             'success' => true,
             'message' => 'Data mapel berdasarkan guru berhasil diambil',
             'data' => $mapels,
+        ]);
+    }
+
+    private function canViewMapel(Request $request, Subjek $mapel): bool
+    {
+        $user = $request->user();
+
+        if (AcademicAccess::isAdmin($user)) {
+            return true;
+        }
+
+        if (AcademicAccess::isGuru($user)) {
+            return $mapel->subjekgurus()->where('guru_id', AcademicAccess::guruId($user))->exists();
+        }
+
+        if (AcademicAccess::isMurid($user)) {
+            return $mapel->subjekkelas()->where('kelas_id', AcademicAccess::kelasId($user))->exists();
+        }
+
+        return false;
+    }
+
+    private function paginated($query, Request $request, string $message): JsonResponse
+    {
+        $perPage = min(max($request->integer('per_page', 50), 1), 100);
+        $page = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'data' => $page->items(),
+            'meta' => [
+                'current_page' => $page->currentPage(),
+                'last_page' => $page->lastPage(),
+                'per_page' => $page->perPage(),
+                'total' => $page->total(),
+            ],
         ]);
     }
 }

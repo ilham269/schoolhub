@@ -56,18 +56,17 @@ class User extends Authenticatable
         ];
     }
 
-    //relasi 
-    public function Murid()
+    public function murid()
     {
         return $this->hasOne(Murid::class);
     }
 
-    public function Guru()
+    public function guru()
     {
         return $this->hasOne(Guru::class);
     }
 
-    public function Karyawan()
+    public function karyawan()
     {
         return $this->hasOne(Karyawan::class);
     }

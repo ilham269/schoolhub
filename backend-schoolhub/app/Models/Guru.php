@@ -38,12 +38,20 @@ class Guru extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function subjekgurus()
     {
-    return $this->hasMany(Subjekguru::class, 'guru_id');
+        return $this->hasMany(Subjekguru::class, 'guru_id');
     }
+
     public function jadwals()
     {
-    return $this->hasMany(Jadwal::class, 'guru_id');
+        return $this->hasMany(Jadwal::class, 'guru_id');
+    }
+
+    public function subjeks()
+    {
+        return $this->belongsToMany(Subjek::class, 'teacher_subjects', 'guru_id', 'mapel_id')
+            ->withTimestamps();
     }
 }

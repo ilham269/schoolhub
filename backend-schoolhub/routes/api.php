@@ -13,6 +13,10 @@ use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PpdbController;
 use App\Http\Controllers\Api\PaymentCallbackController;
+use App\Http\Controllers\Api\MapelController;
+use App\Http\Controllers\Api\SubjekGuruController;
+use App\Http\Controllers\Api\SubjekKelasController;
+use App\Http\Controllers\Api\JadwalController;
 
 // No session/auth middleware: notification is sent server-to-server by Midtrans.
 Route::post('/payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');
@@ -180,6 +184,41 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [KelasController::class, 'destroy']);
         Route::get('/jurusan/{jurusan}', [KelasController::class, 'byJurusan']);
         Route::get('/tingkat/{tingkat}', [KelasController::class, 'byTingkat']);
+    });
+
+    // Academic Core — readable by admin, guru, murid
+    Route::middleware('role:admin,guru,murid')->group(function () {
+        Route::get('/mapel', [MapelController::class, 'index']);
+        Route::get('/mapel/active', [MapelController::class, 'active']);
+        Route::get('/mapel/kelas/{kelasId}', [MapelController::class, 'byKelas']);
+        Route::get('/mapel/guru/{guruId}', [MapelController::class, 'byGuru']);
+        Route::get('/mapel/{id}', [MapelController::class, 'show']);
+
+        Route::get('/subjek-guru', [SubjekGuruController::class, 'index']);
+        Route::get('/subjek-kelas', [SubjekKelasController::class, 'index']);
+
+        Route::get('/jadwal', [JadwalController::class, 'index']);
+        Route::get('/jadwal/kelas/{kelasId}', [JadwalController::class, 'byKelas']);
+        Route::get('/jadwal/guru/{guruId}', [JadwalController::class, 'byGuru']);
+        Route::get('/jadwal/hari/{hari}', [JadwalController::class, 'byHari']);
+        Route::get('/jadwal/{id}', [JadwalController::class, 'show']);
+    });
+
+    // Academic Core — admin mutations
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/mapel', [MapelController::class, 'store']);
+        Route::put('/mapel/{id}', [MapelController::class, 'update']);
+        Route::delete('/mapel/{id}', [MapelController::class, 'destroy']);
+
+        Route::post('/subjek-guru', [SubjekGuruController::class, 'store']);
+        Route::delete('/subjek-guru/{id}', [SubjekGuruController::class, 'destroy']);
+
+        Route::post('/subjek-kelas', [SubjekKelasController::class, 'store']);
+        Route::delete('/subjek-kelas/{id}', [SubjekKelasController::class, 'destroy']);
+
+        Route::post('/jadwal', [JadwalController::class, 'store']);
+        Route::put('/jadwal/{id}', [JadwalController::class, 'update']);
+        Route::delete('/jadwal/{id}', [JadwalController::class, 'destroy']);
     });
 
     // Keuangan Routes (Karyawan & Admin)

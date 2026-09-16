@@ -100,10 +100,25 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
+        $user = $request->user();
+        $role = strtolower($user->role ?? '');
+
+        $relations = match ($role) {
+            'murid' => ['murid', 'calonSiswa'],
+            'guru' => ['guru'],
+            'karyawan' => ['karyawan'],
+            'calon_siswa' => ['calonSiswa'],
+            default => [],
+        };
+
+        if ($relations) {
+            $user->load($relations);
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
         ]);
     }
