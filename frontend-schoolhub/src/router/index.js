@@ -114,6 +114,12 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'murid' },
     },
     {
+      path: '/dashboard/murid/tugas',
+      name: 'murid_tugas',
+      component: () => import('../views/murid/Tugas.vue'),
+      meta: { requiresAuth: true, role: 'murid' },
+    },
+    {
       path: '/dashboard/karyawan',
       name: 'dashboard_karyawan',
       component: () => import('../views/karyawan/dashboard_karyawan.vue'),
