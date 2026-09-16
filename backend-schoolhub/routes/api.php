@@ -156,6 +156,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('murid')->group(function () {
         Route::get('/', [MuridController::class, 'index']);
         Route::post('/', [MuridController::class, 'store']);
+        Route::get('/profile', [MuridController::class, 'myProfile']);
+        Route::put('/profile', [MuridController::class, 'updateMyProfile']);
         Route::get('/{id}', [MuridController::class, 'show']);
         Route::put('/{id}', [MuridController::class, 'update']);
         Route::delete('/{id}', [MuridController::class, 'destroy']);

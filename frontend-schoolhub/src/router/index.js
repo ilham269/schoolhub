@@ -108,6 +108,12 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'murid' },
     },
     {
+      path: '/dashboard/murid/profil',
+      name: 'murid_profil',
+      component: () => import('../views/murid/Profil.vue'),
+      meta: { requiresAuth: true, role: 'murid' },
+    },
+    {
       path: '/dashboard/karyawan',
       name: 'dashboard_karyawan',
       component: () => import('../views/karyawan/dashboard_karyawan.vue'),

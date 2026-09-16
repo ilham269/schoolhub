@@ -43,6 +43,7 @@ class MuridController extends Controller
             'tempat_lahir' => 'nullable|string|max:255',
             'alamat' => 'required|string',
             'nomor_telepon' => 'required|string|max:20',
+            'nama_orangtua' => 'nullable|string|max:255',
             'nama_ayah' => 'nullable|string|max:255',
             'nama_ibu' => 'nullable|string|max:255',
             'pekerjaan_ayah' => 'nullable|string|max:255',
@@ -85,6 +86,7 @@ class MuridController extends Controller
                 'tempat_lahir' => $request->tempat_lahir,
                 'alamat' => $request->alamat,
                 'nomor_telepon' => $request->nomor_telepon,
+                'nama_orangtua' => $request->nama_orangtua,
                 'nama_ayah' => $request->nama_ayah,
                 'nama_ibu' => $request->nama_ibu,
                 'pekerjaan_ayah' => $request->pekerjaan_ayah,
@@ -109,6 +111,111 @@ class MuridController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menambahkan murid',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Profil murid yang sedang login.
+     * PENTING: route ini harus didaftarkan SEBELUM /{id} di routes/api.php,
+     * kalau tidak, 'profile' akan tertangkap sebagai nilai {id}.
+     */
+    public function myProfile(Request $request): JsonResponse
+    {
+        $murid = Murid::with('kelas')->where('user_id', $request->user()->id)->first();
+
+        if (!$murid) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Murid tidak ditemukan',
+            ], 404);
+        }
+
+        // Kolom database memakai 'Nama_lengkap_murid' (N besar).
+        // Disamakan ke 'nama_lengkap_murid' supaya cocok dengan frontend.
+        $data = $murid->toArray();
+        $data['nama_lengkap_murid'] = $murid->Nama_lengkap_murid;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil murid berhasil diambil',
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Update profil murid yang sedang login.
+     * Murid hanya boleh mengubah datanya sendiri, bukan nis/kelas_id.
+     */
+    public function updateMyProfile(Request $request): JsonResponse
+    {
+        $murid = Murid::where('user_id', $request->user()->id)->first();
+
+        if (!$murid) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Murid tidak ditemukan',
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama_lengkap_murid' => 'required|string|max:255',
+            'gender' => 'required|in:L,P',
+            'agama' => 'nullable|string|max:50',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'tanggal_lahir' => 'nullable|date',
+            'nomor_telepon' => 'nullable|string|max:20',
+            'hobi' => 'nullable|string|max:255',
+            'cita_cita' => 'nullable|string|max:255',
+            'anak_ke' => 'nullable|integer|min:1',
+            'jumlah_saudara' => 'nullable|integer|min:0',
+            'alamat' => 'nullable|string',
+            'nama_orangtua' => 'nullable|string|max:255',
+            'nama_ayah' => 'nullable|string|max:255',
+            'pekerjaan_ayah' => 'nullable|string|max:255',
+            'nama_ibu' => 'nullable|string|max:255',
+            'pekerjaan_ibu' => 'nullable|string|max:255',
+            'nomor_telepon_ortu' => 'nullable|string|max:20',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+
+        // Samakan lagi ke nama kolom asli sebelum disimpan.
+        $validated['Nama_lengkap_murid'] = $validated['nama_lengkap_murid'];
+        unset($validated['nama_lengkap_murid']);
+
+        DB::beginTransaction();
+        try {
+            $murid->update($validated);
+
+            // Nama di tabel users ikut disamakan (opsional, biar konsisten).
+            $murid->user?->update(['name' => $validated['Nama_lengkap_murid']]);
+
+            DB::commit();
+
+            $murid->refresh()->load('kelas');
+            $data = $murid->toArray();
+            $data['nama_lengkap_murid'] = $murid->Nama_lengkap_murid;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profil berhasil diperbarui',
+                'data' => $data,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui profil',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -160,6 +267,7 @@ class MuridController extends Controller
             'tempat_lahir' => 'nullable|string|max:255',
             'alamat' => 'sometimes|string',
             'nomor_telepon' => 'sometimes|string|max:20',
+            'nama_orangtua' => 'nullable|string|max:255',
             'nama_ayah' => 'nullable|string|max:255',
             'nama_ibu' => 'nullable|string|max:255',
             'pekerjaan_ayah' => 'nullable|string|max:255',
@@ -202,6 +310,7 @@ class MuridController extends Controller
                 'tempat_lahir',
                 'alamat',
                 'nomor_telepon',
+                'nama_orangtua',
                 'nama_ayah',
                 'nama_ibu',
                 'pekerjaan_ayah',
