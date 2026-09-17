@@ -254,98 +254,101 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Semua warna & font memakai design tokens global situs
+   (--forest-950, --leaf-500, --lime-400, dst dari main.css) supaya
+   konsisten dengan tema hijau/forest yang dipakai di seluruh aplikasi. */
+
 .welcome-card {
-  background: linear-gradient(110deg, #1e3a8a, #3b82f6);
+  background: linear-gradient(110deg, var(--forest-950), var(--leaf-600));
   padding: 26px 30px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
-
 .welcome-card h2 {
   color: white;
   font-size: 1.35rem;
   margin: 8px 0 4px;
 }
-
 .welcome-card p {
-  color: #dbeafe;
+  color: #d9efe0;
   margin: 0;
   font-size: 0.9rem;
 }
-
 .welcome-card > i {
   font-size: 3rem;
-  color: #60a5fa;
-  opacity: 0.8;
+  color: var(--lime-400);
+  opacity: 0.85;
+}
+.eyebrow-dot.dark {
+  color: var(--lime-400);
+}
+.eyebrow-dot.dark::before {
+  background: var(--lime-400);
 }
 
 .loading-state,
 .error-state {
   text-align: center;
   padding: 60px 20px;
-  color: #64748b;
+  color: var(--muted);
 }
-
 .loading-state i {
   font-size: 2.5rem;
   margin-bottom: 16px;
-  color: #3b82f6;
+  color: var(--leaf-500);
 }
-
 .error-state i {
   font-size: 2.5rem;
   margin-bottom: 16px;
-  color: #ef4444;
+  color: var(--red);
 }
-
 .error-state p {
   margin-bottom: 20px;
   font-size: 0.95rem;
 }
-
 .btn-retry {
-  background: #3b82f6;
+  background: var(--leaf-500);
   color: white;
   border: none;
   padding: 10px 24px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
+  font-family: var(--font-head);
+  font-weight: 600;
   transition: background 0.2s;
 }
-
 .btn-retry:hover {
-  background: #2563eb;
+  background: var(--leaf-600);
 }
 
 .section-heading {
   margin: 34px 0 15px;
 }
-
 .section-heading h2 {
   font-size: 1.1rem;
   margin: 0;
-  color: #1e293b;
+  color: var(--forest-950);
 }
-
 .section-heading p {
   font-size: 0.82rem;
   margin: 3px 0 0;
-  color: #64748b;
+  color: var(--muted);
 }
 
 /* Recent Transactions */
 .recent-transactions,
 .upcoming-dues {
   margin-top: 32px;
-  background: white;
-  border-radius: 12px;
+  background: var(--paper);
+  border-radius: var(--radius-md);
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
 }
 
 .section-header {
@@ -354,40 +357,41 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--line);
 }
-
 .section-header h3 {
   font-size: 1rem;
-  color: #1e293b;
+  color: var(--forest-950);
   margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
 }
+.section-header h3 i {
+  color: var(--leaf-600);
+}
 
 .transaction-count,
 .dues-count {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--cream);
+  color: var(--forest-900);
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
+  font-family: var(--font-head);
 }
 
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #94a3b8;
+  color: var(--muted);
 }
-
 .empty-state i {
   font-size: 2.5rem;
   margin-bottom: 12px;
-  opacity: 0.5;
+  color: var(--line);
 }
-
 .empty-state p {
   margin: 0;
   font-size: 0.9rem;
@@ -407,14 +411,13 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: #f8fafc;
-  border-radius: 10px;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
   transition: all 0.2s;
 }
-
 .transaction-item:hover,
 .due-item:hover {
-  background: #f1f5f9;
+  background: #eef4ea;
   transform: translateX(4px);
 }
 
@@ -429,96 +432,89 @@ onMounted(() => {
   font-size: 1.2rem;
   flex-shrink: 0;
 }
-
 .transaction-icon {
-  background: #dbeafe;
-  color: #3b82f6;
+  background: #eaf1fd;
+  color: #2563eb;
 }
-
 .transaction-icon.status-success {
-  background: #d1fae5;
-  color: #10b981;
+  background: #e3f6ea;
+  color: var(--leaf-600);
 }
-
 .transaction-icon.status-pending {
-  background: #fef3c7;
-  color: #f59e0b;
+  background: #fdf1dc;
+  color: var(--amber);
 }
-
 .transaction-icon.status-error {
-  background: #fee2e2;
-  color: #ef4444;
+  background: #fbe4e4;
+  color: var(--red);
 }
 
 .due-icon {
-  background: #fef3c7;
-  color: #f59e0b;
+  background: #fdf1dc;
+  color: var(--amber);
 }
 
 .transaction-info,
 .due-info {
   flex: 1;
 }
-
 .transaction-name,
 .due-name {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--forest-950);
   font-size: 0.95rem;
   margin-bottom: 4px;
+  font-family: var(--font-head);
 }
-
 .transaction-meta,
 .due-meta {
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .transaction-details,
 .due-details {
   text-align: right;
 }
-
 .transaction-amount,
 .due-amount {
   font-weight: 700;
-  color: #1e293b;
+  color: var(--forest-950);
   font-size: 0.95rem;
   margin-bottom: 4px;
+  font-family: var(--font-head);
 }
 
 .transaction-status {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: 999px;
   display: inline-block;
+  font-family: var(--font-head);
 }
-
 .transaction-status.status-success {
-  background: #d1fae5;
-  color: #059669;
+  background: #e3f6ea;
+  color: var(--leaf-600);
 }
-
 .transaction-status.status-pending {
-  background: #fef3c7;
-  color: #d97706;
+  background: #fdf1dc;
+  color: #a9711f;
 }
-
 .transaction-status.status-warning {
-  background: #fed7aa;
-  color: #c2410c;
+  background: #fdeada;
+  color: #b3540f;
 }
-
 .transaction-status.status-error {
-  background: #fee2e2;
-  color: #dc2626;
+  background: #fbe4e4;
+  color: var(--red);
 }
 
 .due-date {
   font-size: 0.8rem;
-  color: #f59e0b;
-  font-weight: 500;
+  color: var(--amber);
+  font-weight: 600;
+  font-family: var(--font-head);
 }
 
 @media (max-width: 768px) {
@@ -527,20 +523,17 @@ onMounted(() => {
     text-align: center;
     gap: 16px;
   }
-
   .section-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-
   .transaction-item,
   .due-item {
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
   }
-
   .transaction-details,
   .due-details {
     width: 100%;

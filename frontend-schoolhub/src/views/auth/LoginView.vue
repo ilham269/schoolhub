@@ -152,7 +152,7 @@ const login = async (type) => {
       <!-- BRAND -->
       <div class="brand">
         <span class="brand-mark">HB</span>
-        SMA Harapan Bangsa
+        SMK Harapan Bangsa
       </div>
 
       <p class="sub">Masuk ke portal siswa, orang tua, atau staf sekolah.</p>
@@ -312,3 +312,26 @@ const login = async (type) => {
     </div>
   </section>
 </template>
+<style scoped>
+.login-shell {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  
+  /* Background Gambar dengan Dark Overlay */
+  background: 
+    linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.55)),
+    url('https://i.pinimg.com/736x/4e/6f/cf/4e6fcff0ea88fd7724700944a36c05fb.jpg') center/cover no-repeat;
+}
+
+/* Memastikan card login berada di atas background dengan tampilan kontras */
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px); /* Efek kaca halus */
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+</style>

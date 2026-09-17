@@ -1,59 +1,52 @@
 <template>
   <DashboardLayout title="Data Siswa" role-label="Karyawan" :navigation="navigation">
     <!-- Header -->
-    <div class="page-header">
+    <section class="welcome">
       <div>
-        <h1>Data Siswa</h1>
-        <p>Kelola data siswa sekolah</p>
+        <span class="eyebrow-dot dark">Manajemen akademik</span>
+        <h2>Data Siswa</h2>
+        <p>Kelola data siswa sekolah.</p>
       </div>
-      <button @click="showCreateModal = true" class="btn-primary">
+      <button @click="showCreateModal = true" class="btn-add">
         <i class="fas fa-plus"></i> Tambah Siswa
       </button>
-    </div>
+    </section>
 
     <!-- Stats Cards -->
-    <div class="stats-grid" v-if="!loading && stats">
-      <div class="stat-card">
-        <div class="stat-icon blue">
-          <i class="fas fa-users"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ stats.total }}</div>
-          <div class="stat-label">Total Siswa</div>
+    <div class="summary-row" v-if="!loading && stats">
+      <div class="summary-card total">
+        <i class="fas fa-users"></i>
+        <div>
+          <b>{{ stats.total }}</b>
+          <span>Total Siswa</span>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon green">
-          <i class="fas fa-user-check"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ stats.active }}</div>
-          <div class="stat-label">Siswa Aktif</div>
+      <div class="summary-card active">
+        <i class="fas fa-user-check"></i>
+        <div>
+          <b>{{ stats.active }}</b>
+          <span>Siswa Aktif</span>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon amber">
-          <i class="fas fa-mars"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ stats.male }}</div>
-          <div class="stat-label">Laki-laki</div>
+      <div class="summary-card male">
+        <i class="fas fa-mars"></i>
+        <div>
+          <b>{{ stats.male }}</b>
+          <span>Laki-laki</span>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon pink">
-          <i class="fas fa-venus"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ stats.female }}</div>
-          <div class="stat-label">Perempuan</div>
+      <div class="summary-card female">
+        <i class="fas fa-venus"></i>
+        <div>
+          <b>{{ stats.female }}</b>
+          <span>Perempuan</span>
         </div>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="filters-card">
-      <div class="filter-group">
+    <section class="filter-bar">
+      <div class="filter-item">
         <label>Kelas</label>
         <select v-model="filters.kelas_id" @change="loadSiswa">
           <option value="">Semua Kelas</option>
@@ -63,7 +56,7 @@
         </select>
       </div>
 
-      <div class="filter-group">
+      <div class="filter-item">
         <label>Gender</label>
         <select v-model="filters.gender" @change="loadSiswa">
           <option value="">Semua</option>
@@ -72,7 +65,7 @@
         </select>
       </div>
 
-      <div class="filter-group">
+      <div class="filter-item grow">
         <label>Cari</label>
         <input
           type="text"
@@ -85,7 +78,7 @@
       <button @click="resetFilters" class="btn-secondary">
         <i class="fas fa-redo"></i> Reset
       </button>
-    </div>
+    </section>
 
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
@@ -97,12 +90,14 @@
     <div v-else-if="error" class="error-state">
       <i class="fas fa-exclamation-circle"></i>
       <p>{{ error }}</p>
-      <button @click="loadSiswa" class="btn-retry">Coba Lagi</button>
+      <button @click="loadSiswa" class="btn-retry">
+        <i class="fas fa-redo"></i> Coba Lagi
+      </button>
     </div>
 
     <!-- Data Table -->
-    <div v-else class="table-card">
-      <div class="table-header">
+    <section v-else class="table-wrap">
+      <div class="table-head">
         <h3>Daftar Siswa</h3>
         <span class="record-count">{{ filteredSiswa.length }} siswa</span>
       </div>
@@ -115,7 +110,7 @@
 
       <!-- Table -->
       <div v-else class="table-responsive">
-        <table>
+        <table class="data-table">
           <thead>
             <tr>
               <th>NIS</th>
@@ -158,9 +153,9 @@
                     <i class="fas fa-eye"></i>
                   </button>
                   <button @click="editSiswa(siswa)" class="btn-icon" title="Edit">
-                    <i class="fas fa-edit"></i>
+                    <i class="fas fa-pen"></i>
                   </button>
-                  <button @click="deleteSiswa(siswa)" class="btn-icon btn-danger" title="Hapus">
+                  <button @click="deleteSiswa(siswa)" class="btn-icon danger" title="Hapus">
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
@@ -169,13 +164,13 @@
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
 
     <!-- Detail Modal -->
     <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
-      <div class="modal-content modal-large">
+      <div class="modal-box modal-large">
         <div class="modal-header">
-          <h2>Detail Siswa</h2>
+          <h3>Detail Siswa</h3>
           <button @click="closeDetailModal" class="btn-close">
             <i class="fas fa-times"></i>
           </button>
@@ -185,7 +180,7 @@
           <div class="detail-grid">
             <!-- Personal Info -->
             <div class="detail-section">
-              <h3><i class="fas fa-user"></i> Data Pribadi</h3>
+              <h4><i class="fas fa-user"></i> Data Pribadi</h4>
               <div class="detail-row">
                 <span class="detail-label">NIS:</span>
                 <span class="detail-value">{{ selectedSiswa.nis }}</span>
@@ -218,7 +213,7 @@
 
             <!-- Academic Info -->
             <div class="detail-section">
-              <h3><i class="fas fa-school"></i> Data Akademik</h3>
+              <h4><i class="fas fa-school"></i> Data Akademik</h4>
               <div class="detail-row">
                 <span class="detail-label">Kelas:</span>
                 <span class="detail-value">{{ selectedSiswa.kelas?.name || '-' }}</span>
@@ -235,7 +230,7 @@
 
             <!-- Contact Info -->
             <div class="detail-section">
-              <h3><i class="fas fa-address-book"></i> Kontak</h3>
+              <h4><i class="fas fa-address-book"></i> Kontak</h4>
               <div class="detail-row">
                 <span class="detail-label">Alamat:</span>
                 <span class="detail-value">{{ selectedSiswa.alamat || '-' }}</span>
@@ -252,7 +247,7 @@
 
             <!-- Parent Info -->
             <div class="detail-section">
-              <h3><i class="fas fa-users"></i> Data Orang Tua</h3>
+              <h4><i class="fas fa-users"></i> Data Orang Tua</h4>
               <div class="detail-row">
                 <span class="detail-label">Nama Ayah:</span>
                 <span class="detail-value">{{ selectedSiswa.nama_ayah || '-' }}</span>
@@ -285,9 +280,9 @@
 
     <!-- Create/Edit Modal -->
     <div v-if="showCreateModal || showEditModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content modal-large">
+      <div class="modal-box modal-large">
         <div class="modal-header">
-          <h2>{{ showEditModal ? 'Edit Siswa' : 'Tambah Siswa Baru' }}</h2>
+          <h3>{{ showEditModal ? 'Edit Siswa' : 'Tambah Siswa Baru' }}</h3>
           <button @click="closeModal" class="btn-close">
             <i class="fas fa-times"></i>
           </button>
@@ -296,7 +291,7 @@
         <form @submit.prevent="submitForm" class="modal-body">
           <!-- Personal Info Section -->
           <div class="form-section">
-            <h3><i class="fas fa-user"></i> Data Pribadi</h3>
+            <h4><i class="fas fa-user"></i> Data Pribadi</h4>
             <div class="form-grid">
               <div class="form-group">
                 <label>NIS <span class="required">*</span></label>
@@ -365,7 +360,7 @@
 
           <!-- Contact Section -->
           <div class="form-section">
-            <h3><i class="fas fa-address-book"></i> Kontak</h3>
+            <h4><i class="fas fa-address-book"></i> Kontak</h4>
             <div class="form-grid">
               <div class="form-group full-width">
                 <label>Alamat <span class="required">*</span></label>
@@ -386,7 +381,7 @@
 
           <!-- Parent Info Section -->
           <div class="form-section">
-            <h3><i class="fas fa-users"></i> Data Orang Tua</h3>
+            <h4><i class="fas fa-users"></i> Data Orang Tua</h4>
             <div class="form-grid">
               <div class="form-group">
                 <label>Nama Ayah</label>
@@ -422,7 +417,7 @@
 
           <!-- Additional Info -->
           <div class="form-section">
-            <h3><i class="fas fa-info-circle"></i> Informasi Tambahan</h3>
+            <h4><i class="fas fa-info-circle"></i> Informasi Tambahan</h4>
             <div class="form-grid">
               <div class="form-group">
                 <label>Hobi</label>
@@ -436,7 +431,7 @@
             </div>
           </div>
 
-          <div class="form-actions">
+          <div class="modal-actions">
             <button type="button" @click="closeModal" class="btn-secondary">Batal</button>
             <button type="submit" class="btn-primary" :disabled="submitting">
               <i v-if="submitting" class="fas fa-spinner fa-spin"></i>
@@ -506,7 +501,7 @@ let searchTimeout = null
 
 const stats = computed(() => {
   if (!siswaList.value.length) return null
-  
+
   return {
     total: siswaList.value.length,
     active: siswaList.value.filter(s => s.user?.is_active).length,
@@ -728,280 +723,283 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Continue in next message due to length... */
-/* Page Header */
-.page-header {
+/* Semua warna & font di bawah memakai design tokens global situs
+   (--forest-950, --leaf-500, --lime-400, dst dari main.css) supaya
+   halaman ini konsisten dengan tema hijau/forest yang dipakai di
+   seluruh bagian lain aplikasi. */
+
+.welcome {
+  background: linear-gradient(110deg, var(--forest-950), var(--leaf-600));
+  padding: 27px 30px;
+  border-radius: var(--radius-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  gap: 16px;
 }
-
-.page-header h1 {
-  font-size: 1.5rem;
-  color: #1e293b;
-  margin: 0 0 4px;
+.welcome h2 {
+  color: #fff;
+  font-size: 1.35rem;
+  margin: 4px 0;
 }
-
-.page-header p {
-  color: #64748b;
+.welcome p {
+  color: #d9efe0;
   margin: 0;
-  font-size: 0.9rem;
+}
+.eyebrow-dot.dark {
+  color: var(--lime-400);
+}
+.eyebrow-dot.dark::before {
+  background: var(--lime-400);
 }
 
-/* Buttons */
-.btn-primary {
-  background: #3b82f6;
-  color: white;
+.btn-add {
+  background: var(--lime-400);
+  color: var(--forest-950);
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-family: var(--font-head);
+  font-weight: 600;
   cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
+  white-space: nowrap;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: background 0.2s;
+  transition: filter 0.2s;
+}
+.btn-add:hover {
+  filter: brightness(1.05);
 }
 
-.btn-primary:hover {
-  background: #2563eb;
-}
-
-.btn-primary:disabled {
-  background: #94a3b8;
-  cursor: not-allowed;
-}
-
-.btn-secondary {
-  background: #f1f5f9;
-  color: #475569;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background 0.2s;
-}
-
-.btn-secondary:hover {
-  background: #e2e8f0;
-}
-
-/* Stats Cards */
-.stats-grid {
+/* ---------- Summary cards ---------- */
+.summary-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
 }
-
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
+@media (max-width: 900px) {
+  .summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.summary-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 18px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  gap: 14px;
+  box-shadow: var(--shadow-card);
 }
-
-.stat-icon {
-  width: 56px;
-  height: 56px;
+.summary-card i {
+  font-size: 1.3rem;
+  width: 46px;
+  height: 46px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  flex-shrink: 0;
+  flex: none;
 }
-
-.stat-icon.blue {
-  background: #dbeafe;
-  color: #3b82f6;
+.summary-card.total i {
+  background: var(--cream);
+  color: var(--forest-900);
 }
-
-.stat-icon.green {
-  background: #d1fae5;
-  color: #10b981;
+.summary-card.active i {
+  background: #e3f6ea;
+  color: var(--leaf-600);
 }
-
-.stat-icon.amber {
-  background: #fef3c7;
-  color: #f59e0b;
+.summary-card.male i {
+  background: #eaf1fd;
+  color: #2563eb;
 }
-
-.stat-icon.pink {
+.summary-card.female i {
   background: #fce7f3;
-  color: #ec4899;
+  color: #db2777;
+}
+.summary-card b {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  color: var(--forest-950);
+}
+.summary-card span {
+  font-size: 0.78rem;
+  color: var(--muted);
 }
 
-.stat-content {
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 0.85rem;
-  color: #64748b;
-}
-
-/* Filters */
-.filters-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+/* ---------- Filters ---------- */
+.filter-bar {
   display: flex;
   gap: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
   align-items: flex-end;
 }
-
-.filter-group {
+.filter-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+.filter-item.grow {
+  flex: 1;
   min-width: 200px;
 }
-
-.filter-group label {
-  font-size: 0.85rem;
+.filter-item label {
+  font-size: 0.78rem;
+  color: var(--muted);
   font-weight: 600;
-  color: #475569;
+  font-family: var(--font-head);
+}
+.filter-item input,
+.filter-item select {
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  min-width: 160px;
+  font-size: 0.88rem;
+  font-family: var(--font-body);
+}
+.filter-item input:focus,
+.filter-item select:focus {
+  border-color: var(--leaf-500);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(34, 181, 108, 0.14);
 }
 
-.filter-group input,
-.filter-group select {
-  padding: 8px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.9rem;
+.btn-secondary {
+  background: var(--cream);
+  color: var(--forest-950);
+  border: 1.5px solid var(--line);
+  padding: 9px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: fit-content;
+}
+.btn-secondary:hover {
+  border-color: var(--leaf-500);
+  color: var(--leaf-600);
 }
 
-/* Loading & Error States */
+/* ---------- Loading / Error ---------- */
 .loading-state,
-.error-state {
+.error-state,
+.empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #64748b;
+  color: var(--muted);
 }
-
 .loading-state i {
   font-size: 2.5rem;
   margin-bottom: 16px;
-  color: #3b82f6;
+  color: var(--leaf-500);
 }
-
 .error-state i {
   font-size: 2.5rem;
   margin-bottom: 16px;
-  color: #ef4444;
+  color: var(--red);
 }
-
+.empty-state i {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  color: var(--line);
+}
 .btn-retry {
-  background: #3b82f6;
+  background: var(--leaf-500);
   color: white;
   border: none;
   padding: 10px 24px;
   border-radius: 8px;
   cursor: pointer;
   margin-top: 12px;
+  font-family: var(--font-head);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-retry:hover {
+  background: var(--leaf-600);
 }
 
-/* Table */
-.table-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* ---------- Table ---------- */
+.table-wrap {
+  background: var(--paper);
+  border-radius: var(--radius-md);
   overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
 }
-
-.table-header {
+.table-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
 }
-
-.table-header h3 {
+.table-head h3 {
   font-size: 1rem;
-  color: #1e293b;
   margin: 0;
+  color: var(--forest-950);
 }
-
 .record-count {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--cream);
+  color: var(--forest-900);
   padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #94a3b8;
-}
-
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 12px;
-  opacity: 0.5;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-head);
 }
 
 .table-responsive {
   overflow-x: auto;
 }
-
-table {
+.data-table {
   width: 100%;
   border-collapse: collapse;
 }
-
-thead {
-  background: #f8fafc;
-}
-
-th {
+.data-table th,
+.data-table td {
+  padding: 13px 18px;
   text-align: left;
-  padding: 12px 16px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 0.86rem;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
 }
-
-td {
-  padding: 16px;
-  border-top: 1px solid #f1f5f9;
-  font-size: 0.9rem;
-  color: #334155;
+.data-table thead th {
+  background: var(--cream);
+  font-family: var(--font-head);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--forest-900);
+}
+.data-table tbody tr:hover {
+  background: #f8fbf7;
+}
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .nis-badge {
   font-family: monospace;
-  font-weight: 600;
-  color: #3b82f6;
-  background: #dbeafe;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--leaf-600);
+  background: #e3f6ea;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
 }
 
 .student-info {
@@ -1009,14 +1007,12 @@ td {
   flex-direction: column;
   gap: 2px;
 }
-
 .student-info strong {
-  color: #1e293b;
+  color: var(--forest-950);
 }
-
 .student-info small {
-  color: #64748b;
-  font-size: 0.8rem;
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .gender-badge {
@@ -1024,19 +1020,18 @@ td {
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-head);
 }
-
 .gender-badge.male {
-  background: #dbeafe;
-  color: #3b82f6;
+  background: #eaf1fd;
+  color: #2563eb;
 }
-
 .gender-badge.female {
   background: #fce7f3;
-  color: #ec4899;
+  color: #db2777;
 }
 
 .birth-info {
@@ -1044,270 +1039,257 @@ td {
   flex-direction: column;
   gap: 2px;
 }
-
 .birth-info small {
-  color: #64748b;
-  font-size: 0.8rem;
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .action-buttons {
   display: flex;
   gap: 8px;
 }
-
 .btn-icon {
-  background: #f1f5f9;
-  color: #475569;
   border: none;
+  background: var(--cream);
+  color: var(--forest-900);
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+  transition: background 0.2s;
 }
-
 .btn-icon:hover {
-  background: #3b82f6;
-  color: white;
+  background: var(--line);
+}
+.btn-icon.danger:hover {
+  background: #fbe4e4;
+  color: var(--red);
 }
 
-.btn-icon.btn-danger:hover {
-  background: #ef4444;
-  color: white;
-}
-
-/* Modal */
+/* ---------- Modal ---------- */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(6, 20, 15, 0.55);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 200;
   padding: 20px;
 }
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
+.modal-box {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.4);
 }
-
-.modal-content.modal-large {
+.modal-box.modal-large {
   max-width: 900px;
 }
-
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 20px 26px;
+  border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
-  background: white;
+  background: var(--paper);
   z-index: 10;
 }
-
-.modal-header h2 {
-  font-size: 1.1rem;
-  color: #1e293b;
+.modal-header h3 {
+  font-size: 1.05rem;
   margin: 0;
+  color: var(--forest-950);
 }
-
 .btn-close {
   background: none;
   border: none;
-  font-size: 1.2rem;
-  color: #64748b;
+  font-size: 1.1rem;
+  color: var(--muted);
   cursor: pointer;
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: background 0.2s;
 }
-
 .btn-close:hover {
-  background: #f1f5f9;
+  background: var(--cream);
 }
-
 .modal-body {
-  padding: 24px;
+  padding: 26px;
 }
 
-/* Detail Grid */
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
-
 .detail-section {
-  background: #f8fafc;
+  background: var(--cream);
   padding: 20px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
-
-.detail-section h3 {
-  font-size: 1rem;
-  color: #1e293b;
-  margin: 0 0 16px;
+.detail-section h4 {
+  font-size: 0.95rem;
+  margin: 0 0 14px;
   display: flex;
   align-items: center;
   gap: 8px;
+  color: var(--forest-950);
 }
-
-.detail-section h3 i {
-  color: #3b82f6;
+.detail-section h4 i {
+  color: var(--leaf-600);
 }
-
 .detail-row {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  gap: 12px;
 }
-
 .detail-row:last-child {
   border-bottom: none;
 }
-
 .detail-label {
-  font-size: 0.85rem;
-  color: #64748b;
+  font-size: 0.82rem;
+  color: var(--muted);
   font-weight: 500;
 }
-
 .detail-value {
-  font-size: 0.9rem;
-  color: #1e293b;
-  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--forest-950);
+  font-weight: 600;
   text-align: right;
 }
 
-/* Form */
+/* ---------- Form ---------- */
 .form-section {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
-
-.form-section h3 {
-  font-size: 1rem;
-  color: #1e293b;
-  margin: 0 0 16px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #e2e8f0;
+.form-section h4 {
+  font-size: 0.95rem;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
   display: flex;
   align-items: center;
   gap: 8px;
+  color: var(--forest-950);
 }
-
-.form-section h3 i {
-  color: #3b82f6;
+.form-section h4 i {
+  color: var(--leaf-600);
 }
-
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
 }
-
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-
 .form-group.full-width {
   grid-column: 1 / -1;
 }
-
 .form-group label {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--forest-950);
+  font-family: var(--font-head);
 }
-
 .required {
-  color: #ef4444;
+  color: var(--red);
 }
-
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
+  padding: 10px 13px;
+  border: 1.5px solid var(--line);
   border-radius: 8px;
   font-size: 0.9rem;
-  font-family: inherit;
+  font-family: var(--font-body);
+  color: var(--ink);
 }
-
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--leaf-500);
+  box-shadow: 0 0 0 4px rgba(34, 181, 108, 0.14);
 }
-
 .form-group small {
-  font-size: 0.75rem;
-  color: #64748b;
+  font-size: 0.74rem;
+  color: var(--muted);
 }
 
-.form-actions {
+.modal-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
   margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid #e2e8f0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.btn-primary {
+  background: var(--leaf-500);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.btn-primary:hover {
+  background: var(--leaf-600);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* Responsive */
+/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
-  .page-header {
+  .welcome {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
   }
-
-  .filters-card {
+  .filter-bar {
     flex-direction: column;
+    align-items: stretch;
   }
-
-  .filter-group {
+  .filter-item,
+  .filter-item.grow {
     width: 100%;
+    min-width: 0;
   }
-
-  .stats-grid {
+  .summary-row {
     grid-template-columns: 1fr;
   }
-
   .table-responsive {
     font-size: 0.8rem;
   }
-
   td,
   th {
     padding: 10px;
   }
-
   .detail-grid {
     grid-template-columns: 1fr;
   }
-
   .form-grid {
     grid-template-columns: 1fr;
   }

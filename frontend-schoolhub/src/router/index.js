@@ -92,6 +92,12 @@ const router = createRouter({
       component: () => import('../views/admin/AdminCrudView.vue'),
       meta: { requiresAuth: true, role: 'admin' },
     },
+    {
+      path: '/dashboar/admin/jadwal',
+      name: 'admin_jadwal',
+      component: () => import('../views/admin/JadwalManagement.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
 
     // ===================== CALON SISWA =====================
     {
