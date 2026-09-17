@@ -33,16 +33,17 @@
           :visible-once="{ opacity: 1, x: 0, transition: { duration: 700 } }"
         >
           <p class="eyebrow-dot dark">Profil Sekolah</p>
-          <h2>Mengenal Lebih Dekat SMA Harapan Bangsa</h2>
+          <h2>Mengenal Lebih Dekat SMK Harapan Bangsa</h2>
           <p>
-            Didirikan pada tahun 1998, SMA Harapan Bangsa telah berkembang menjadi salah satu
-            sekolah menengah atas terpercaya di Bandung. Kami mengelola pendidikan dengan memadukan
-            kurikulum nasional, penguatan karakter, dan fasilitas belajar modern.
+            Didirikan pada tahun 1998, SMK Harapan Bangsa telah berkembang menjadi salah satu
+            sekolah menengah kejuruan terpercaya di Bandung. Kami mengelola pendidikan dengan
+            memadukan kurikulum nasional, penguatan karakter, dan fasilitas praktik industri
+            yang mendukung kesiapan kerja lulusan.
           </p>
           <p>
-            Dengan luas area 3,2 hektar, kampus kami memiliki 42 ruang kelas, 6 laboratorium,
-            perpustakaan digital, dan gedung olahraga indoor yang mendukung kegiatan belajar dan
-            pengembangan bakat siswa.
+            Dengan luas area 3,2 hektar, kampus kami memiliki 42 ruang kelas, 6 bengkel/laboratorium
+            praktik, perpustakaan digital, dan gedung olahraga indoor yang mendukung kegiatan belajar
+            dan pengembangan kompetensi siswa di jurusan TKR, RPL, dan TSM.
           </p>
           <div class="stat-row">
             <div class="stat"><b>1998</b><span>Tahun Berdiri</span></div>
@@ -81,7 +82,7 @@
           :initial="{ opacity: 0, y: 20 }"
           :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 100 } }"
         >
-          Fasilitas Penunjang Belajar
+          Fasilitas Penunjang Praktik &amp; Belajar
         </h2>
 
         <div class="value-grid">
@@ -93,9 +94,9 @@
             :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 100 } }"
           >
             <div class="n">01</div>
-            <h3 style="color: #fff">Laboratorium Sains</h3>
+            <h3 style="color: #fff">Bengkel Otomotif</h3>
             <p>
-              Lab fisika, kimia, dan biologi dengan peralatan sesuai standar praktikum nasional.
+              Bengkel praktik TKR dan TSM dengan peralatan sesuai standar industri otomotif.
             </p>
           </div>
           <div
@@ -106,8 +107,8 @@
             :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 200 } }"
           >
             <div class="n">02</div>
-            <h3 style="color: #fff">Perpustakaan Digital</h3>
-            <p>Akses ke ribuan e-book dan jurnal untuk mendukung riset dan tugas siswa.</p>
+            <h3 style="color: #fff">Laboratorium Komputer &amp; RPL</h3>
+            <p>Lab pemrograman dengan perangkat mendukung praktik pengembangan aplikasi web dan mobile.</p>
           </div>
           <div
             class="value-card"
@@ -128,8 +129,8 @@
             :visible-once="{ opacity: 1, y: 0, transition: { duration: 500, delay: 400 } }"
           >
             <div class="n">04</div>
-            <h3 style="color: #fff">Ruang Kreativitas</h3>
-            <p>Studio seni, musik, dan ruang komputer untuk kelas peminatan dan ekstrakurikuler.</p>
+            <h3 style="color: #fff">Perpustakaan Digital</h3>
+            <p>Akses ke ribuan e-book dan jurnal untuk mendukung riset dan tugas siswa.</p>
           </div>
         </div>
       </div>
@@ -156,7 +157,7 @@
           >
             <time>1998</time>
             <h4>Pendirian Sekolah</h4>
-            <p>SMA Harapan Bangsa didirikan dengan tiga rombongan belajar pertama.</p>
+            <p>SMK Harapan Bangsa didirikan dengan tiga rombongan belajar pertama.</p>
           </div>
           <div
             class="timeline-item"
@@ -176,7 +177,7 @@
           >
             <time>2016</time>
             <h4>Perluasan Kampus</h4>
-            <p>Pembangunan gedung laboratorium dan perpustakaan digital baru.</p>
+            <p>Pembangunan gedung bengkel praktik dan perpustakaan digital baru.</p>
           </div>
           <div
             class="timeline-item"

@@ -904,11 +904,11 @@ table.data-table {
   background:
     linear-gradient(
       100deg,
-      rgba(6, 26, 19, 0.94) 30%,
-      rgba(6, 26, 19, 0.55) 65%,
-      rgba(6, 26, 19, 0.25)
+      rgba(6, 26, 19, 0.75) 30%,
+      rgba(6, 26, 19, 0.45) 65%,
+      rgba(6, 26, 19, 0.15)
     ),
-    url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1600&auto=format&fit=crop')
+    url('https://i.pinimg.com/736x/4e/6f/cf/4e6fcff0ea88fd7724700944a36c05fb.jpg')
       center/cover;
   padding: 110px 0 150px;
 }

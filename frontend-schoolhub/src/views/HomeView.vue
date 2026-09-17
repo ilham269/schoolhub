@@ -615,7 +615,7 @@
           </div>
         </div>
 
-        <!-- Fallback jika backend belum menyediakan program -->
+        <!-- Fallback jika backend belum menyediakan program TKR/RPL/TSM -->
         <div
           v-else
           class="news-grid"
@@ -991,17 +991,16 @@ const filteredPrograms = computed(() => {
     return []
   }
 
-  if (activeFilter.value === 'Semua') {
-    return home.value.programs
-  }
+  // Hanya program yang kategorinya benar-benar cocok TKR/RPL/TSM yang
+  // dipakai dari backend. Kalau backend mengirim data lain (mis. program
+  // peminatan MIPA/IPS/Bahasa), data itu diabaikan di sini, dan halaman
+  // otomatis jatuh ke kartu fallback TKR/RPL/TSM di bawah — sehingga tab
+  // "Semua" pun tetap menampilkan tiga jurusan SMK yang benar, bukan
+  // program yang tidak relevan dari backend.
+  const allowedKeywords = Object.values(jurusanKeywordMap).flat()
 
-  const keywords =
-    jurusanKeywordMap[activeFilter.value] || [
-      activeFilter.value.toLowerCase()
-    ]
-
-  return home.value.programs.filter((program) => {
-    const kategori = String(
+  const getKategori = (program) =>
+    String(
       program.kategori ||
         program.category ||
         program.jurusan ||
@@ -1011,10 +1010,22 @@ const filteredPrograms = computed(() => {
         ''
     ).toLowerCase()
 
-    return keywords.some((keyword) =>
-      kategori.includes(keyword)
-    )
-  })
+  const relevantPrograms = home.value.programs.filter((program) =>
+    allowedKeywords.some((keyword) => getKategori(program).includes(keyword))
+  )
+
+  if (activeFilter.value === 'Semua') {
+    return relevantPrograms
+  }
+
+  const keywords =
+    jurusanKeywordMap[activeFilter.value] || [
+      activeFilter.value.toLowerCase()
+    ]
+
+  return relevantPrograms.filter((program) =>
+    keywords.some((keyword) => getKategori(program).includes(keyword))
+  )
 })
 
 /*
