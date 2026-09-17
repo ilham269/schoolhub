@@ -1,27 +1,15 @@
-import api from './api'
+import api from '@/utils/api'
 
 export const mapelApi = {
-  getAll() {
-    return api.get('/mapel')
-  },
+  list: (params) => api.get('/mapel', { params }).then((response) => response.data),
 
-  getActive() {
-    return api.get('/mapel/active')
-  },
+  getActive: () => api.get('/mapel/active').then((response) => response.data),
 
-  getById(id) {
-    return api.get(`/mapel/${id}`)
-  },
+  show: (id) => api.get(`/mapel/${id}`).then((response) => response.data),
 
-  create(data) {
-    return api.post('/mapel', data)
-  },
+  create: (data) => api.post('/mapel', data).then((response) => response.data),
 
-  update(id, data) {
-    return api.put(`/mapel/${id}`, data)
-  },
+  update: (id, data) => api.put(`/mapel/${id}`, data).then((response) => response.data),
 
-  delete(id) {
-    return api.delete(`/mapel/${id}`)
-  },
+  remove: (id) => api.delete(`/mapel/${id}`).then((response) => response.data),
 }

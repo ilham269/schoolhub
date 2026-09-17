@@ -4,7 +4,10 @@
       {{ alert.message }}
     </UiAlert>
     <UiAlert v-if="error" type="danger" title="Gagal memuat tugas" class="mb-4" :dismissible="false">
-      {{ error }}
+      <div class="flex items-center justify-between gap-4">
+        <span>{{ error }}</span>
+        <button class="shrink-0 rounded-lg border border-rose-300 px-3 py-1 text-sm font-medium text-rose-700 hover:bg-rose-50" @click="fetchAll">Coba lagi</button>
+      </div>
     </UiAlert>
 
     <!-- Ringkasan -->
@@ -38,9 +41,13 @@
       </div>
 
       <div v-if="loading" class="px-6 py-14 text-center text-slate-400">Memuat tugas...</div>
+      <div v-else-if="noKelas" class="px-6 py-14 text-center">
+        <p class="font-medium text-amber-700">Akun kamu belum terhubung ke kelas</p>
+        <p class="mt-1 text-sm text-slate-400">Hubungi admin sekolah untuk menghubungkan akunmu ke kelas.</p>
+      </div>
       <div v-else-if="!filtered.length" class="px-6 py-14 text-center">
-        <p class="font-medium text-slate-600">Tidak ada tugas yang cocok</p>
-        <p class="mt-1 text-sm text-slate-400">Coba ubah kata kunci atau tab filter.</p>
+        <p class="font-medium text-slate-600">{{ items.length ? 'Tidak ada tugas yang cocok' : 'Belum ada tugas yang tersedia' }}</p>
+        <p class="mt-1 text-sm text-slate-400">{{ items.length ? 'Coba ubah kata kunci atau tab filter.' : 'Guru belum membuat tugas aktif untuk kelasmu saat ini.' }}</p>
       </div>
 
       <ul v-else class="divide-y divide-slate-100">
@@ -130,7 +137,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import DashboardLayout from '../../components/dashboard/DashboardLayout.vue'
+import DashboardLayout from '@/components/dashboard/DashboardLayout.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiInput from '@/components/ui/UiInput.vue'
@@ -140,30 +147,30 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiAlert from '@/components/ui/UiAlert.vue'
 import UiTabs from '@/components/ui/UiTabs.vue'
 import { muridTugasApi } from '@/services/muridTugasApi'
-
-const navigation = [
-  { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/murid' },
-  { label: 'Profil', icon: 'fas fa-user', to: '/dashboard/murid/profil' },
-  { label: 'Tugas', icon: 'fas fa-book-open', to: '/dashboard/murid/tugas' },
-  { label: 'Nilai', icon: 'fas fa-chart-bar', to: '/dashboard/murid/nilai' },
-  { label: 'Jadwal', icon: 'fas fa-calendar', to: '/dashboard/murid/jadwal' },
-  { label: 'Ujian', icon: 'fas fa-laptop', to: '/dashboard/murid/ujian' },
-  { label: 'Administrasi', icon: 'fas fa-folder', to: '/dashboard/murid/administrasi' },
-  { label: 'Keuangan', icon: 'fas fa-file-invoice', to: '/dashboard/murid/keuangan' },
-]
+import { muridNavigation as navigation } from './muridNavigation'
 
 const items = ref([])
-const loading = ref(false)
+const loading = ref(true)
 const error = ref('')
+const noKelas = ref(false)
 
 const fetchAll = async () => {
   loading.value = true
   error.value = ''
+  noKelas.value = false
   try {
-    const res = await muridTugasApi.list()
-    items.value = res.data ?? res
+    const body = await muridTugasApi.list()
+    items.value = body?.data ?? []
   } catch (e) {
-    error.value = e.response?.data?.message ?? 'Tugas gagal dimuat. Periksa koneksi ke server.'
+    const status = e.response?.status
+    const message = e.response?.data?.message
+    if (status === 422 && message?.includes('belum terhubung ke kelas')) {
+      noKelas.value = true
+      items.value = []
+      return
+    }
+    const errorMap = { 401: 'Sesi Anda telah berakhir. Silakan masuk kembali.', 403: 'Anda tidak memiliki akses ke tugas ini.', 404: 'Profil murid tidak ditemukan.', 500: 'Server sedang bermasalah. Silakan coba lagi.' }
+    error.value = errorMap[status] ?? message ?? 'Tugas gagal dimuat. Silakan coba lagi.'
   } finally {
     loading.value = false
   }

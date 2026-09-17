@@ -86,6 +86,13 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'admin' },
     },
     {
+      path: '/dashboard/admin/mapel',
+      name: 'admin_mapel',
+      component: () => import('../views/admin/MapelManagement.vue'),
+      meta: { requiresAuth: true, role: 'admin' },
+    },
+    { path: '/dashboard/admin/users', name: 'admin_users', component: () => import('../views/admin/UserManagement.vue'), meta: { requiresAuth: true, role: 'admin' } },
+    {
       // CRUD generik: /dashboard/admin/berita, /dashboard/admin/pengumuman
       path: '/dashboard/admin/:resource(berita|pengumuman)',
       name: 'admin_crud_content',
@@ -93,7 +100,7 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'admin' },
     },
     {
-      path: '/dashboar/admin/jadwal',
+      path: '/dashboard/admin/jadwal',
       name: 'admin_jadwal',
       component: () => import('../views/admin/JadwalManagement.vue'),
       meta: { requiresAuth: true, role: 'admin' },

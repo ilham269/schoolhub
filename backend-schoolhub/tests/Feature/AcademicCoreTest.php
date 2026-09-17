@@ -338,6 +338,40 @@ class AcademicCoreTest extends TestCase
             ->assertJsonPath('data.nama_mapel', 'Basis Data Lanjut');
     }
 
+    public function test_admin_can_list_update_and_delete_mapel(): void
+    {
+        $this->actingAsAdmin();
+        $mapel = Subjek::factory()->create(['kode_mapel' => 'PWB01']);
+
+        $this->getJson('/api/mapel')->assertOk()->assertJsonFragment(['id' => $mapel->id]);
+        $this->putJson("/api/mapel/{$mapel->id}", ['nama_mapel' => 'Pemrograman Web Lanjut'])
+            ->assertOk()->assertJsonPath('data.nama_mapel', 'Pemrograman Web Lanjut');
+        $this->deleteJson("/api/mapel/{$mapel->id}")->assertOk()->assertJsonPath('success', true);
+        $this->assertDatabaseMissing('mapels', ['id' => $mapel->id]);
+    }
+
+    public function test_store_mapel_uses_academic_defaults(): void
+    {
+        $this->actingAsAdmin();
+
+        $this->postJson('/api/mapel', ['kode_mapel' => 'MTK01', 'nama_mapel' => 'Matematika'])
+            ->assertCreated()
+            ->assertJsonPath('data.jumlah_jam', 2)
+            ->assertJsonPath('data.kkm', 75)
+            ->assertJsonPath('data.is_active', true);
+    }
+
+    public function test_non_admin_cannot_update_or_delete_mapel(): void
+    {
+        $mapel = Subjek::factory()->create();
+        $this->actingAsGuru();
+
+        $this->putJson("/api/mapel/{$mapel->id}", ['nama_mapel' => 'Tidak boleh'])
+            ->assertForbidden()->assertJsonPath('success', false);
+        $this->deleteJson("/api/mapel/{$mapel->id}")
+            ->assertForbidden()->assertJsonPath('success', false);
+    }
+
     public function test_invalid_time_range_is_rejected(): void
     {
         $this->actingAsAdmin();

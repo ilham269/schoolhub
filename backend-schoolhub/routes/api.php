@@ -22,10 +22,11 @@ use App\Http\Controllers\Api\PublicHomeController;
 use App\Http\Controllers\Api\MateriController;
 use App\Http\Controllers\Api\MuridTugasController;
 use App\Http\Controllers\Api\TugasController;
+use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 
 
 
-    Route::middleware(['auth:sanctum'])
+    Route::middleware(['auth:sanctum', 'role:guru'])
     ->prefix('guru')
     ->group(function () {
         Route::get('tugas', [TugasController::class, 'index']);
@@ -245,6 +246,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Academic Core — admin mutations
     Route::middleware('role:admin')->group(function () {
+        Route::apiResource('/admin/users', AdminUserController::class);
+        Route::post('/admin/users/{user}/reset-password', [AdminUserController::class, 'resetPassword']);
         Route::post('/mapel', [MapelController::class, 'store']);
         Route::put('/mapel/{id}', [MapelController::class, 'update']);
         Route::delete('/mapel/{id}', [MapelController::class, 'destroy']);

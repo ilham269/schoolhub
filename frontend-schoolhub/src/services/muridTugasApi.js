@@ -1,11 +1,9 @@
-import http from './kelasApi'
+import api from '@/utils/api'
 
-// Endpoint khusus murid: hanya tugas dari kelas murid yang sedang login,
-// beserta status pengumpulannya sendiri.
+/** API tugas yang tersedia untuk murid. */
 export const muridTugasApi = {
-  list: () => http.get('/murid/tugas').then((r) => r.data),
-  submit: (tugasId, formData) =>
-    http.post(`/murid/tugas/${tugasId}/kumpulkan`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }).then((r) => r.data),
+  list: () => api.get('/murid/tugas').then((response) => response.data),
+  submit: (id, formData) => api.post(`/murid/tugas/${id}/kumpulkan`, formData).then((response) => response.data),
 }
+
+export default muridTugasApi

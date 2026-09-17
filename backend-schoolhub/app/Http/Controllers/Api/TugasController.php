@@ -106,6 +106,8 @@ class TugasController extends Controller
 
         // Tanggal pembuatan tugas.
         $data['tanggal_dibuat'] = now();
+        $data['nilai_maksimal'] = $data['nilai_maksimal'] ?? 100;
+        $data['is_active'] = $data['is_active'] ?? true;
 
         // Upload file jika ada.
         if ($request->hasFile('file')) {

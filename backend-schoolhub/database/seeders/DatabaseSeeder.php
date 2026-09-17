@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
             GuruSeeder::class,              // Guru
             MuridSeeder::class,             // Murid
             KaryawanSeeder::class,          // Karyawan
+            MapelSeeder::class,             // Mata Pelajaran (NEW!)
+            MateriSeeder::class,            // Materi Pembelajaran (NEW!)
+            TugasDummySeeder::class,        // Tugas & Nilai Dummy (NEW!)
             NewsSeeder::class,              // Berita publik
             PaymentSettingsSeeder::class,   // Payment & SPP Settings
         ]);
@@ -33,6 +36,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('');
         $this->command->info('📝 Default credentials:');
         $this->command->info('   Email: admin@schoolhub.com (Admin)');
+        $this->command->info('   Email: ahmad.fauzi@schoolhub.com (Guru)');
         $this->command->info('   Password: password');
     }
 }

@@ -49,13 +49,13 @@ const dashboardData = ref(null)
 
 // Only show implemented features
 const adminItems = [
-  // ['Kelola User', 'fas fa-users', 'users'], // TODO: Not implemented yet
+  ['Kelola User', 'fas fa-users', 'users'],
   ['Kelola Siswa', 'fas fa-user-graduate', 'murid'],
   ['Kelola Guru', 'fas fa-chalkboard-user', 'guru'],
   ['Kelola Karyawan', 'fas fa-id-card', 'karyawan'],
   ['Kelola Kelas', 'fas fa-school', 'kelas'],
   ['Kelola Jadwal', 'fas fa-calendar-days', 'jadwal'],
-  // ['Kelola Mata Pelajaran', 'fas fa-book-open', 'mapel'], // TODO: Not implemented yet
+  ['Kelola Mata Pelajaran', 'fas fa-book-open', 'mapel'],
   // ['Kelola Ujian', 'fas fa-file-circle-check', 'ujian'], // TODO: Not implemented yet
   // ['Kelola Soal', 'fas fa-list-ol', 'soal'], // TODO: Not implemented yet
   ['Kelola Pendaftaran', 'fas fa-clipboard-list', 'pendaftaran'],

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Materi extends Model
 {
@@ -15,15 +16,18 @@ class Materi extends Model
         'mapel_id',
         'judul',
         'deskripsi',
-        'file',
+        'konten',
+        'file_path',
         'link',
-        'published_at',
+        'tanggal_upload',
+        'is_published',
     ];
 
     protected function casts(): array
     {
         return [
-            'published_at' => 'datetime',
+            'tanggal_upload' => 'date',
+            'is_published'   => 'boolean',
         ];
     }
 
@@ -42,7 +46,7 @@ class Materi extends Model
         return $this->belongsTo(Subjek::class, 'mapel_id');
     }
 
-    public function tugas()
+    public function tugas(): HasMany
     {
         return $this->hasMany(Tugas::class, 'materi_id');
     }

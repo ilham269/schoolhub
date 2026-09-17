@@ -7,14 +7,15 @@ use App\Models\Pengumpulantugas;
 use App\Models\Tugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
 
 class MuridTugasController extends Controller
 {
     public function index(Request $request)
     {
         $murid = $request->user()->murid;
-        abort_unless($murid, 403, 'Profil murid tidak ditemukan.');
+        abort_unless($murid, 404, 'Profil murid tidak ditemukan.');
+        abort_if($murid->kelas_id === null, 422, 'Akun murid belum terhubung ke kelas.');
 
         $tugas = Tugas::query()
             ->with(['mapel', 'guru.user'])
@@ -50,7 +51,9 @@ class MuridTugasController extends Controller
     public function submit(Request $request, Tugas $tugas)
     {
         $murid = $request->user()->murid;
-        abort_unless($murid && $tugas->kelas_id === $murid->kelas_id && $tugas->is_active, 403, 'Anda tidak dapat mengumpulkan tugas ini.');
+        abort_unless($murid, 404, 'Profil murid tidak ditemukan.');
+        abort_if($murid->kelas_id === null, 422, 'Akun murid belum terhubung ke kelas.');
+        abort_unless($tugas->kelas_id === $murid->kelas_id && $tugas->is_active, 403, 'Anda tidak dapat mengumpulkan tugas ini.');
 
         $data = Validator::make($request->all(), [
             'file' => ['nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,jpg,jpeg,png', 'max:10240'],

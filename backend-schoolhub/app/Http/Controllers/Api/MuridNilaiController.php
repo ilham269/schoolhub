@@ -22,6 +22,10 @@ class MuridNilaiController extends Controller
             return response()->json(['success' => false, 'message' => 'Profil murid tidak ditemukan.'], 404);
         }
 
+        if ($murid->kelas_id === null) {
+            return response()->json(['success' => false, 'message' => 'Akun murid belum terhubung ke kelas.'], 422);
+        }
+
         $mapels = DB::table('class_subjects as cs')
             ->join('mapels as m', 'm.id', '=', 'cs.mapel_id')
             ->where('cs.kelas_id', $murid->kelas_id)
@@ -69,6 +73,16 @@ class MuridNilaiController extends Controller
             if ($hasSubmission) {
                 $completedTasks[] = $item;
                 if ($tugasItem->nilai !== null) {
+                    if (! isset($mapels[$tugasItem->mapel_id])) {
+                        $mapels[$tugasItem->mapel_id] = [
+                            'mapel_id' => $tugasItem->mapel_id,
+                            'kode_mapel' => null,
+                            'nama_mapel' => $tugasItem->nama_mapel,
+                            'kkm' => self::DEFAULT_KKM,
+                            'task_scores' => [],
+                            'exam_scores' => [],
+                        ];
+                    }
                     $mapels[$tugasItem->mapel_id]['task_scores'][] = (float) $tugasItem->nilai;
                     $taskScores[] = (float) $tugasItem->nilai;
                 }
@@ -103,7 +117,7 @@ class MuridNilaiController extends Controller
                 if (! isset($mapels[$attempt->mapel_id])) {
                     $mapels[$attempt->mapel_id] = ['mapel_id' => $attempt->mapel_id, 'kode_mapel' => $attempt->kode_mapel, 'nama_mapel' => $attempt->nama_mapel, 'kkm' => (int) ($attempt->kkm ?? self::DEFAULT_KKM), 'task_scores' => [], 'exam_scores' => []];
                 }
-                if (isset($mapels[$attempt->mapel_id])) $mapels[$attempt->mapel_id]['exam_scores'][] = (float) $attempt->score;
+                $mapels[$attempt->mapel_id]['exam_scores'][] = (float) $attempt->score;
                 $examScores[] = (float) $attempt->score;
             }
         }

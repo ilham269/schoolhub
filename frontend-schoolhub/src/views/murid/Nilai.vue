@@ -1,7 +1,8 @@
 <template>
   <DashboardLayout title="Nilai Saya" role-label="Murid" :navigation="muridNavigation">
     <div v-if="loading" class="py-20 text-center text-slate-400">Memuat nilai...</div>
-    <UiAlert v-else-if="error" type="danger" :dismissible="false">{{ error }}</UiAlert>
+    <UiAlert v-else-if="error" type="danger" :dismissible="false"><div class="flex items-center justify-between gap-4"><span>{{ error }}</span><button class="shrink-0 rounded-lg border border-rose-300 px-3 py-1 text-sm font-medium text-rose-700 hover:bg-rose-50" @click="load">Coba lagi</button></div></UiAlert>
+    <UiCard v-else-if="noKelas" class="mt-4"><div class="py-14 text-center"><p class="font-medium text-amber-700">Akun kamu belum terhubung ke kelas</p><p class="mt-1 text-sm text-slate-400">Hubungi admin sekolah untuk menghubungkan akunmu ke kelas.</p></div></UiCard>
     <template v-else>
       <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article v-for="card in cards" :key="card.label" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -42,14 +43,15 @@ import { muridNavigation } from './muridNavigation'
 import { muridNilaiApi } from '@/services/muridNilaiApi'
 
 Chart.register(BarController, BarElement, CategoryScale, Legend, LineController, LineElement, LinearScale, PointElement, Tooltip)
-const loading = ref(true); const error = ref(''); const data = ref({ summary: {}, breakdown: [], tugas_selesai: [], tugas_belum_dikumpulkan: [], ujian: [], trend: [], weights: { tugas: .4, ujian: .6 } })
+const loading = ref(true); const error = ref(''); const noKelas = ref(false); const data = ref({ summary: {}, breakdown: [], tugas_selesai: [], tugas_belum_dikumpulkan: [], ujian: [], trend: [], weights: { tugas: .4, ujian: .6 } })
 const trendCanvas = ref(null); const mapelCanvas = ref(null); let trendChart; let mapelChart
 const summary = computed(() => data.value.summary); const weights = computed(() => ({ tugas: Math.round(data.value.weights.tugas * 100), ujian: Math.round(data.value.weights.ujian * 100) })); const scoredBreakdown = computed(() => data.value.breakdown.filter((item) => item.nilai_akhir !== null))
 const cards = computed(() => [{ label: 'Rata-rata nilai', value: score(summary.value.rata_rata), note: 'Gabungan tugas dan ujian', icon: 'fas fa-chart-line', color: 'text-emerald-500' }, { label: 'Tugas selesai', value: `${summary.value.tugas_selesai ?? 0}/${summary.value.tugas_total ?? 0}`, note: 'Tugas aktif', icon: 'fas fa-book-check', color: 'text-blue-500' }, { label: 'Ujian diambil', value: summary.value.ujian_diambil ?? 0, note: 'Riwayat ujian', icon: 'fas fa-file-circle-check', color: 'text-amber-500' }, { label: 'Status KKM', value: `${summary.value.mapel_tuntas ?? 0} tuntas`, note: `${summary.value.mapel_perlu_perhatian ?? 0} perlu perhatian`, icon: 'fas fa-award', color: 'text-violet-500' }])
 function score(value) { return value === null || value === undefined ? '—' : Number(value).toLocaleString('id-ID', { maximumFractionDigits: 2 }) }
 function date(value) { return value ? new Date(value).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '—' }
 function renderCharts() { trendChart?.destroy(); mapelChart?.destroy(); if (trendCanvas.value && data.value.trend.length) trendChart = new Chart(trendCanvas.value, { type: 'line', data: { labels: data.value.trend.map((item) => date(item.label)), datasets: [{ label: 'Nilai', data: data.value.trend.map((item) => item.nilai), borderColor: '#15935a', backgroundColor: 'rgba(21,147,90,.12)', fill: true, tension: .35 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } } }); if (mapelCanvas.value && scoredBreakdown.value.length) mapelChart = new Chart(mapelCanvas.value, { type: 'bar', data: { labels: scoredBreakdown.value.map((item) => item.nama_mapel), datasets: [{ label: 'Nilai akhir', data: scoredBreakdown.value.map((item) => item.nilai_akhir), backgroundColor: scoredBreakdown.value.map((item) => item.tuntas ? '#15935a' : '#dc4c4c'), borderRadius: 7 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } }, plugins: { legend: { display: false } } } }) }
-onMounted(async () => { try { data.value = (await muridNilaiApi.get()).data ?? data.value; await nextTick(); renderCharts() } catch (e) { error.value = e.response?.data?.message ?? 'Nilai gagal dimuat. Periksa koneksi API.' } finally { loading.value = false } }); onBeforeUnmount(() => { trendChart?.destroy(); mapelChart?.destroy() })
+async function load() { loading.value = true; error.value = ''; noKelas.value = false; try { data.value = (await muridNilaiApi.get()).data ?? data.value; await nextTick(); renderCharts() } catch (e) { const status = e.response?.status; const message = e.response?.data?.message; if (status === 422 && message?.includes('belum terhubung ke kelas')) { noKelas.value = true; return } const errorMap = { 401: 'Sesi Anda telah berakhir. Silakan masuk kembali.', 403: 'Anda tidak memiliki akses ke nilai ini.', 404: 'Profil murid tidak ditemukan.', 500: 'Server sedang bermasalah. Silakan coba lagi.' }; error.value = errorMap[status] ?? message ?? 'Nilai gagal dimuat. Silakan coba lagi.' } finally { loading.value = false } }
+onMounted(load); onBeforeUnmount(() => { trendChart?.destroy(); mapelChart?.destroy() })
 </script>
 
 <style scoped>
