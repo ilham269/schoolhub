@@ -7,17 +7,25 @@ export const KELAS_REF = [
   { id: 3, name: 'X TKR 1' }, { id: 4, name: 'X TKR 2' },
   { id: 7, name: 'XI RPL 1' }, { id: 8, name: 'XI RPL 2' },
 ]
+
+// IMPORTANT: These are MOCK data. Real mapel IDs will be 1,2,3,4... from database
+// If validation fails with "mapel not found", you need to seed the database first:
+// cd backend-schoolhub && php artisan db:seed --class=MapelSeeder
 export const MAPEL_REF = [
   { id: 1, name: 'Pemrograman Web' },
   { id: 2, name: 'Basis Data' },
-  { id: 3, name: 'Matematika' },
-  { id: 4, name: 'Bahasa Indonesia' },
+  { id: 3, name: 'Pemrograman Berorientasi Objek' },
+  { id: 4, name: 'Matematika' },
+  { id: 5, name: 'Bahasa Indonesia' },
+  { id: 6, name: 'Bahasa Inggris' },
 ]
+
 export const MATERI_REF = [
   { id: 1, mapel_id: 1, name: 'Dasar HTML & CSS' },
-  { id: 2, mapel_id: 1, name: 'JavaScript Lanjutan' },
-  { id: 3, mapel_id: 2, name: 'Normalisasi Database' },
-  { id: 4, mapel_id: 3, name: 'Trigonometri' },
+  { id: 2, mapel_id: 1, name: 'JavaScript Fundamental' },
+  { id: 3, mapel_id: 2, name: 'Pengenalan Database' },
+  { id: 4, mapel_id: 2, name: 'SQL Query' },
+  { id: 5, mapel_id: 3, name: 'Konsep OOP' },
 ]
 
 const MOCK = [
@@ -78,8 +86,17 @@ const wait = (ms = 350) => new Promise((r) => setTimeout(r, ms))
 export function createFormData(payload) {
   const fd = new FormData()
   Object.entries(payload).forEach(([key, value]) => {
-    if (key === 'file' && value instanceof File) fd.append('file', value)
-    else if (value !== null && value !== undefined) fd.append(key, value)
+    if (key === 'file' && value instanceof File) {
+      fd.append('file', value)
+    } else if (key === 'is_active') {
+      // Convert boolean to integer: true -> 1, false -> 0
+      fd.append(key, value ? '1' : '0')
+    } else if (key === 'materi_id' && (!value || value === '')) {
+      // Skip materi_id if empty (it's nullable)
+      return
+    } else if (value !== null && value !== undefined && value !== '') {
+      fd.append(key, value)
+    }
   })
   return fd
 }
@@ -115,8 +132,30 @@ export function useTugas() {
       items.value.unshift({ ...rest, id, jumlah_pengumpulan: 0, file_path: file?.name ?? null })
       return
     }
-    const created = await tugasApi.create(createFormData(payload))
-    items.value.unshift(created.data ?? created)
+    
+    try {
+      const created = await tugasApi.create(createFormData(payload))
+      items.value.unshift(created.data ?? created)
+    } catch (e) {
+      // Better error handling with validation errors
+      if (e.response?.status === 422) {
+        const errors = e.response?.data?.errors
+        if (errors) {
+          // Format validation errors
+          const errorMessages = Object.entries(errors)
+            .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+            .join('\n')
+          throw new Error(`Validasi gagal:\n${errorMessages}`)
+        }
+        throw new Error(e.response?.data?.message || 'Data tidak valid.')
+      } else if (e.response?.status === 401) {
+        throw new Error('Sesi login Anda telah berakhir. Silakan login kembali.')
+      } else if (e.response?.status === 403) {
+        throw new Error('Anda tidak memiliki akses untuk membuat tugas.')
+      } else {
+        throw new Error(e.response?.data?.message || 'Gagal membuat tugas. Silakan coba lagi.')
+      }
+    }
   }
 
   const update = async (id, payload) => {
@@ -139,7 +178,15 @@ export function useTugas() {
   }
 
   const toggleActive = async (row) => {
-    await update(row.id, { ...row, is_active: !row.is_active })
+    if (USE_MOCK) {
+      await wait(250)
+      const i = items.value.findIndex((t) => t.id === row.id)
+      if (i >= 0) items.value[i].is_active = !items.value[i].is_active
+      return
+    }
+    const updated = await tugasApi.toggleActive(row.id)
+    const i = items.value.findIndex((t) => t.id === row.id)
+    if (i >= 0) items.value[i] = updated.data ?? updated
   }
 
   return { items, loading, error, fetchAll, store, update, destroy, toggleActive }

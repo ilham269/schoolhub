@@ -1,4 +1,3 @@
-```vue
 <template>
   <DashboardLayout
     title="Tugas"
@@ -160,7 +159,7 @@
         />
 
         <!-- Search + Filter -->
-        <div class="flex flex-col gap-3 sm:flex-row">
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <!-- Search -->
           <div class="sm:max-w-xs sm:flex-1">
             <UiInput
@@ -190,11 +189,20 @@
             </UiInput>
           </div>
 
-          <!-- Filter kelas -->
+          <!-- Filter jurusan -->
+          <div class="sm:w-56">
+            <UiSelect
+              v-model="jurusanFilter"
+              :options="jurusanOptions"
+              placeholder="Semua jurusan"
+            />
+          </div>
+
+          <!-- Filter kelas (mengikuti jurusan yang dipilih) -->
           <div class="sm:w-52">
             <UiSelect
               v-model="kelasFilter"
-              :options="kelasOptions"
+              :options="kelasOptionsFiltered"
               placeholder="Semua kelas"
             />
           </div>
@@ -207,13 +215,58 @@
               placeholder="Semua mapel"
             />
           </div>
+
+          <!-- Jumlah data per halaman (5-25) -->
+          <div class="sm:w-44">
+            <UiSelect
+              v-model.number="perPage"
+              :options="perPageOptions"
+              placeholder="Tampilkan"
+            />
+          </div>
+        </div>
+
+        <!-- Toggle tampilan: Tabel / Kelompok -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-medium text-slate-500">
+            Tampilan:
+          </span>
+
+          <UiButton
+            size="sm"
+            :variant="viewMode === 'tabel' ? 'primary' : 'secondary'"
+            @click="viewMode = 'tabel'"
+          >
+            Tabel
+          </UiButton>
+
+          <UiButton
+            size="sm"
+            :variant="viewMode === 'kelompok' ? 'primary' : 'secondary'"
+            @click="viewMode = 'kelompok'"
+          >
+            Kelompok
+          </UiButton>
+
+          <template v-if="viewMode === 'kelompok'">
+            <span class="ml-2 text-xs font-medium text-slate-500">
+              Kelompokkan per:
+            </span>
+
+            <UiSelect
+              v-model="groupBy"
+              class="w-40"
+              :options="groupByOptions"
+            />
+          </template>
         </div>
       </div>
 
       <!-- =======================================================
-           TABLE
+           TABLE VIEW
       ======================================================== -->
       <UiTable
+        v-if="viewMode === 'tabel'"
         :columns="columns"
         :rows="paged"
         :sort-key="sortKey"
@@ -254,6 +307,13 @@
             <p class="text-xs text-slate-400">
               {{ mapelName(row.mapel_id) }}
             </p>
+          </td>
+
+          <!-- Jurusan -->
+          <td class="px-6 py-4">
+            <UiBadge variant="neutral">
+              {{ jurusanName(getJurusanIdFromKelas(row.kelas_id)) }}
+            </UiBadge>
           </td>
 
           <!-- Kelas -->
@@ -383,10 +443,153 @@
         </template>
       </UiTable>
 
+      <!-- =======================================================
+           GROUPED VIEW (per Kelas / per Jurusan)
+      ======================================================== -->
+      <div
+        v-else
+        class="space-y-4 px-6 pb-6"
+      >
+        <div
+          v-if="loading"
+          class="py-10 text-center text-sm text-slate-400"
+        >
+          Memuat data tugas...
+        </div>
+
+        <div
+          v-else-if="!groupedSections.length"
+          class="py-10 text-center"
+        >
+          <p class="font-medium text-slate-600">
+            Belum ada tugas yang cocok
+          </p>
+
+          <p class="mt-1 text-sm text-slate-400">
+            Ubah kata kunci atau filter, atau buat tugas baru.
+          </p>
+
+          <UiButton
+            class="mt-4"
+            variant="soft"
+            size="sm"
+            @click="openCreate"
+          >
+            Buat tugas
+          </UiButton>
+        </div>
+
+        <div
+          v-for="group in groupedSections"
+          :key="group.key"
+          class="overflow-hidden rounded-xl border border-slate-200"
+        >
+          <div class="flex items-center justify-between bg-slate-50 px-4 py-2.5">
+            <p class="text-sm font-semibold text-slate-700">
+              {{ group.label }}
+            </p>
+
+            <UiBadge variant="neutral">
+              {{ group.rows.length }} tugas
+            </UiBadge>
+          </div>
+
+          <div class="divide-y divide-slate-100">
+            <div
+              v-for="row in group.rows"
+              :key="row.id"
+              class="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div class="min-w-0">
+                <p class="truncate font-medium text-slate-800">
+                  {{ row.judul }}
+                </p>
+
+                <p class="text-xs text-slate-400">
+                  {{ kelasName(row.kelas_id) }}
+                  &middot;
+                  {{ mapelName(row.mapel_id) }}
+                  &middot;
+                  {{ formatTanggal(row.deadline) }}
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <UiBadge :variant="statusTone(row)">
+                  {{ statusLabel(row) }}
+                </UiBadge>
+
+                <UiButton
+                  variant="ghost"
+                  size="icon"
+                  title="Lihat detail"
+                  @click="openDetail(row)"
+                >
+                  <svg
+                    class="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path
+                      d="M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5Z"
+                    />
+
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="2"
+                    />
+                  </svg>
+                </UiButton>
+
+                <UiButton
+                  variant="ghost"
+                  size="icon"
+                  title="Ubah tugas"
+                  @click="openEdit(row)"
+                >
+                  <svg
+                    class="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M14 3l3 3-9 9H5v-3z" />
+                  </svg>
+                </UiButton>
+
+                <UiButton
+                  variant="ghost"
+                  size="icon"
+                  title="Hapus tugas"
+                  class="text-rose-500 hover:bg-rose-50 hover:text-rose-600"
+                  @click="askDelete(row)"
+                >
+                  <svg
+                    class="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  >
+                    <path d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10" />
+                  </svg>
+                </UiButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Pagination -->
       <UiPagination
         v-model:page="page"
-        v-model:perPage="perPage"
+        :per-page="perPage"
         :total="sorted.length"
       />
     </UiCard>
@@ -412,6 +615,14 @@
           :error="errors.kelas_id"
           required
           placeholder="Pilih kelas"
+        />
+
+        <!-- Jurusan (otomatis mengikuti kelas) -->
+        <UiInput
+          :model-value="jurusanName(getJurusanIdFromKelas(form.kelas_id))"
+          label="Jurusan"
+          disabled
+          placeholder="Otomatis dari kelas"
         />
 
         <!-- Mata pelajaran -->
@@ -558,6 +769,16 @@
       >
         <!-- Metadata -->
         <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-slate-400">
+              Jurusan
+            </p>
+
+            <p class="mt-0.5 font-medium text-slate-800">
+              {{ jurusanName(getJurusanIdFromKelas(detail.kelas_id)) }}
+            </p>
+          </div>
+
           <div>
             <p class="text-slate-400">
               Kelas
@@ -722,8 +943,38 @@ import {
   ref,
   watch,
 } from 'vue'
+import { useRouter } from 'vue-router'
 
 import DashboardLayout from '../../components/dashboard/DashboardLayout.vue'
+
+// Check auth before anything
+const router = useRouter()
+onMounted(() => {
+  const token = sessionStorage.getItem('token')
+  const user = sessionStorage.getItem('user')
+  
+  if (!token || !user) {
+    console.error('❌ No token or user found, redirecting to login...')
+    sessionStorage.clear()
+    router.push('/login')
+    return
+  }
+  
+  // Check if user is guru
+  try {
+    const userData = JSON.parse(user)
+    if (userData.role !== 'guru' && userData.role !== 'Guru') {
+      console.error('❌ User is not a guru, redirecting...')
+      router.push('/dashboard')
+      return
+    }
+    console.log('✅ Auth OK: User is guru')
+  } catch (e) {
+    console.error('❌ Failed to parse user data:', e)
+    sessionStorage.clear()
+    router.push('/login')
+  }
+})
 
 import UiCard from '@/components/ui/UiCard.vue'
 import UiButton from '@/components/ui/UiButton.vue'
@@ -782,6 +1033,10 @@ const navigation = [
 
 /* =============================================================
    COMPOSABLE
+   Catatan: fetchAll() tetap mengambil SEMUA data tugas dari
+   backend sekaligus (tidak ada server-side pagination). Yang
+   dibatasi hanya jumlah baris yang ditampilkan di halaman
+   (lihat bagian PAGINATION di bawah).
 ============================================================= */
 
 const {
@@ -796,7 +1051,7 @@ const {
 } = useTugas()
 
 /* =============================================================
-   REFERENCE DATA
+   REFERENCE DATA - KELAS & MAPEL
 ============================================================= */
 
 const kelasOptions = KELAS_REF.map((kelas) => ({
@@ -822,6 +1077,67 @@ const mapelName = (id) => {
     MAPEL_REF.find(
       (mapel) => mapel.id === Number(id),
     )?.name ?? '—'
+  )
+}
+
+/* =============================================================
+   REFERENCE DATA - JURUSAN
+   Jurusan disimpulkan dari nama kelas (mis. "X TKR 1" -> TKR).
+   Kalau nanti KELAS_REF sudah punya field jurusan_id sendiri
+   dari backend, tinggal ganti getJurusanIdFromKelas untuk
+   membaca field itu langsung.
+============================================================= */
+
+const JURUSAN_REF = [
+  {
+    id: 'TKR',
+    name: 'Teknik Kendaraan Ringan',
+    keywords: ['tkr', 'kendaraan ringan'],
+  },
+  {
+    id: 'RPL',
+    name: 'Rekayasa Perangkat Lunak',
+    keywords: ['rpl', 'perangkat lunak'],
+  },
+  {
+    id: 'TSM',
+    name: 'Teknik Sepeda Motor',
+    keywords: ['tsm', 'sepeda motor'],
+  },
+]
+
+const jurusanOptions = JURUSAN_REF.map((jurusan) => ({
+  value: jurusan.id,
+  label: jurusan.name,
+}))
+
+const getJurusanIdFromKelas = (kelasId) => {
+  const kelas = KELAS_REF.find(
+    (item) => item.id === Number(kelasId),
+  )
+
+  if (!kelas) {
+    return null
+  }
+
+  const namaKelas = String(
+    kelas.name || '',
+  ).toLowerCase()
+
+  const found = JURUSAN_REF.find((jurusan) =>
+    jurusan.keywords.some((keyword) =>
+      namaKelas.includes(keyword),
+    ),
+  )
+
+  return found ? found.id : null
+}
+
+const jurusanName = (id) => {
+  return (
+    JURUSAN_REF.find(
+      (jurusan) => jurusan.id === id,
+    )?.name ?? 'Lainnya'
   )
 }
 
@@ -924,9 +1240,43 @@ const formatTanggal = (value) => {
 ============================================================= */
 
 const search = ref('')
+const jurusanFilter = ref('')
 const kelasFilter = ref('')
 const mapelFilter = ref('')
 const activeTab = ref('semua')
+
+/*
+|--------------------------------------------------------------------------
+| Opsi kelas mengikuti jurusan yang dipilih (cascading).
+| Kalau jurusan dikosongkan, semua kelas ditampilkan lagi.
+|--------------------------------------------------------------------------
+*/
+
+const kelasOptionsFiltered = computed(() => {
+  if (!jurusanFilter.value) {
+    return kelasOptions
+  }
+
+  return KELAS_REF.filter(
+    (kelas) =>
+      getJurusanIdFromKelas(kelas.id) ===
+      jurusanFilter.value,
+  ).map((kelas) => ({
+    value: kelas.id,
+    label: kelas.name,
+  }))
+})
+
+/*
+|--------------------------------------------------------------------------
+| Reset pilihan kelas kalau jurusan diganti, supaya tidak
+| "nyangkut" ke kelas yang sudah tidak relevan.
+|--------------------------------------------------------------------------
+*/
+
+watch(jurusanFilter, () => {
+  kelasFilter.value = ''
+})
 
 const filtered = computed(() => {
   const keyword = search.value
@@ -949,6 +1299,11 @@ const filtered = computed(() => {
         statusLabel(task) === 'Lewat tenggat'
       )
 
+    const cocokJurusan =
+      !jurusanFilter.value ||
+      getJurusanIdFromKelas(task.kelas_id) ===
+        jurusanFilter.value
+
     const cocokKelas =
       !kelasFilter.value ||
       Number(task.kelas_id) ===
@@ -967,6 +1322,7 @@ const filtered = computed(() => {
 
     return (
       cocokTab &&
+      cocokJurusan &&
       cocokKelas &&
       cocokMapel &&
       cocokCari
@@ -1067,10 +1423,20 @@ const toggleSort = (key) => {
 
 /* =============================================================
    PAGINATION
+   Semua data tugas sudah ada di memori (items/sorted), di sini
+   kita cuma slice untuk ditampilkan. perPage dibatasi 5-25 lewat
+   perPageOptions di bawah.
 ============================================================= */
 
 const page = ref(1)
 const perPage = ref(10)
+
+const perPageOptions = [5, 10, 15, 20, 25].map(
+  (n) => ({
+    value: n,
+    label: `${n} / halaman`,
+  }),
+)
 
 const paged = computed(() => {
   const start =
@@ -1087,17 +1453,96 @@ const paged = computed(() => {
   )
 })
 
+watch(perPage, (value) => {
+  const num = Number(value)
+
+  if (Number.isNaN(num)) {
+    perPage.value = 10
+
+    return
+  }
+
+  if (num < 5) {
+    perPage.value = 5
+  } else if (num > 25) {
+    perPage.value = 25
+  }
+})
+
 watch(
   [
     search,
+    jurusanFilter,
     kelasFilter,
     mapelFilter,
     activeTab,
+    perPage,
   ],
   () => {
     page.value = 1
   },
 )
+
+/* =============================================================
+   VIEW MODE (Tabel / Kelompok) & GROUPING
+============================================================= */
+
+const viewMode = ref('tabel')
+const groupBy = ref('jurusan')
+
+const groupByOptions = [
+  {
+    value: 'jurusan',
+    label: 'Jurusan',
+  },
+  {
+    value: 'kelas',
+    label: 'Kelas',
+  },
+]
+
+/*
+|--------------------------------------------------------------------------
+| Grouping diterapkan pada data yang sedang tampil di halaman
+| aktif (paged), supaya tetap konsisten dengan pengaturan
+| jumlah data per halaman.
+|--------------------------------------------------------------------------
+*/
+
+const groupedSections = computed(() => {
+  const groups = new Map()
+
+  paged.value.forEach((task) => {
+    const jurusanId = getJurusanIdFromKelas(
+      task.kelas_id,
+    )
+
+    const key =
+      groupBy.value === 'jurusan'
+        ? jurusanId ?? 'lainnya'
+        : String(task.kelas_id)
+
+    const label =
+      groupBy.value === 'jurusan'
+        ? jurusanName(jurusanId)
+        : kelasName(task.kelas_id)
+
+    if (!groups.has(key)) {
+      groups.set(key, {
+        key,
+        label,
+        rows: [],
+      })
+    }
+
+    groups.get(key).rows.push(task)
+  })
+
+  return Array.from(groups.values()).sort(
+    (a, b) =>
+      a.label.localeCompare(b.label, 'id'),
+  )
+})
 
 /* =============================================================
    TABLE COLUMNS
@@ -1108,6 +1553,10 @@ const columns = [
     key: 'judul',
     label: 'Tugas',
     sortable: true,
+  },
+  {
+    key: 'jurusan',
+    label: 'Jurusan',
   },
   {
     key: 'kelas_id',
@@ -1515,4 +1964,3 @@ onMounted(async () => {
   await fetchAll()
 })
 </script>
-```
