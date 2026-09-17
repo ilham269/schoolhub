@@ -422,7 +422,7 @@
     </section>
 
     <!-- =========================
-         PROGRAM PEMINATAN
+         PROGRAM PEMINATAN (JURUSAN SMK)
     ========================== -->
     <section class="section">
       <div class="container">
@@ -453,7 +453,7 @@
               margin-bottom: 12px;
             "
           >
-            Jenjang &amp; Program Peminatan
+            Jenjang &amp; Program Keahlian
           </h2>
 
           <p
@@ -463,7 +463,7 @@
               margin-inline: auto 36px;
             "
           >
-            Pilih jalur peminatan yang paling sesuai
+            Pilih jurusan yang paling sesuai
             dengan minat dan rencana masa depanmu.
           </p>
         </div>
@@ -496,29 +496,29 @@
 
           <button
             :class="{
-              active: activeFilter === 'MIPA'
+              active: activeFilter === 'TKR'
             }"
-            @click="setFilter('MIPA')"
+            @click="setFilter('TKR')"
           >
-            MIPA
+            Teknik Kendaraan Ringan
           </button>
 
           <button
             :class="{
-              active: activeFilter === 'IPS'
+              active: activeFilter === 'RPL'
             }"
-            @click="setFilter('IPS')"
+            @click="setFilter('RPL')"
           >
-            IPS
+            Rekayasa Perangkat Lunak
           </button>
 
           <button
             :class="{
-              active: activeFilter === 'Bahasa'
+              active: activeFilter === 'TSM'
             }"
-            @click="setFilter('Bahasa')"
+            @click="setFilter('TSM')"
           >
-            Bahasa
+            Teknik Sepeda Motor
           </button>
         </div>
 
@@ -620,12 +620,61 @@
           v-else
           class="news-grid"
         >
-         
-          <!-- IPS -->
+          <!-- Teknik Kendaraan Ringan -->
           <div
             v-show="
               activeFilter === 'Semua' ||
-              activeFilter === 'IPS'
+              activeFilter === 'TKR'
+            "
+            class="news-card"
+            v-motion
+            :initial="{
+              opacity: 0,
+              y: 30
+            }"
+            :visible-once="{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 500,
+                delay: 100
+              }
+            }"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=700&auto=format&fit=crop"
+              alt="Teknik Kendaraan Ringan"
+            />
+
+            <div class="body">
+              <span class="badge badge-green">
+                TKR
+              </span>
+
+              <h3 style="font-size: 1.1rem">
+                Teknik Kendaraan Ringan
+              </h3>
+
+              <p>
+                Mempelajari perawatan, perbaikan, dan
+                kelistrikan mobil sesuai standar industri
+                otomotif terkini.
+              </p>
+
+              <router-link
+                class="link-arrow"
+                to="/profile"
+              >
+                Pelajari program &rarr;
+              </router-link>
+            </div>
+          </div>
+
+          <!-- Rekayasa Perangkat Lunak -->
+          <div
+            v-show="
+              activeFilter === 'Semua' ||
+              activeFilter === 'RPL'
             "
             class="news-card"
             v-motion
@@ -643,22 +692,23 @@
             }"
           >
             <img
-              src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=700&auto=format&fit=crop"
-              alt="Program IPS"
+              src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=700&auto=format&fit=crop"
+              alt="Rekayasa Perangkat Lunak"
             />
 
             <div class="body">
-              <span class="badge badge-amber">
-                IPS
+              <span class="badge badge-dark">
+                RPL
               </span>
 
               <h3 style="font-size: 1.1rem">
-                Ilmu Sosial
+                Rekayasa Perangkat Lunak
               </h3>
 
               <p>
-                Ekonomi, sosiologi, dan geografi untuk
-                memahami dinamika masyarakat.
+                Fokus pada pemrograman, pengembangan
+                aplikasi web/mobile, dan basis data untuk
+                membekali siswa siap kerja di dunia IT.
               </p>
 
               <router-link
@@ -670,11 +720,11 @@
             </div>
           </div>
 
-          <!-- Bahasa -->
+          <!-- Teknik Sepeda Motor -->
           <div
             v-show="
               activeFilter === 'Semua' ||
-              activeFilter === 'Bahasa'
+              activeFilter === 'TSM'
             "
             class="news-card"
             v-motion
@@ -692,27 +742,28 @@
             }"
           >
             <img
-              src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=700&auto=format&fit=crop"
-              alt="Program Bahasa"
+              src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=700&auto=format&fit=crop"
+              alt="Teknik Sepeda Motor"
             />
 
             <div class="body">
-              <span class="badge badge-dark">
-                Bahasa
+              <span class="badge badge-amber">
+                TSM
               </span>
 
               <h3 style="font-size: 1.1rem">
-                Bahasa &amp; Budaya
+                Teknik Sepeda Motor
               </h3>
 
               <p>
-                Penguasaan bahasa asing dan sastra
-                untuk komunikasi global.
+                Mempelajari mesin, sistem injeksi, dan
+                perawatan sepeda motor konvensional maupun
+                matic sesuai kebutuhan bengkel resmi.
               </p>
 
               <router-link
                 class="link-arrow"
-                to="/profil"
+                to="/profile"
               >
                 Pelajari program &rarr;
               </router-link>
@@ -818,7 +869,7 @@ const defaultGuruImage =
 
 const home = ref({
   school: {
-    name: 'SMA Harapan Bangsa',
+    name: 'SMK Harapan Bangsa',
 
     hero_title:
       'Memimpin Jalan Menuju Pendidikan Tinggi Berkualitas',
@@ -924,7 +975,16 @@ const getGuruImage = (guru) => {
 |--------------------------------------------------------------------------
 | Filter Programs
 |--------------------------------------------------------------------------
+| Mendukung pencocokan lewat singkatan (TKR/RPL/TSM) maupun
+| nama lengkap jurusan yang dikirim backend.
+|--------------------------------------------------------------------------
 */
+
+const jurusanKeywordMap = {
+  TKR: ['tkr', 'kendaraan ringan'],
+  RPL: ['rpl', 'perangkat lunak'],
+  TSM: ['tsm', 'sepeda motor']
+}
 
 const filteredPrograms = computed(() => {
   if (!Array.isArray(home.value.programs)) {
@@ -935,17 +995,24 @@ const filteredPrograms = computed(() => {
     return home.value.programs
   }
 
-  return home.value.programs.filter((program) => {
-    const kategori =
-      program.kategori ||
-      program.category ||
-      program.jurusan ||
-      program.nama_jurusan ||
-      ''
-
-    return (
-      String(kategori).toLowerCase() ===
+  const keywords =
+    jurusanKeywordMap[activeFilter.value] || [
       activeFilter.value.toLowerCase()
+    ]
+
+  return home.value.programs.filter((program) => {
+    const kategori = String(
+      program.kategori ||
+        program.category ||
+        program.jurusan ||
+        program.nama_jurusan ||
+        program.nama ||
+        program.name ||
+        ''
+    ).toLowerCase()
+
+    return keywords.some((keyword) =>
+      kategori.includes(keyword)
     )
   })
 })
@@ -961,16 +1028,25 @@ const getProgramBadgeClass = (kategori) => {
     kategori || ''
   ).toLowerCase()
 
-  if (value === 'mipa') {
+  if (
+    value.includes('kendaraan ringan') ||
+    value === 'tkr'
+  ) {
     return 'badge-green'
   }
 
-  if (value === 'ips') {
-    return 'badge-amber'
+  if (
+    value.includes('perangkat lunak') ||
+    value === 'rpl'
+  ) {
+    return 'badge-dark'
   }
 
-  if (value === 'bahasa') {
-    return 'badge-dark'
+  if (
+    value.includes('sepeda motor') ||
+    value === 'tsm'
+  ) {
+    return 'badge-amber'
   }
 
   return 'badge-dark'
