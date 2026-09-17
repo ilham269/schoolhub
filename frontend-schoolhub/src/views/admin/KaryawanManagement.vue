@@ -6,9 +6,24 @@
         <h2 class="page-title">Manajemen Karyawan</h2>
         <p class="page-subtitle">Kelola data karyawan dan staf sekolah</p>
       </div>
-      <Button variant="primary" icon="plus" @click="openCreateModal">
-        Tambah Karyawan
-      </Button>
+      <div class="page-actions">
+        <Button variant="secondary" icon="download" @click="downloadTemplate('karyawan')">
+          Template CSV
+        </Button>
+        <Button variant="secondary" icon="upload" :disabled="importing" @click="triggerImport('karyawan')">
+          {{ importing ? 'Mengimpor...' : 'Import CSV' }}
+        </Button>
+        <Button variant="primary" icon="plus" @click="openCreateModal">
+          Tambah Karyawan
+        </Button>
+      </div>
+      <input
+        ref="karyawanImportInput"
+        type="file"
+        accept=".csv,text/csv,.xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        hidden
+        @change="handleImportCsv($event, 'karyawan')"
+      />
     </div>
 
     <!-- Alert Message -->
@@ -186,6 +201,63 @@ const alert = ref({
   title: '',
   message: '',
 })
+
+const importing = ref(false)
+const karyawanImportInput = ref(null)
+
+const triggerImport = (type) => {
+  const input = type === 'karyawan' ? karyawanImportInput.value : null
+  if (input) input.click()
+}
+
+const downloadTemplate = (type) => {
+  const csv = [
+    'email,password,nip,nama_lengkap_karyawan,bagian,nomor_telepon,alamat',
+    'staff1@example.com,Secret123,8001,Staff Satu,Tata Usaha,0813333333,Jl. Melati 9',
+  ].join('\n')
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${type}-template.csv`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+const handleImportCsv = async (event, type) => {
+  const file = event.target.files?.[0]
+
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  importing.value = true
+
+  try {
+    const response = await api.post(`/${type}/import`, formData)
+    const { imported = 0, failed = 0, errors = [] } = response.data || {}
+
+    if (response.data?.success === false) {
+      throw new Error(response.data.message || 'Import gagal')
+    }
+
+    const errorSummary = errors.length ? `\n${errors.slice(0, 3).map((item) => item.message).join('\n')}` : ''
+    showAlert(
+      'success',
+      'Import selesai',
+      `Berhasil mengimpor ${imported} data. Gagal: ${failed}.${errorSummary}`,
+    )
+    await fetchData()
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Gagal mengimpor data'
+    showAlert('danger', 'Import gagal', message)
+  } finally {
+    importing.value = false
+    event.target.value = ''
+  }
+}
 
 // Table columns configuration
 const columns = [

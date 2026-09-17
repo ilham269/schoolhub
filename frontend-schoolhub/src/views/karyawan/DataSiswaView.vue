@@ -462,8 +462,18 @@ const submitting = ref(false)
 const siswaList = ref([])
 const kelasList = ref([])
 
-const getNamaSiswa = (siswa) =>
-  siswa?.nama_lengkap_murid ?? siswa?.Nama_lengkap_murid ?? siswa?.user?.name ?? '-'
+const safeString = (value) => (value == null ? '' : String(value))
+
+const getNamaSiswa = (siswa) => {
+  const candidate =
+    siswa?.nama_lengkap_murid ??
+    siswa?.Nama_lengkap_murid ??
+    siswa?.user?.name ??
+    siswa?.user?.nama_lengkap_murid ??
+    null
+
+  return candidate ? safeString(candidate).trim() : '-'
+}
 
 const getKelasLabel = (kelas) => {
   if (!kelas) return '-'
@@ -542,10 +552,11 @@ const filteredSiswa = computed(() => {
   }
 
   if (filters.value.search) {
-    const search = filters.value.search.toLowerCase()
+    const search = safeString(filters.value.search).trim().toLowerCase()
     result = result.filter((s) => {
-      const nama = getNamaSiswa(s).toLowerCase()
-      return nama.includes(search) || s.nis?.toLowerCase().includes(search)
+      const nama = safeString(getNamaSiswa(s)).toLowerCase()
+      const nis = safeString(s?.nis).toLowerCase()
+      return nama.includes(search) || nis.includes(search)
     })
   }
 

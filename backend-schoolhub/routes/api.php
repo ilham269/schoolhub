@@ -166,6 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
       Route::prefix('guru')->group(function () {
         Route::get('/', [GuruController::class, 'index']);
         Route::post('/', [GuruController::class, 'store']);
+        Route::post('/import', [GuruController::class, 'import']);
         Route::get('/{id}', [GuruController::class, 'show']);
         Route::put('/{id}', [GuruController::class, 'update']);
         Route::delete('/{id}', [GuruController::class, 'destroy']);
@@ -195,6 +196,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         Route::get('/', [MuridController::class, 'index']);
         Route::post('/', [MuridController::class, 'store']);
+        Route::post('/import', [MuridController::class, 'import']);
         Route::get('/profile', [MuridController::class, 'myProfile']);
         Route::put('/profile', [MuridController::class, 'updateMyProfile']);
         Route::get('/nilai', [MuridNilaiController::class, 'index'])->middleware('role:murid');
@@ -209,6 +211,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('karyawan')->group(function () {
         Route::get('/', [KaryawanController::class, 'index']);
         Route::post('/', [KaryawanController::class, 'store']);
+        Route::post('/import', [KaryawanController::class, 'import']);
         Route::get('/{id}', [KaryawanController::class, 'show']);
         Route::put('/{id}', [KaryawanController::class, 'update']);
         Route::delete('/{id}', [KaryawanController::class, 'destroy']);

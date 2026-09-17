@@ -6,9 +6,24 @@
         <h2 class="page-title">Manajemen Siswa</h2>
         <p class="page-subtitle">Kelola data siswa sekolah</p>
       </div>
-      <Button variant="primary" icon="plus" @click="openCreateModal">
-        Tambah Siswa
-      </Button>
+      <div class="page-actions">
+        <Button variant="secondary" icon="download" @click="downloadTemplate('murid')">
+          Template CSV
+        </Button>
+        <Button variant="secondary" icon="upload" :disabled="importing" @click="triggerImport('murid')">
+          {{ importing ? 'Mengimpor...' : 'Import CSV' }}
+        </Button>
+        <Button variant="primary" icon="plus" @click="openCreateModal">
+          Tambah Siswa
+        </Button>
+      </div>
+      <input
+        ref="muridImportInput"
+        type="file"
+        accept=".csv,text/csv,.xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        hidden
+        @change="handleImportCsv($event, 'murid')"
+      />
     </div>
 
     <!-- Alert Message -->
@@ -19,10 +34,57 @@
       :message="alert.message"
     />
 
+    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:end; margin:16px 0;">
+      <div style="flex:1 1 220px; min-width:220px;">
+        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:#475569;">Cari siswa</label>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Nama, NIS, kelas..."
+          style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;"
+        />
+      </div>
+
+      <div style="flex:1 1 180px; min-width:180px;">
+        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:#475569;">Kelas</label>
+        <select
+          v-model="kelasFilter"
+          style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;"
+        >
+          <option value="all">Semua kelas</option>
+          <option v-for="kelas in kelasOptions" :key="kelas" :value="kelas">{{ kelas }}</option>
+        </select>
+      </div>
+
+      <div style="flex:1 1 160px; min-width:160px;">
+        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:#475569;">Jenis kelamin</label>
+        <select
+          v-model="genderFilter"
+          style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;"
+        >
+          <option value="all">Semua</option>
+          <option value="L">Laki-laki</option>
+          <option value="P">Perempuan</option>
+        </select>
+      </div>
+
+      <div style="flex:1 1 160px; min-width:160px;">
+        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:#475569;">Status</label>
+        <select
+          v-model="statusFilter"
+          style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;"
+        >
+          <option value="all">Semua</option>
+          <option value="active">Aktif</option>
+          <option value="inactive">Nonaktif</option>
+        </select>
+      </div>
+    </div>
+
     <!-- Data Table -->
     <Card>
       <DataTable
-        :data="muridList"
+        :data="filteredMuridList"
         :columns="columns"
         :loading="loading"
         :actions="['view', 'edit', 'delete']"
@@ -224,7 +286,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import api from '@/utils/api'
 import DashboardLayout from '@/components/dashboard/DashboardLayout.vue'
 import { adminNavigation } from '@/views/admin/adminNavigation'
@@ -246,6 +308,57 @@ const navigation = adminNavigation
 const muridList = ref([])
 const loading = ref(false)
 const selectedMurid = ref(null)
+const searchQuery = ref('')
+const kelasFilter = ref('all')
+const genderFilter = ref('all')
+const statusFilter = ref('all')
+
+const kelasOptions = computed(() => {
+  const uniqueKelas = new Set()
+
+  muridList.value.forEach((murid) => {
+    const kelasLabel = murid.kelas
+      ? `${murid.kelas.kelas || ''} ${murid.kelas.nama_kelas || ''}`.trim()
+      : ''
+
+    if (kelasLabel) {
+      uniqueKelas.add(kelasLabel)
+    }
+  })
+
+  return Array.from(uniqueKelas).sort()
+})
+
+const filteredMuridList = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+
+  return muridList.value.filter((murid) => {
+    const nama = String(murid.nama_lengkap_murid || murid.user?.name || '').toLowerCase()
+    const nis = String(murid.nis || '').toLowerCase()
+    const kelasName = murid.kelas
+      ? `${murid.kelas.kelas || ''} ${murid.kelas.nama_kelas || ''}`.trim().toLowerCase()
+      : ''
+
+    const matchesSearch =
+      !query ||
+      [nama, nis, kelasName].some((value) => value.includes(query))
+
+    const kelasValue = murid.kelas
+      ? `${murid.kelas.kelas || ''} ${murid.kelas.nama_kelas || ''}`.trim()
+      : ''
+    const matchesKelas = kelasFilter.value === 'all' || kelasValue === kelasFilter.value
+
+    const matchesGender = genderFilter.value === 'all' || murid.gender === genderFilter.value
+
+    const isActive = Boolean(murid.user?.is_active ?? murid.is_active)
+    const matchesStatus =
+      statusFilter.value === 'all' ||
+      (statusFilter.value === 'active' && isActive) ||
+      (statusFilter.value === 'inactive' && !isActive)
+
+    return matchesSearch && matchesKelas && matchesGender && matchesStatus
+  })
+})
 
 // Modal states
 const formModal = ref({
@@ -274,6 +387,62 @@ const alert = ref({
   title: '',
   message: '',
 })
+
+const importing = ref(false)
+const muridImportInput = ref(null)
+
+const triggerImport = (type) => {
+  const input = type === 'murid' ? muridImportInput.value : null
+  if (input) input.click()
+}
+
+const downloadTemplate = (type) => {
+  const csv = [
+    'email,password,nis,nama_lengkap_murid,gender,kelas_id,tanggal_lahir,tempat_lahir,alamat,nomor_telepon',
+    'siswa1@example.com,Secret123,2001,Siswa Satu,L,1,2009-01-15,Jakarta,Jl. Mawar 1,0811111111',
+  ].join('\n')
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${type}-template.csv`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+const handleImportCsv = async (event, type) => {
+  const file = event.target.files?.[0]
+
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  importing.value = true
+
+  try {
+    const response = await api.post(`/${type}/import`, formData)
+    const { imported = 0, failed = 0, errors = [] } = response.data || {}
+
+    if (response.data?.success === false) {
+      throw new Error(response.data.message || 'Import gagal')
+    }
+
+    const errorSummary = errors.length ? `\n${errors.slice(0, 3).map((item) => item.message).join('\n')}` : ''
+    showAlert(
+      'success',
+      'Import selesai',
+      `Berhasil mengimpor ${imported} data. Gagal: ${failed}.${errorSummary}`,
+    )
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Gagal mengimpor data'
+    showAlert('danger', 'Import gagal', message)
+  } finally {
+    importing.value = false
+    event.target.value = ''
+  }
+}
 
 // Table columns configuration
 const columns = [

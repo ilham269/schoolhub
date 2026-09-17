@@ -67,7 +67,12 @@ class MuridTugasController extends Controller
 
         $pengumpulan = Pengumpulantugas::firstOrNew(['tugas_id' => $tugas->id, 'murid_id' => $murid->id]);
         if ($request->hasFile('file')) {
-            Storage::disk('local')->delete($pengumpulan->file_path);
+            $existingFilePath = $pengumpulan->file_path;
+
+            if (filled($existingFilePath) && Storage::disk('local')->exists($existingFilePath)) {
+                Storage::disk('local')->delete($existingFilePath);
+            }
+
             $pengumpulan->file_path = $request->file('file')->store('pengumpulan-tugas', 'local');
         }
         $pengumpulan->link = $data['link'] ?? null;

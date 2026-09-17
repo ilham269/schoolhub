@@ -41,6 +41,195 @@ class GuruController extends Controller
     }
 
     /**
+     * Import guru from CSV file.
+     */
+    public function import(Request $request): JsonResponse
+    {
+        if (!$request->hasFile('file')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File CSV atau Excel wajib diupload',
+                'errors' => ['file' => ['File CSV atau Excel wajib diupload']],
+            ], 422);
+        }
+
+        $file = $request->file('file');
+        $extension = strtolower($file->getClientOriginalExtension() ?: 'csv');
+        $supportedExtensions = ['csv', 'txt', 'xls', 'xlsx', 'xlsm'];
+
+        if (!in_array($extension, $supportedExtensions, true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Format file harus CSV atau Excel (.xls/.xlsx)',
+                'errors' => ['file' => ['Format file harus CSV atau Excel (.xls/.xlsx)']],
+            ], 422);
+        }
+
+        try {
+            $rows = $this->readSpreadsheetRows($file);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membaca file spreadsheet',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+
+        if (count($rows) === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File spreadsheet tidak memiliki data',
+            ], 422);
+        }
+
+        $header = array_values(array_filter($rows[0], function ($column) {
+            return $column !== null && trim((string) $column) !== '';
+        }));
+
+        if ($header === [] || count($header) === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File spreadsheet tidak memiliki header yang valid',
+            ], 422);
+        }
+
+        $normalizedHeaders = array_map(function ($column) {
+            return strtolower(trim(preg_replace('/\s+/', '_', (string) $column)));
+        }, $header);
+
+        $requiredHeaders = ['email', 'password', 'nip', 'nama_lengkap_guru', 'gender', 'tanggal_lahir'];
+        $missing = array_values(array_diff($requiredHeaders, $normalizedHeaders));
+
+        if ($missing) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Header spreadsheet tidak lengkap',
+                'errors' => ['file' => ['Kolom yang dibutuhkan: ' . implode(', ', $requiredHeaders)]],
+                'missing_headers' => $missing,
+            ], 422);
+        }
+
+        $imported = 0;
+        $failed = 0;
+        $errors = [];
+
+        foreach (array_slice($rows, 1) as $index => $row) {
+            if (count(array_filter($row, fn ($value) => $value !== null && trim((string) $value) !== '')) === 0) {
+                continue;
+            }
+
+            $rowData = [];
+            foreach ($normalizedHeaders as $headerIndex => $headerName) {
+                $rowData[$headerName] = $row[$headerIndex] ?? null;
+            }
+
+            $validator = Validator::make($rowData, [
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:8',
+                'nip' => 'required|string|unique:gurus,nip',
+                'nama_lengkap_guru' => 'required|string|max:255',
+                'gender' => 'required|in:L,P',
+                'tanggal_lahir' => 'required|date',
+                'alamat' => 'nullable|string',
+                'nomor_telepon' => 'nullable|string|max:20',
+                'pendidikan_terakhir' => 'nullable|string|max:100',
+                'mata_pelajaran' => 'nullable|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                $failed++;
+                $errors[] = [
+                    'row' => $index + 2,
+                    'message' => $validator->errors()->first(),
+                ];
+                continue;
+            }
+
+            try {
+                DB::beginTransaction();
+
+                $user = User::create([
+                    'name' => $rowData['nama_lengkap_guru'],
+                    'email' => $rowData['email'],
+                    'password' => Hash::make($rowData['password']),
+                    'role' => 'Guru',
+                    'is_active' => true,
+                ]);
+
+                Guru::create([
+                    'user_id' => $user->id,
+                    'nip' => $rowData['nip'],
+                    'nama_lengkap_guru' => $rowData['nama_lengkap_guru'],
+                    'gender' => $rowData['gender'],
+                    'tanggal_lahir' => $rowData['tanggal_lahir'],
+                    'alamat' => $rowData['alamat'] ?? null,
+                    'nomor_telepon' => $rowData['nomor_telepon'] ?? null,
+                ]);
+
+                DB::commit();
+                $imported++;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $failed++;
+                $errors[] = [
+                    'row' => $index + 2,
+                    'message' => $e->getMessage(),
+                ];
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Import data guru selesai',
+            'imported' => $imported,
+            'failed' => $failed,
+            'errors' => $errors,
+        ]);
+    }
+
+    private function readSpreadsheetRows($file): array
+    {
+        $extension = strtolower($file->getClientOriginalExtension() ?: 'csv');
+
+        if (in_array($extension, ['csv', 'txt'], true)) {
+            $handle = fopen($file->getRealPath(), 'r');
+            if ($handle === false) {
+                throw new \RuntimeException('Gagal membuka file CSV');
+            }
+
+            $rows = [];
+            while (($row = fgetcsv($handle)) !== false) {
+                $rows[] = $row;
+            }
+            fclose($handle);
+
+            return $rows;
+        }
+
+        if (!class_exists('PhpOffice\\PhpSpreadsheet\\IOFactory')) {
+            throw new \RuntimeException('Library spreadsheet belum terinstal');
+        }
+
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = [];
+
+        foreach ($sheet->getRowIterator() as $row) {
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+            $values = [];
+
+            foreach ($cellIterator as $cell) {
+                $values[] = $cell->getValue();
+            }
+
+            $rows[] = $values;
+        }
+
+        return $rows;
+    }
+
+    /**
      * Store a newly created guru.
      */
     public function store(Request $request): JsonResponse
