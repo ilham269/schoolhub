@@ -64,6 +64,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import DashboardLayout from '@/components/dashboard/DashboardLayout.vue'
+import { adminNavigation } from '@/views/admin/adminNavigation'
 import UiAlert from '@/components/ui/UiAlert.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
@@ -74,14 +75,7 @@ import UiSelect from '@/components/ui/UiSelect.vue'
 import UiTable from '@/components/ui/UiTable.vue'
 import { mapelApi } from '@/services/mapelApi'
 
-const navigation = [
-  { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/admin' },
-  { label: 'Kelola Siswa', icon: 'fas fa-user-graduate', to: '/dashboard/admin/murid' },
-  { label: 'Kelola Guru', icon: 'fas fa-chalkboard-user', to: '/dashboard/admin/guru' },
-  { label: 'Kelola Karyawan', icon: 'fas fa-id-card', to: '/dashboard/admin/karyawan' },
-  { label: 'Kelola Mata Pelajaran', icon: 'fas fa-book-open', to: '/dashboard/admin/mapel' },
-  { label: 'Kelola Jadwal', icon: 'fas fa-calendar-days', to: '/dashboard/admin/jadwal' },
-]
+const navigation = adminNavigation
 const columns = [{ key: 'kode', label: 'Kode' }, { key: 'nama', label: 'Mata pelajaran' }, { key: 'jam', label: 'Jam' }, { key: 'kkm', label: 'KKM' }, { key: 'status', label: 'Status' }, { key: 'aksi', label: '', class: 'text-right' }]
 const statusOptions = [{ value: 'true', label: 'Aktif' }, { value: 'false', label: 'Nonaktif' }]
 const items = ref([]); const loading = ref(true); const error = ref(''); const search = ref(''); const formOpen = ref(false); const deleteOpen = ref(false); const editing = ref(false); const saving = ref(false); const deleting = ref(false); const selected = ref(null); const errors = ref({})

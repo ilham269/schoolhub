@@ -201,8 +201,8 @@ import { guruApi } from '@/services/guruApi'
 const navigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/guru' },
   { label: 'Data Kelas', icon: 'fas fa-users', to: '/dashboard/guru/kelas' },
+  { label: 'Materi', icon: 'fas fa-book-open', to: '/dashboard/guru/materi' },
   { label: 'Tugas', icon: 'fas fa-book-open', to: '/dashboard/guru/tugas' },
-  { label: 'Nilai', icon: 'fas fa-chart-bar', to: '/dashboard/guru/nilai' },
   { label: 'Ujian PPDB & Soal', icon: 'fas fa-file-circle-check', to: '/dashboard/guru/ujian-ppdb' },
 ]
 

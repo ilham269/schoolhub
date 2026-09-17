@@ -10,10 +10,14 @@ class Murid extends Model
 {
     use HasFactory;
 
+    protected $appends = ['nama_lengkap_murid'];
+
     protected $fillable = [
         'user_id',
         'kelas_id',
         'nis',
+        'Nama_lengkap_murid',
+        'nama_lengkap_murid',
         'gambar_murid',
         'gender',
         'tanggal_lahir',
@@ -49,7 +53,10 @@ class Murid extends Model
     // Accessor untuk nama_lengkap_murid (lowercase)
     public function getNamaLengkapMuridAttribute()
     {
-        return $this->attributes['Nama_lengkap_murid'] ?? null;
+        return $this->attributes['Nama_lengkap_murid']
+            ?? $this->attributes['nama_lengkap_murid']
+            ?? $this->user?->name
+            ?? null;
     }
 
     /*

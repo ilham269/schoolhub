@@ -21,15 +21,11 @@
 import { onMounted, ref } from 'vue'
 import api from '../../utils/api'
 import DashboardLayout from '../../components/dashboard/DashboardLayout.vue'
-const candidates = ref([]),
-  navigation = [
-    { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/admin' },
-    {
-      label: 'Pendaftaran PPDB',
-      icon: 'fas fa-clipboard-list',
-      to: '/dashboard/admin/pendaftaran',
-    },
-  ]
+import { adminNavigation } from '@/views/admin/adminNavigation'
+
+const candidates = ref([])
+const navigation = adminNavigation
+
 async function load() {
   candidates.value = (await api.get('/ppdb/manage/candidates')).data.data
 }

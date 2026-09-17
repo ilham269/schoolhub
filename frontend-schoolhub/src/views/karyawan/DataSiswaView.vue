@@ -129,11 +129,11 @@
               </td>
               <td>
                 <div class="student-info">
-                  <strong>{{ siswa.Nama_lengkap_murid }}</strong>
+                  <strong>{{ getNamaSiswa(siswa) }}</strong>
                   <small>{{ siswa.user?.email }}</small>
                 </div>
               </td>
-              <td>{{ siswa.kelas?.name || '-' }}</td>
+              <td>{{ getKelasLabel(siswa.kelas) }}</td>
               <td>
                 <span class="gender-badge" :class="siswa.gender === 'L' ? 'male' : 'female'">
                   <i :class="siswa.gender === 'L' ? 'fas fa-mars' : 'fas fa-venus'"></i>
@@ -142,7 +142,7 @@
               </td>
               <td>
                 <div class="birth-info">
-                  <div>{{ siswa.tanggal_lahir.tempat_lahir || '-' }}</div>
+                  <div>{{ getTempatLahir(siswa) }}</div>
                   <small>{{ formatDate(siswa.tanggal_lahir) }}</small>
                 </div>
               </td>
@@ -187,7 +187,7 @@
               </div>
               <div class="detail-row">
                 <span class="detail-label">Nama Lengkap:</span>
-                <span class="detail-value">{{ selectedSiswa.Nama_lengkap_murid }}</span>
+                <span class="detail-value">{{ getNamaSiswa(selectedSiswa) }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Email:</span>
@@ -199,7 +199,7 @@
               </div>
               <div class="detail-row">
                 <span class="detail-label">Tempat Lahir:</span>
-                <span class="detail-value">{{ selectedSiswa.tempat_lahir || '-' }}</span>
+                <span class="detail-value">{{ getTempatLahir(selectedSiswa) }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Tanggal Lahir:</span>
@@ -216,7 +216,7 @@
               <h4><i class="fas fa-school"></i> Data Akademik</h4>
               <div class="detail-row">
                 <span class="detail-label">Kelas:</span>
-                <span class="detail-value">{{ selectedSiswa.kelas?.name || '-' }}</span>
+                <span class="detail-value">{{ getKelasLabel(selectedSiswa.kelas) }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Hobi:</span>
@@ -462,6 +462,26 @@ const submitting = ref(false)
 const siswaList = ref([])
 const kelasList = ref([])
 
+const getNamaSiswa = (siswa) =>
+  siswa?.nama_lengkap_murid ?? siswa?.Nama_lengkap_murid ?? siswa?.user?.name ?? '-'
+
+const getKelasLabel = (kelas) => {
+  if (!kelas) return '-'
+  if (kelas.name) return kelas.name
+  if (kelas.nama_kelas) return kelas.nama_kelas
+  if (kelas.kelas) return `${kelas.kelas} ${kelas.nama_kelas || ''}`.trim()
+  return '-'
+}
+
+const getTempatLahir = (siswa) => {
+  if (!siswa) return '-'
+  if (siswa.tempat_lahir) return siswa.tempat_lahir
+  if (siswa.tanggal_lahir && typeof siswa.tanggal_lahir === 'object') {
+    return siswa.tanggal_lahir.tempat_lahir || '-'
+  }
+  return '-'
+}
+
 const filters = ref({
   kelas_id: '',
   gender: '',
@@ -523,11 +543,10 @@ const filteredSiswa = computed(() => {
 
   if (filters.value.search) {
     const search = filters.value.search.toLowerCase()
-    result = result.filter(
-      s =>
-        s.Nama_lengkap_murid?.toLowerCase().includes(search) ||
-        s.nis?.toLowerCase().includes(search)
-    )
+    result = result.filter((s) => {
+      const nama = getNamaSiswa(s).toLowerCase()
+      return nama.includes(search) || s.nis?.toLowerCase().includes(search)
+    })
   }
 
   return result
@@ -600,7 +619,7 @@ const editSiswa = (siswa) => {
   editingId.value = siswa.id
   form.value = {
     nis: siswa.nis,
-    nama_lengkap_murid: siswa.Nama_lengkap_murid,
+    nama_lengkap_murid: getNamaSiswa(siswa),
     email: siswa.user?.email,
     password: '',
     gender: siswa.gender,
@@ -624,7 +643,7 @@ const editSiswa = (siswa) => {
 }
 
 const deleteSiswa = async (siswa) => {
-  if (!confirm(`Apakah Anda yakin ingin menghapus siswa ${siswa.Nama_lengkap_murid}?`)) {
+  if (!confirm(`Apakah Anda yakin ingin menghapus siswa ${getNamaSiswa(siswa)}?`)) {
     return
   }
 

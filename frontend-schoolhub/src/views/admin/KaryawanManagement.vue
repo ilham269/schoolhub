@@ -139,6 +139,7 @@
 import { ref, onMounted } from 'vue'
 import api from '@/utils/api'
 import DashboardLayout from '@/components/dashboard/DashboardLayout.vue'
+import { adminNavigation } from '@/views/admin/adminNavigation'
 import {
   Card,
   DataTable,
@@ -150,16 +151,8 @@ import {
 } from '@/components/ui'
 import KaryawanForm from '@/components/admin/forms/KaryawanForm.vue'
 
-// Navigation for sidebar
-const navigation = [
-  { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/admin' },
-  { label: 'Kelola Guru', icon: 'fas fa-chalkboard-user', to: '/dashboard/admin/guru' },
-  { label: 'Kelola Siswa', icon: 'fas fa-user-graduate', to: '/dashboard/admin/murid' },
-  { label: 'Kelola Karyawan', icon: 'fas fa-id-card', to: '/dashboard/admin/karyawan' },
-  { label: 'Kelola Berita', icon: 'fas fa-newspaper', to: '/dashboard/admin/berita' },
-  { label: 'Kelola Pengumuman', icon: 'fas fa-bullhorn', to: '/dashboard/admin/pengumuman' },
-  { label: 'Pendaftaran PPDB', icon: 'fas fa-clipboard-list', to: '/dashboard/admin/pendaftaran' },
-]
+// Shared admin navigation for consistent sidebar across all admin pages
+const navigation = adminNavigation
 
 // State
 const karyawanList = ref([])

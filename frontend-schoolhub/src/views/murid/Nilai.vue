@@ -50,7 +50,37 @@ const cards = computed(() => [{ label: 'Rata-rata nilai', value: score(summary.v
 function score(value) { return value === null || value === undefined ? '—' : Number(value).toLocaleString('id-ID', { maximumFractionDigits: 2 }) }
 function date(value) { return value ? new Date(value).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '—' }
 function renderCharts() { trendChart?.destroy(); mapelChart?.destroy(); if (trendCanvas.value && data.value.trend.length) trendChart = new Chart(trendCanvas.value, { type: 'line', data: { labels: data.value.trend.map((item) => date(item.label)), datasets: [{ label: 'Nilai', data: data.value.trend.map((item) => item.nilai), borderColor: '#15935a', backgroundColor: 'rgba(21,147,90,.12)', fill: true, tension: .35 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } } }); if (mapelCanvas.value && scoredBreakdown.value.length) mapelChart = new Chart(mapelCanvas.value, { type: 'bar', data: { labels: scoredBreakdown.value.map((item) => item.nama_mapel), datasets: [{ label: 'Nilai akhir', data: scoredBreakdown.value.map((item) => item.nilai_akhir), backgroundColor: scoredBreakdown.value.map((item) => item.tuntas ? '#15935a' : '#dc4c4c'), borderRadius: 7 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } }, plugins: { legend: { display: false } } } }) }
-async function load() { loading.value = true; error.value = ''; noKelas.value = false; try { data.value = (await muridNilaiApi.get()).data ?? data.value; await nextTick(); renderCharts() } catch (e) { const status = e.response?.status; const message = e.response?.data?.message; if (status === 422 && message?.includes('belum terhubung ke kelas')) { noKelas.value = true; return } const errorMap = { 401: 'Sesi Anda telah berakhir. Silakan masuk kembali.', 403: 'Anda tidak memiliki akses ke nilai ini.', 404: 'Profil murid tidak ditemukan.', 500: 'Server sedang bermasalah. Silakan coba lagi.' }; error.value = errorMap[status] ?? message ?? 'Nilai gagal dimuat. Silakan coba lagi.' } finally { loading.value = false } }
+async function load() {
+  loading.value = true
+  error.value = ''
+  noKelas.value = false
+
+  try {
+    const body = await muridNilaiApi.get()
+    data.value = body ?? data.value
+    await nextTick()
+    renderCharts()
+  } catch (e) {
+    const status = e.response?.status
+    const message = e.response?.data?.message
+
+    if (status === 422 && message?.includes('belum terhubung ke kelas')) {
+      noKelas.value = true
+      return
+    }
+
+    const errorMap = {
+      401: 'Sesi Anda telah berakhir. Silakan masuk kembali.',
+      403: 'Anda tidak memiliki akses ke nilai ini.',
+      404: 'Profil murid tidak ditemukan.',
+      500: 'Server sedang bermasalah. Silakan coba lagi.',
+    }
+
+    error.value = errorMap[status] ?? message ?? 'Nilai gagal dimuat. Silakan coba lagi.'
+  } finally {
+    loading.value = false
+  }
+}
 onMounted(load); onBeforeUnmount(() => { trendChart?.destroy(); mapelChart?.destroy() })
 </script>
 

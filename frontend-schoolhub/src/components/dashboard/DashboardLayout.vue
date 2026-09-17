@@ -12,7 +12,7 @@
 
       <nav class="dashboard-nav" aria-label="Navigasi dashboard">
         <router-link
-          v-for="item in navigation"
+          v-for="item in resolvedNavigation"
           :key="item.label"
           :to="item.to"
           active-class="active"
@@ -59,6 +59,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { adminNavigation } from '@/views/admin/adminNavigation'
 
 const props = defineProps({
   title: { type: String, required: true },
@@ -68,7 +69,22 @@ const props = defineProps({
 
 const router = useRouter()
 const menuOpen = ref(false)
-const user = ref(JSON.parse(sessionStorage.getItem('user') || '{}'))
+const rawUser = (() => {
+  const sessionUser = sessionStorage.getItem('user')
+  if (sessionUser) return JSON.parse(sessionUser)
+
+  const localUser = localStorage.getItem('user')
+  if (localUser) return JSON.parse(localUser)
+
+  return {}
+})()
+const user = ref(rawUser)
+const normalizedRole = computed(() =>
+  (user.value.role || props.roleLabel || '').toString().trim().toLowerCase(),
+)
+const resolvedNavigation = computed(() =>
+  normalizedRole.value === 'admin' ? adminNavigation : props.navigation,
+)
 const initials = computed(() =>
   (user.value.name || props.roleLabel)
     .split(' ')
@@ -81,6 +97,8 @@ const initials = computed(() =>
 const logout = () => {
   sessionStorage.removeItem('token')
   sessionStorage.removeItem('user')
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
   router.push('/login')
 }
 </script>

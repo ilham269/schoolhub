@@ -27,10 +27,7 @@ const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
 const navigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/karyawan' },
   { label: 'Data Siswa', icon: 'fas fa-user-graduate', to: '/dashboard/karyawan/data-siswa' },
-  { label: 'Administrasi', icon: 'fas fa-folder-open', to: '/dashboard/karyawan/administrasi' },
-  { label: 'Pembayaran', icon: 'fas fa-credit-card', to: '/dashboard/karyawan/pembayaran' },
   { label: 'Keuangan', icon: 'fas fa-wallet', to: '/dashboard/karyawan/keuangan' },
-  { label: 'Laporan', icon: 'fas fa-file-lines', to: '/dashboard/karyawan/laporan' },
 ]
 const metrics = [
   {
@@ -70,28 +67,10 @@ const features = [
     to: '/dashboard/karyawan/data-siswa',
   },
   {
-    title: 'Administrasi',
-    description: 'Mengelola berkas dan administrasi siswa.',
-    icon: 'fas fa-folder-open',
-    to: '/dashboard/karyawan/administrasi',
-  },
-  {
-    title: 'Pembayaran',
-    description: 'Memeriksa serta mencatat pembayaran.',
-    icon: 'fas fa-credit-card',
-    to: '/dashboard/karyawan/pembayaran',
-  },
-  {
     title: 'Keuangan',
     description: 'Mengelola pemasukan dan pengeluaran.',
     icon: 'fas fa-wallet',
     to: '/dashboard/karyawan/keuangan',
-  },
-  {
-    title: 'Laporan',
-    description: 'Membuat laporan administrasi dan keuangan.',
-    icon: 'fas fa-file-lines',
-    to: '/dashboard/karyawan/laporan',
   },
 ]
 </script>

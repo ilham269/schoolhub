@@ -5,7 +5,6 @@ const menu = [
   { key: 'dashboard', label: 'Dashboard', href: '/dashboard/admin', icon: 'M3 10.5 10 4l7 6.5V16a1 1 0 0 1-1 1h-3v-4H7v4H4a1 1 0 0 1-1-1z' },
   { key: 'guru', label: 'Kelola Guru', href: '/dashboard/admin/guru', icon: 'M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 6a6 6 0 1 1 12 0z' },
   { key: 'siswa', label: 'Kelola Siswa', href: '/dashboard/admin/murid', icon: 'M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-6 6a6 6 0 1 1 12 0z' },
-  { key: 'kelas', label: 'Kelola Kelas', href: '/dashboard/admin/kelas', icon: 'M3 5h14v10H3zM7 17h6' },
   { key: 'berita', label: 'Kelola Berita', href: '/dashboard/admin/berita', icon: 'M4 4h12v12H4zM6 7h8M6 10h8M6 13h5' },
   { key: 'pengumuman', label: 'Kelola Pengumuman', href: '/dashboard/admin/pengumuman', icon: 'M4 8v4h3l5 3V5L7 8z' },
   { key: 'ppdb', label: 'Pendaftaran PPDB', href: '/dashboard/admin/ppdb', icon: 'M6 3h8v14H6zM8 7h4M8 10h4' },

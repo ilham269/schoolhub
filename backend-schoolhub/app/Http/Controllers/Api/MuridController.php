@@ -18,7 +18,13 @@ class MuridController extends Controller
      */
     public function index(): JsonResponse
     {
-        $murids = Murid::with(['user', 'kelas'])->get();
+        $murids = Murid::with(['user', 'kelas'])->get()->map(function (Murid $murid) {
+            $data = $murid->toArray();
+            $nama = $murid->Nama_lengkap_murid ?? $murid->user?->name ?? null;
+            $data['Nama_lengkap_murid'] = $nama;
+            $data['nama_lengkap_murid'] = $nama;
+            return $data;
+        });
 
         return response()->json([
             'success' => true,
@@ -235,10 +241,15 @@ class MuridController extends Controller
             ], 404);
         }
 
+        $data = $murid->toArray();
+        $nama = $murid->Nama_lengkap_murid ?? $murid->user?->name ?? null;
+        $data['Nama_lengkap_murid'] = $nama;
+        $data['nama_lengkap_murid'] = $nama;
+
         return response()->json([
             'success' => true,
             'message' => 'Detail murid berhasil diambil',
-            'data' => $murid,
+            'data' => $data,
         ]);
     }
 
@@ -333,10 +344,14 @@ class MuridController extends Controller
 
             DB::commit();
 
+            $murid->refresh()->load(['user', 'kelas']);
+            $data = $murid->toArray();
+            $data['nama_lengkap_murid'] = $murid->Nama_lengkap_murid ?? $murid->user?->name ?? null;
+
             return response()->json([
                 'success' => true,
                 'message' => 'Murid berhasil diupdate',
-                'data' => $murid->load(['user', 'kelas']),
+                'data' => $data,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -389,6 +404,12 @@ class MuridController extends Controller
         $murids = Murid::where('kelas_id', $kelasId)
             ->with(['user', 'kelas'])
             ->get();
+
+        $murids = $murids->map(function (Murid $murid) {
+            $data = $murid->toArray();
+            $data['nama_lengkap_murid'] = $murid->Nama_lengkap_murid ?? $murid->user?->name ?? null;
+            return $data;
+        });
 
         return response()->json([
             'success' => true,

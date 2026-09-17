@@ -42,6 +42,7 @@ import DashboardLayout from '../../components/dashboard/DashboardLayout.vue'
 import DashboardMetrics from '../../components/dashboard/DashboardMetrics.vue'
 import DashboardFeatureGrid from '../../components/dashboard/DashboardFeatureGrid.vue'
 import api from '../../utils/api'
+import { adminNavigation } from '@/views/admin/adminNavigation'
 
 const loading = ref(true)
 const error = ref(null)
@@ -66,10 +67,7 @@ const adminItems = [
   // ['Laporan', 'fas fa-chart-line', 'laporan'], // TODO: Not implemented yet
 ]
 
-const navigation = [
-  { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/admin' },
-  ...adminItems.map(([label, icon, slug]) => ({ label, icon, to: `/dashboard/admin/${slug}` })),
-]
+const navigation = adminNavigation
 
 const metrics = computed(() => {
   if (!dashboardData.value) {

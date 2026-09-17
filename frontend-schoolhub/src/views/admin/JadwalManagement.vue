@@ -182,24 +182,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import DashboardLayout from '../../components/dashboard/DashboardLayout.vue'
+import { adminNavigation } from '@/views/admin/adminNavigation'
 import api from '../../utils/api'
 
-const adminItems = [
-  ['Kelola Siswa', 'fas fa-user-graduate', 'murid'],
-  ['Kelola Guru', 'fas fa-chalkboard-user', 'guru'],
-  ['Kelola Karyawan', 'fas fa-id-card', 'karyawan'],
-  ['Kelola Kelas', 'fas fa-school', 'kelas'],
-  ['Kelola Jadwal', 'fas fa-calendar-days', 'jadwal'],
-  ['Kelola Pendaftaran', 'fas fa-clipboard-list', 'pendaftaran'],
-  ['Kelola Berita', 'fas fa-newspaper', 'berita'],
-  ['Kelola Pengumuman', 'fas fa-bullhorn', 'pengumuman'],
-  ['Kelola Keuangan', 'fas fa-wallet', 'keuangan'],
-]
-
-const navigation = [
-  { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/admin' },
-  ...adminItems.map(([label, icon, slug]) => ({ label, icon, to: `/dashboard/admin/${slug}` })),
-]
+const navigation = adminNavigation
 
 const hariOptions = ['Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu', 'Minggu']
 

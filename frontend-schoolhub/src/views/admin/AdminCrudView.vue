@@ -97,6 +97,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import DashboardLayout from '../../components/dashboard/DashboardLayout.vue'
+import { adminNavigation } from '@/views/admin/adminNavigation'
 import api from '../../utils/api'
 const route = useRoute()
 const label = computed(() => (route.params.resource === 'berita' ? 'Berita' : 'Pengumuman'))
@@ -106,11 +107,7 @@ const saving = ref(false)
 const error = ref('')
 const editing = ref(false)
 const form = ref({})
-const navigation = [
-  { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/admin' },
-  { label: 'Kelola Berita', icon: 'fas fa-newspaper', to: '/dashboard/admin/berita' },
-  { label: 'Kelola Pengumuman', icon: 'fas fa-bullhorn', to: '/dashboard/admin/pengumuman' },
-]
+const navigation = adminNavigation
 const emptyForm = () => ({
   id: null,
   title: '',

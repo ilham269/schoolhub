@@ -44,8 +44,8 @@ let chart
 const navigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/guru' },
   { label: 'Data Kelas', icon: 'fas fa-users', to: '/dashboard/guru/kelas' },
+  { label: 'Materi', icon: 'fas fa-book-open', to: '/dashboard/guru/materi' },
   { label: 'Tugas', icon: 'fas fa-book-open', to: '/dashboard/guru/tugas' },
-  { label: 'Nilai', icon: 'fas fa-chart-bar', to: '/dashboard/guru/nilai' },
   {
     label: 'Ujian PPDB & Soal',
     icon: 'fas fa-file-circle-check',
@@ -90,16 +90,16 @@ const features = [
     to: '/dashboard/guru/kelas',
   },
   {
-    title: 'Tugas',
-    description: 'Buat, periksa, dan nilai tugas siswa.',
+    title: 'Materi',
+    description: 'Kelola materi pengajaran dan bahan ajar.',
     icon: 'fas fa-book-open',
-    to: '/dashboard/guru/tugas',
+    to: '/dashboard/guru/materi',
   },
   {
-    title: 'Nilai',
-    description: 'Kelola nilai dan hasil belajar.',
-    icon: 'fas fa-chart-bar',
-    to: '/dashboard/guru/nilai',
+    title: 'Tugas',
+    description: 'Buat, periksa, dan kelola tugas siswa.',
+    icon: 'fas fa-clipboard-list',
+    to: '/dashboard/guru/tugas',
   },
 ]
 const progress = [

@@ -158,18 +158,27 @@ const fetchAll = async () => {
   loading.value = true
   error.value = ''
   noKelas.value = false
+
   try {
     const body = await muridTugasApi.list()
-    items.value = body?.data ?? []
+    items.value = Array.isArray(body) ? body : []
   } catch (e) {
     const status = e.response?.status
     const message = e.response?.data?.message
+
     if (status === 422 && message?.includes('belum terhubung ke kelas')) {
       noKelas.value = true
       items.value = []
       return
     }
-    const errorMap = { 401: 'Sesi Anda telah berakhir. Silakan masuk kembali.', 403: 'Anda tidak memiliki akses ke tugas ini.', 404: 'Profil murid tidak ditemukan.', 500: 'Server sedang bermasalah. Silakan coba lagi.' }
+
+    const errorMap = {
+      401: 'Sesi Anda telah berakhir. Silakan masuk kembali.',
+      403: 'Anda tidak memiliki akses ke tugas ini.',
+      404: 'Profil murid tidak ditemukan.',
+      500: 'Server sedang bermasalah. Silakan coba lagi.',
+    }
+
     error.value = errorMap[status] ?? message ?? 'Tugas gagal dimuat. Silakan coba lagi.'
   } finally {
     loading.value = false
@@ -247,8 +256,9 @@ const submitTugas = async () => {
     const fd = new FormData()
     fd.append('file', submitForm.file)
     fd.append('catatan', submitForm.catatan)
+
     const res = await muridTugasApi.submit(submitTarget.value.id, fd)
-    const updatedPengumpulan = res.data ?? res
+    const updatedPengumpulan = res ?? {}
 
     const i = items.value.findIndex((t) => t.id === submitTarget.value.id)
     if (i !== -1) items.value[i] = { ...items.value[i], pengumpulan: updatedPengumpulan }
