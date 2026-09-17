@@ -21,6 +21,21 @@ use App\Http\Controllers\Api\MuridNilaiController;
 use App\Http\Controllers\Api\PublicHomeController;
 use App\Http\Controllers\Api\MateriController;
 use App\Http\Controllers\Api\MuridTugasController;
+use App\Http\Controllers\Api\TugasController;
+
+
+
+    Route::middleware(['auth:sanctum'])
+    ->prefix('guru')
+    ->group(function () {
+        Route::get('tugas', [TugasController::class, 'index']);
+        Route::post('tugas', [TugasController::class, 'store']);
+        Route::get('tugas/{tugas}', [TugasController::class, 'show']);
+        Route::put('tugas/{tugas}', [TugasController::class, 'update']);
+        Route::post('tugas/{tugas}', [TugasController::class, 'update']); // untuk multipart/form-data + method spoof
+        Route::patch('tugas/{tugas}/toggle-active', [TugasController::class, 'toggleActive']);
+        Route::delete('tugas/{tugas}', [TugasController::class, 'destroy']);
+    });
 
 // No session/auth middleware: notification is sent server-to-server by Midtrans.
 Route::post('/payment/callback', [PaymentCallbackController::class, 'callback'])->name('payment.callback');

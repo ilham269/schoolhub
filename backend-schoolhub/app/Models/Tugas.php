@@ -17,14 +17,21 @@ class Tugas extends Model
         'materi_id',
         'judul',
         'deskripsi',
-        'file',
+        'instruksi',
+        'file_path',
+        'tanggal_dibuat',
         'deadline',
+        'nilai_maksimal',
+        'is_active',
     ];
 
     protected function casts(): array
     {
         return [
+            'tanggal_dibuat' => 'datetime',
             'deadline' => 'datetime',
+            'is_active' => 'boolean',
+            'nilai_maksimal' => 'integer',
         ];
     }
 
@@ -48,7 +55,7 @@ class Tugas extends Model
         return $this->belongsTo(Materi::class, 'materi_id');
     }
 
-    public function pengumpulan()
+    public function pengumpulan(): HasMany
     {
         return $this->hasMany(PengumpulanTugas::class, 'tugas_id');
     }
