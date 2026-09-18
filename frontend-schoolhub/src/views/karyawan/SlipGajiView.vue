@@ -1,250 +1,178 @@
 <template>
   <DashboardLayout title="Kelola Slip Gaji" role-label="Karyawan" :navigation="navigation">
-    <!-- Header -->
-    <div class="page-header">
-      <div>
-        <h1>Kelola Slip Gaji</h1>
-        <p>Kelola slip gaji karyawan sekolah</p>
-      </div>
-      <button @click="showCreateModal = true" class="btn-primary">
-        <i class="fas fa-plus"></i> Buat Slip Gaji
-      </button>
+    <UiAlert v-if="alert.show" :type="alert.type" class="mb-4" @close="alert.show = false">
+      {{ alert.message }}
+    </UiAlert>
+    <UiAlert v-if="error" type="danger" title="Gagal memuat data" class="mb-4" :dismissible="false">
+      {{ error }}
+    </UiAlert>
+
+    <!-- Ringkasan -->
+    <div class="grid gap-4 sm:grid-cols-3 mb-6">
+      <UiCard>
+        <p class="text-sm text-slate-400">Total slip gaji</p>
+        <p class="mt-1 text-3xl font-semibold text-slate-800">{{ pagination.total || 0 }}</p>
+      </UiCard>
+      <UiCard>
+        <p class="text-sm text-slate-400">Menunggu persetujuan</p>
+        <p class="mt-1 text-3xl font-semibold text-amber-600">{{ draftCount }}</p>
+      </UiCard>
+      <UiCard>
+        <p class="text-sm text-slate-400">Sudah dibayar</p>
+        <p class="mt-1 text-3xl font-semibold text-emerald-600">{{ paidCount }}</p>
+      </UiCard>
     </div>
 
-    <!-- Filters -->
-    <div class="filters-card">
-      <div class="filter-group">
-        <label>Status</label>
-        <select v-model="filters.status" @change="loadSlipGaji">
-          <option value="">Semua Status</option>
-          <option value="DRAFT">Draft</option>
-          <option value="APPROVED">Disetujui</option>
-          <option value="PAID">Dibayar</option>
-        </select>
-      </div>
+    <UiCard title="Daftar Slip Gaji" subtitle="Kelola slip gaji karyawan sekolah" :padded="false">
+      <template #actions>
+        <UiButton @click="showCreateModal = true">
+          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M10 5v10M5 10h10" />
+          </svg>
+          Buat slip gaji
+        </UiButton>
+      </template>
 
-      <div class="filter-group">
-        <label>Periode</label>
-        <input type="month" v-model="filters.periode" @change="loadSlipGaji" />
-      </div>
-
-      <button @click="resetFilters" class="btn-secondary">
-        <i class="fas fa-redo"></i> Reset
-      </button>
-    </div>
-
-    <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
-      <i class="fas fa-spinner fa-spin"></i>
-      <p>Memuat data slip gaji...</p>
-    </div>
-
-    <!-- Error State -->
-    <div v-else-if="error" class="error-state">
-      <i class="fas fa-exclamation-circle"></i>
-      <p>{{ error }}</p>
-      <button @click="loadSlipGaji" class="btn-retry">Coba Lagi</button>
-    </div>
-
-    <!-- Data Table -->
-    <div v-else class="table-card">
-      <div class="table-header">
-        <h3>Daftar Slip Gaji</h3>
-        <span class="record-count">{{ pagination.total || 0 }} slip gaji</span>
-      </div>
-
-      <!-- Empty State -->
-      <div v-if="!slipGaji || slipGaji.length === 0" class="empty-state">
-        <i class="fas fa-inbox"></i>
-        <p>Tidak ada slip gaji ditemukan</p>
-      </div>
-
-      <!-- Table -->
-      <div v-else class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Karyawan</th>
-              <th>Bagian</th>
-              <th>Periode</th>
-              <th>Gaji Pokok</th>
-              <th>Tunjangan</th>
-              <th>Potongan</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in slipGaji" :key="item.id">
-              <td>
-                <div class="employee-info">
-                  <strong>{{ item.karyawan?.nama_lengkap_karyawan }}</strong>
-                  <small>NIP: {{ item.karyawan?.nip }}</small>
-                </div>
-              </td>
-              <td>{{ item.karyawan?.bagian || '-' }}</td>
-              <td>{{ formatPeriode(item.periode) }}</td>
-              <td>{{ formatCurrency(item.gaji_pokok) }}</td>
-              <td>{{ formatCurrency(item.tunjangan) }}</td>
-              <td>{{ formatCurrency(item.potongan) }}</td>
-              <td>
-                <strong>{{ formatCurrency(item.total) }}</strong>
-              </td>
-              <td>
-                <span class="status-badge" :class="getStatusClass(item.status)">
-                  {{ getStatusLabel(item.status) }}
-                </span>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button
-                    @click="approveSlipGaji(item)"
-                    class="btn-icon btn-success"
-                    title="Setujui"
-                    v-if="item.status === 'DRAFT' && isAdmin"
-                  >
-                    <i class="fas fa-check"></i>
-                  </button>
-                  <button
-                    @click="markAsPaid(item)"
-                    class="btn-icon btn-primary"
-                    title="Tandai Dibayar"
-                    v-if="item.status === 'APPROVED'"
-                  >
-                    <i class="fas fa-money-bill"></i>
-                  </button>
-                  <button
-                    @click="editSlipGaji(item)"
-                    class="btn-icon"
-                    title="Edit"
-                    v-if="item.status === 'DRAFT'"
-                  >
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button
-                    @click="deleteSlipGaji(item)"
-                    class="btn-icon btn-danger"
-                    title="Hapus"
-                    v-if="item.status === 'DRAFT'"
-                  >
-                    <i class="fas fa-trash"></i>
-                  </button>
-                  <button
-                    v-if="item.file_path"
-                    @click="downloadPdf(item)"
-                    class="btn-icon"
-                    title="Download PDF"
-                  >
-                    <i class="fas fa-download"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div v-if="pagination.last_page > 1" class="pagination">
-        <button
-          @click="changePage(pagination.current_page - 1)"
-          :disabled="pagination.current_page === 1"
-          class="btn-page"
-        >
-          <i class="fas fa-chevron-left"></i> Prev
-        </button>
-        <span class="page-info">
-          Halaman {{ pagination.current_page }} dari {{ pagination.last_page }}
-        </span>
-        <button
-          @click="changePage(pagination.current_page + 1)"
-          :disabled="pagination.current_page === pagination.last_page"
-          class="btn-page"
-        >
-          Next <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Create/Edit Modal -->
-    <div v-if="showCreateModal || showEditModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>{{ showEditModal ? 'Edit Slip Gaji' : 'Buat Slip Gaji' }}</h2>
-          <button @click="closeModal" class="btn-close">
-            <i class="fas fa-times"></i>
-          </button>
+      <div class="flex flex-col gap-3 px-6 pb-5 pt-1 sm:flex-row sm:items-end">
+        <div class="sm:w-48">
+          <UiSelect v-model="filters.status" label="Status" :options="statusOptions" placeholder="Semua status" @update:modelValue="loadSlipGaji()" />
         </div>
-
-        <form @submit.prevent="submitForm" class="modal-body">
-          <div class="form-group">
-            <label>Karyawan <span class="required">*</span></label>
-            <select v-model="form.karyawan_id" required :disabled="showEditModal">
-              <option value="">Pilih Karyawan</option>
-              <option v-for="karyawan in karyawanList" :key="karyawan.id" :value="karyawan.id">
-                {{ karyawan.nama_lengkap_karyawan }} ({{ karyawan.nip }}) - {{ karyawan.bagian }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Periode <span class="required">*</span></label>
-            <input type="month" v-model="form.periode" required />
-          </div>
-
-          <div class="form-group">
-            <label>Gaji Pokok (Rp) <span class="required">*</span></label>
-            <input type="number" v-model="form.gaji_pokok" required min="0" step="1000" />
-          </div>
-
-          <div class="form-group">
-            <label>Tunjangan (Rp)</label>
-            <input type="number" v-model="form.tunjangan" min="0" step="1000" />
-          </div>
-
-          <div class="form-group">
-            <label>Potongan (Rp)</label>
-            <input type="number" v-model="form.potongan" min="0" step="1000" />
-          </div>
-
-          <div class="form-group">
-            <label>Keterangan</label>
-            <textarea v-model="form.keterangan" rows="3" placeholder="Catatan tambahan..."></textarea>
-          </div>
-
-          <div class="total-preview">
-            <strong>Total Gaji:</strong>
-            <span>{{ formatCurrency(calculateTotal()) }}</span>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" @click="closeModal" class="btn-secondary">Batal</button>
-            <button type="submit" class="btn-primary" :disabled="submitting">
-              <i v-if="submitting" class="fas fa-spinner fa-spin"></i>
-              <i v-else class="fas fa-save"></i>
-              {{ submitting ? 'Menyimpan...' : 'Simpan' }}
-            </button>
-          </div>
-        </form>
+        <div class="sm:w-48">
+          <UiInput v-model="filters.periode" label="Periode" type="month" @update:modelValue="loadSlipGaji()" />
+        </div>
+        <UiButton variant="secondary" @click="resetFilters">Reset filter</UiButton>
       </div>
-    </div>
+
+      <UiTable :columns="columns" :rows="slipGaji" :loading="loading">
+        <template #empty>
+          <p class="font-medium text-slate-600">Tidak ada slip gaji ditemukan</p>
+          <p class="mt-1 text-sm text-slate-400">Coba ubah filter, atau buat slip gaji baru.</p>
+        </template>
+
+        <template #row="{ row }">
+          <td class="px-6 py-4">
+            <p class="font-medium text-slate-800">{{ row.karyawan?.nama_lengkap_karyawan }}</p>
+            <p class="text-xs text-slate-400">NIP: {{ row.karyawan?.nip }}</p>
+          </td>
+          <td class="px-6 py-4 text-slate-600">{{ row.karyawan?.bagian || '—' }}</td>
+          <td class="px-6 py-4 text-slate-600">{{ formatPeriode(row.periode) }}</td>
+          <td class="px-6 py-4 text-slate-600">{{ formatCurrency(row.gaji_pokok) }}</td>
+          <td class="px-6 py-4 text-slate-600">{{ formatCurrency(row.tunjangan) }}</td>
+          <td class="px-6 py-4 text-slate-600">{{ formatCurrency(row.potongan) }}</td>
+          <td class="px-6 py-4 font-medium text-slate-800">{{ formatCurrency(row.total) }}</td>
+          <td class="px-6 py-4"><UiBadge :variant="statusTone(row.status)">{{ statusLabel(row.status) }}</UiBadge></td>
+          <td class="px-6 py-4">
+            <div class="flex items-center justify-end gap-1">
+              <UiButton v-if="row.status === 'DRAFT' && isAdmin" variant="ghost" size="icon" title="Setujui"
+                        class="text-emerald-600 hover:bg-emerald-50" @click="approveSlipGaji(row)">
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <path d="m4 10 4 4 8-8" />
+                </svg>
+              </UiButton>
+              <UiButton v-if="row.status === 'APPROVED'" variant="ghost" size="icon" title="Tandai dibayar"
+                        class="text-sky-600 hover:bg-sky-50" @click="markAsPaid(row)">
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3" y="6" width="14" height="9" rx="1.5" /><circle cx="10" cy="10.5" r="2" />
+                </svg>
+              </UiButton>
+              <UiButton v-if="row.status === 'DRAFT'" variant="ghost" size="icon" title="Ubah" @click="editSlipGaji(row)">
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+                  <path d="M14 3l3 3-9 9H5v-3z" />
+                </svg>
+              </UiButton>
+              <UiButton v-if="row.status === 'DRAFT'" variant="ghost" size="icon" title="Hapus"
+                        class="text-rose-500 hover:bg-rose-50 hover:text-rose-600" @click="deleteSlipGaji(row)">
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10" />
+                </svg>
+              </UiButton>
+              <UiButton v-if="row.file_path" variant="ghost" size="icon" title="Unduh PDF" @click="downloadPdf(row)">
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 3v10m0 0-3-3m3 3 3-3M4 15v1a2 2 0 002 2h8a2 2 0 002-2v-1" />
+                </svg>
+              </UiButton>
+            </div>
+          </td>
+        </template>
+      </UiTable>
+
+      <div v-if="pagination.last_page > 1" class="flex items-center justify-between border-t border-slate-100 px-6 py-4">
+        <p class="text-sm text-slate-500">Halaman {{ pagination.current_page }} dari {{ pagination.last_page }}</p>
+        <div class="flex gap-2">
+          <UiButton variant="secondary" size="sm" :disabled="pagination.current_page === 1" @click="changePage(pagination.current_page - 1)">Sebelumnya</UiButton>
+          <UiButton variant="secondary" size="sm" :disabled="pagination.current_page === pagination.last_page" @click="changePage(pagination.current_page + 1)">Berikutnya</UiButton>
+        </div>
+      </div>
+    </UiCard>
+
+    <!-- Modal tambah / ubah -->
+    <UiModal v-model="modalOpen" :title="showEditModal ? 'Ubah slip gaji' : 'Buat slip gaji'">
+      <form class="grid gap-4 sm:grid-cols-2" @submit.prevent="submitForm">
+        <div class="sm:col-span-2">
+          <UiSelect v-model="form.karyawan_id" label="Karyawan" :options="karyawanOptions"
+                    :disabled="showEditModal" placeholder="Pilih karyawan" required />
+        </div>
+        <UiInput v-model="form.periode" label="Periode" type="month" required />
+        <UiInput v-model="form.gaji_pokok" label="Gaji pokok (Rp)" type="number" min="0" step="1000" required />
+        <UiInput v-model="form.tunjangan" label="Tunjangan (Rp)" type="number" min="0" step="1000" />
+        <UiInput v-model="form.potongan" label="Potongan (Rp)" type="number" min="0" step="1000" />
+        <div class="sm:col-span-2">
+          <UiTextarea v-model="form.keterangan" label="Keterangan" :rows="3" placeholder="Catatan tambahan..." />
+        </div>
+        <div class="sm:col-span-2 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+          <span class="text-sm font-medium text-slate-600">Total gaji</span>
+          <span class="text-lg font-semibold text-emerald-600">{{ formatCurrency(calculateTotal()) }}</span>
+        </div>
+      </form>
+      <template #footer>
+        <UiButton variant="secondary" @click="closeModal">Batal</UiButton>
+        <UiButton :loading="submitting" @click="submitForm">Simpan</UiButton>
+      </template>
+    </UiModal>
   </DashboardLayout>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
 import DashboardLayout from '../../components/dashboard/DashboardLayout.vue'
+import UiCard from '@/components/ui/UiCard.vue'
+import UiButton from '@/components/ui/UiButton.vue'
+import UiInput from '@/components/ui/UiInput.vue'
+import UiSelect from '@/components/ui/UiSelect.vue'
+import UiTextarea from '@/components/ui/UiTextarea.vue'
+import UiModal from '@/components/ui/UiModal.vue'
+import UiTable from '@/components/ui/UiTable.vue'
+import UiBadge from '@/components/ui/UiBadge.vue'
+import UiAlert from '@/components/ui/UiAlert.vue'
 import keuanganService from '../../utils/keuanganService'
 import api from '../../utils/api'
 
-const router = useRouter()
-
+// Menu sama persis seperti dashboard_karyawan.vue, supaya sidebar
+// konsisten di semua halaman portal karyawan.
 const navigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/karyawan' },
+  { label: 'Data Siswa', icon: 'fas fa-user-graduate', to: '/dashboard/karyawan/data-siswa' },
   { label: 'Keuangan', icon: 'fas fa-wallet', to: '/dashboard/karyawan/keuangan' },
-  { label: 'Slip Gaji', icon: 'fas fa-money-check', to: '/dashboard/karyawan/keuangan/slip-gaji', active: true },
+  { label: 'Tagihan SPP', icon: 'fas fa-file-invoice', to: '/dashboard/karyawan/keuangan/tagihan' },
+  { label: 'Slip Gaji', icon: 'fas fa-money-check', to: '/dashboard/karyawan/keuangan/slip-gaji' },
+]
+
+const columns = [
+  { key: 'karyawan', label: 'Karyawan' },
+  { key: 'bagian', label: 'Bagian' },
+  { key: 'periode', label: 'Periode' },
+  { key: 'gaji_pokok', label: 'Gaji pokok' },
+  { key: 'tunjangan', label: 'Tunjangan' },
+  { key: 'potongan', label: 'Potongan' },
+  { key: 'total', label: 'Total' },
+  { key: 'status', label: 'Status' },
+  { key: 'aksi', label: 'Aksi', class: 'text-right' },
+]
+
+const statusOptions = [
+  { value: 'DRAFT', label: 'Draft' },
+  { value: 'APPROVED', label: 'Disetujui' },
+  { value: 'PAID', label: 'Dibayar' },
 ]
 
 const loading = ref(true)
@@ -257,6 +185,16 @@ const karyawanList = ref([])
 const user = JSON.parse(sessionStorage.getItem('user') || '{}')
 const isAdmin = computed(() => user.role?.toLowerCase() === 'admin')
 
+const karyawanOptions = computed(() =>
+  karyawanList.value.map((k) => ({
+    value: k.id,
+    label: `${k.nama_lengkap_karyawan} (${k.nip}) - ${k.bagian}`,
+  })),
+)
+
+const draftCount = computed(() => slipGaji.value.filter((s) => s.status === 'DRAFT').length)
+const paidCount = computed(() => slipGaji.value.filter((s) => s.status === 'PAID').length)
+
 const filters = ref({
   status: '',
   periode: '',
@@ -265,6 +203,10 @@ const filters = ref({
 
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
+const modalOpen = computed({
+  get: () => showCreateModal.value || showEditModal.value,
+  set: (val) => { if (!val) closeModal() },
+})
 const editingId = ref(null)
 
 const form = ref({
@@ -276,16 +218,21 @@ const form = ref({
   keterangan: '',
 })
 
+/* ---------- notifikasi ---------- */
+const alert = ref({ show: false, type: 'success', message: '' })
+let alertTimer
+const notify = (type, message) => {
+  alert.value = { show: true, type, message }
+  clearTimeout(alertTimer)
+  alertTimer = setTimeout(() => (alert.value.show = false), 4000)
+}
+
 const loadSlipGaji = async (page = 1) => {
   try {
     loading.value = true
     error.value = null
 
-    const params = {
-      ...filters.value,
-      page,
-    }
-
+    const params = { ...filters.value, page }
     const response = await keuanganService.getSlipGaji(params)
 
     if (response.success) {
@@ -299,7 +246,6 @@ const loadSlipGaji = async (page = 1) => {
       error.value = response.message || 'Gagal memuat data slip gaji'
     }
   } catch (err) {
-    console.error('Error loading slip gaji:', err)
     error.value = err.response?.data?.message || 'Gagal memuat data slip gaji'
   } finally {
     loading.value = false
@@ -309,26 +255,18 @@ const loadSlipGaji = async (page = 1) => {
 const loadKaryawanList = async () => {
   try {
     const response = await api.get('/karyawan')
-    if (response.data.success) {
-      karyawanList.value = response.data.data
-    }
+    if (response.data.success) karyawanList.value = response.data.data
   } catch (err) {
     console.error('Error loading karyawan list:', err)
   }
 }
 
 const resetFilters = () => {
-  filters.value = {
-    status: '',
-    periode: '',
-    per_page: 15,
-  }
+  filters.value = { status: '', periode: '', per_page: 15 }
   loadSlipGaji()
 }
 
-const changePage = (page) => {
-  loadSlipGaji(page)
-}
+const changePage = (page) => loadSlipGaji(page)
 
 const editSlipGaji = (item) => {
   editingId.value = item.id
@@ -344,59 +282,35 @@ const editSlipGaji = (item) => {
 }
 
 const approveSlipGaji = async (item) => {
-  if (!confirm(`Apakah Anda yakin ingin menyetujui slip gaji ${item.karyawan?.nama_lengkap_karyawan}?`)) {
-    return
-  }
-
+  if (!confirm(`Setujui slip gaji ${item.karyawan?.nama_lengkap_karyawan}?`)) return
   try {
     const response = await keuanganService.approveSlipGaji(item.id)
-    if (response.success) {
-      alert('Slip gaji berhasil disetujui')
-      loadSlipGaji()
-    } else {
-      alert(response.message || 'Gagal menyetujui slip gaji')
-    }
+    if (response.success) { notify('success', 'Slip gaji berhasil disetujui'); loadSlipGaji(pagination.value.current_page) }
+    else notify('danger', response.message || 'Gagal menyetujui slip gaji')
   } catch (err) {
-    console.error('Error approving slip gaji:', err)
-    alert(err.response?.data?.message || 'Gagal menyetujui slip gaji')
+    notify('danger', err.response?.data?.message || 'Gagal menyetujui slip gaji')
   }
 }
 
 const markAsPaid = async (item) => {
-  if (!confirm(`Apakah Anda yakin slip gaji ${item.karyawan?.nama_lengkap_karyawan} sudah dibayarkan?`)) {
-    return
-  }
-
+  if (!confirm(`Tandai slip gaji ${item.karyawan?.nama_lengkap_karyawan} sudah dibayar?`)) return
   try {
     const response = await keuanganService.markSlipGajiAsPaid(item.id)
-    if (response.success) {
-      alert('Slip gaji berhasil ditandai sebagai dibayar')
-      loadSlipGaji()
-    } else {
-      alert(response.message || 'Gagal menandai slip gaji')
-    }
+    if (response.success) { notify('success', 'Slip gaji ditandai sebagai dibayar'); loadSlipGaji(pagination.value.current_page) }
+    else notify('danger', response.message || 'Gagal menandai slip gaji')
   } catch (err) {
-    console.error('Error marking slip gaji as paid:', err)
-    alert(err.response?.data?.message || 'Gagal menandai slip gaji')
+    notify('danger', err.response?.data?.message || 'Gagal menandai slip gaji')
   }
 }
 
 const deleteSlipGaji = async (item) => {
-  if (!confirm(`Apakah Anda yakin ingin menghapus slip gaji ${item.karyawan?.nama_lengkap_karyawan}?`)) {
-    return
-  }
-
+  if (!confirm(`Hapus slip gaji ${item.karyawan?.nama_lengkap_karyawan}?`)) return
   try {
     const response = await keuanganService.deleteSlipGaji(item.id)
-    if (response.success) {
-      alert('Slip gaji berhasil dihapus')
-      loadSlipGaji()
-    } else {
-      alert(response.message || 'Gagal menghapus slip gaji')
-    }
+    if (response.success) { notify('success', 'Slip gaji berhasil dihapus'); loadSlipGaji(pagination.value.current_page) }
+    else notify('danger', response.message || 'Gagal menghapus slip gaji')
   } catch (err) {
-    console.error('Error deleting slip gaji:', err)
-    alert(err.response?.data?.message || 'Gagal menghapus slip gaji')
+    notify('danger', err.response?.data?.message || 'Gagal menghapus slip gaji')
   }
 }
 
@@ -408,29 +322,21 @@ const downloadPdf = (item) => {
 const submitForm = async () => {
   try {
     submitting.value = true
+    const payload = { ...form.value, periode: form.value.periode + '-01' }
 
-    const payload = {
-      ...form.value,
-      periode: form.value.periode + '-01', // Convert YYYY-MM to YYYY-MM-DD
-    }
-
-    let response
-    if (showEditModal.value) {
-      response = await keuanganService.updateSlipGaji(editingId.value, payload)
-    } else {
-      response = await keuanganService.createSlipGaji(payload)
-    }
+    const response = showEditModal.value
+      ? await keuanganService.updateSlipGaji(editingId.value, payload)
+      : await keuanganService.createSlipGaji(payload)
 
     if (response.success) {
-      alert(response.message || 'Slip gaji berhasil disimpan')
+      notify('success', response.message || 'Slip gaji berhasil disimpan')
       closeModal()
-      loadSlipGaji()
+      loadSlipGaji(pagination.value.current_page)
     } else {
-      alert(response.message || 'Gagal menyimpan slip gaji')
+      notify('danger', response.message || 'Gagal menyimpan slip gaji')
     }
   } catch (err) {
-    console.error('Error submitting form:', err)
-    alert(err.response?.data?.message || 'Gagal menyimpan slip gaji')
+    notify('danger', err.response?.data?.message || 'Gagal menyimpan slip gaji')
   } finally {
     submitting.value = false
   }
@@ -440,14 +346,7 @@ const closeModal = () => {
   showCreateModal.value = false
   showEditModal.value = false
   editingId.value = null
-  form.value = {
-    karyawan_id: '',
-    periode: '',
-    gaji_pokok: 0,
-    tunjangan: 0,
-    potongan: 0,
-    keterangan: '',
-  }
+  form.value = { karyawan_id: '', periode: '', gaji_pokok: 0, tunjangan: 0, potongan: 0, keterangan: '' }
 }
 
 const calculateTotal = () => {
@@ -457,496 +356,18 @@ const calculateTotal = () => {
   return gaji + tunjangan - potongan
 }
 
-const formatCurrency = (amount) => {
-  return keuanganService.formatCurrency(amount)
-}
+const formatCurrency = (amount) => keuanganService.formatCurrency(amount)
 
 const formatPeriode = (periode) => {
-  if (!periode) return '-'
-  const date = new Date(periode)
-  return date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+  if (!periode) return '—'
+  return new Date(periode).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
 }
 
-const getStatusLabel = (status) => {
-  return keuanganService.getStatusLabel(status)
-}
-
-const getStatusClass = (status) => {
-  const classes = {
-    DRAFT: 'status-secondary',
-    APPROVED: 'status-pending',
-    PAID: 'status-success',
-  }
-  return classes[status] || ''
-}
+const statusLabel = (status) => keuanganService.getStatusLabel(status)
+const statusTone = (status) => ({ DRAFT: 'neutral', APPROVED: 'warning', PAID: 'success' }[status] || 'neutral')
 
 onMounted(() => {
   loadSlipGaji()
   loadKaryawanList()
 })
 </script>
-
-<style scoped>
-/* Same styles as TagihanSppView.vue with minor adjustments */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.page-header h1 {
-  font-size: 1.5rem;
-  color: #1e293b;
-  margin: 0 0 4px;
-}
-
-.page-header p {
-  color: #64748b;
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.btn-primary {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background 0.2s;
-}
-
-.btn-primary:hover {
-  background: #2563eb;
-}
-
-.btn-primary:disabled {
-  background: #94a3b8;
-  cursor: not-allowed;
-}
-
-.filters-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 200px;
-}
-
-.filter-group label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #475569;
-}
-
-.filter-group input,
-.filter-group select {
-  padding: 8px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.9rem;
-}
-
-.btn-secondary {
-  background: #f1f5f9;
-  color: #475569;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background 0.2s;
-}
-
-.btn-secondary:hover {
-  background: #e2e8f0;
-}
-
-.loading-state,
-.error-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #64748b;
-}
-
-.loading-state i {
-  font-size: 2.5rem;
-  margin-bottom: 16px;
-  color: #3b82f6;
-}
-
-.error-state i {
-  font-size: 2.5rem;
-  margin-bottom: 16px;
-  color: #ef4444;
-}
-
-.btn-retry {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 12px;
-}
-
-.table-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.table-header h3 {
-  font-size: 1rem;
-  color: #1e293b;
-  margin: 0;
-}
-
-.record-count {
-  background: #f1f5f9;
-  color: #475569;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #94a3b8;
-}
-
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 12px;
-  opacity: 0.5;
-}
-
-.table-responsive {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-thead {
-  background: #f8fafc;
-}
-
-th {
-  text-align: left;
-  padding: 12px 16px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-td {
-  padding: 16px;
-  border-top: 1px solid #f1f5f9;
-  font-size: 0.9rem;
-  color: #334155;
-}
-
-.employee-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.employee-info strong {
-  color: #1e293b;
-}
-
-.employee-info small {
-  color: #64748b;
-  font-size: 0.8rem;
-}
-
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: inline-block;
-}
-
-.status-success {
-  background: #d1fae5;
-  color: #059669;
-}
-
-.status-pending {
-  background: #fef3c7;
-  color: #d97706;
-}
-
-.status-secondary {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.btn-icon {
-  background: #f1f5f9;
-  color: #475569;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-
-.btn-icon:hover {
-  background: #3b82f6;
-  color: white;
-}
-
-.btn-icon.btn-primary:hover {
-  background: #3b82f6;
-  color: white;
-}
-
-.btn-icon.btn-success:hover {
-  background: #10b981;
-  color: white;
-}
-
-.btn-icon.btn-danger:hover {
-  background: #ef4444;
-  color: white;
-}
-
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.btn-page {
-  background: #f1f5f9;
-  color: #475569;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background 0.2s;
-}
-
-.btn-page:hover:not(:disabled) {
-  background: #e2e8f0;
-}
-
-.btn-page:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.page-info {
-  font-size: 0.85rem;
-  color: #64748b;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.modal-header h2 {
-  font-size: 1.1rem;
-  color: #1e293b;
-  margin: 0;
-}
-
-.btn-close {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  color: #64748b;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-
-.btn-close:hover {
-  background: #f1f5f9;
-}
-
-.modal-body {
-  padding: 24px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #475569;
-  margin-bottom: 6px;
-}
-
-.required {
-  color: #ef4444;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-}
-
-.total-preview {
-  background: #f8fafc;
-  padding: 16px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border: 2px solid #e2e8f0;
-}
-
-.total-preview strong {
-  color: #1e293b;
-  font-size: 1rem;
-}
-
-.total-preview span {
-  color: #3b82f6;
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.form-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 24px;
-}
-
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .filters-card {
-    flex-direction: column;
-  }
-
-  .filter-group {
-    width: 100%;
-  }
-
-  .table-responsive {
-    font-size: 0.8rem;
-  }
-
-  td,
-  th {
-    padding: 10px;
-  }
-
-  .action-buttons {
-    justify-content: flex-start;
-  }
-}
-</style>

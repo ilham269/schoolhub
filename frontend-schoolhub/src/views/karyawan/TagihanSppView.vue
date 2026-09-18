@@ -1,19 +1,20 @@
 <template>
   <DashboardLayout title="Kelola Tagihan SPP" role-label="Karyawan" :navigation="navigation">
     <!-- Header -->
-    <div class="page-header">
+    <section class="welcome">
       <div>
-        <h1>Kelola Tagihan SPP</h1>
-        <p>Kelola dan pantau pembayaran SPP siswa</p>
+        <span class="eyebrow-dot dark">Keuangan Sekolah</span>
+        <h2>Kelola Tagihan SPP</h2>
+        <p>Kelola dan pantau pembayaran SPP siswa.</p>
       </div>
-      <button @click="showCreateModal = true" class="btn-primary">
+      <button @click="showCreateModal = true" class="btn-add">
         <i class="fas fa-plus"></i> Buat Tagihan
       </button>
-    </div>
+    </section>
 
     <!-- Filters -->
-    <div class="filters-card">
-      <div class="filter-group">
+    <section class="filter-bar">
+      <div class="filter-item">
         <label>Status</label>
         <select v-model="filters.status" @change="loadTagihan">
           <option value="">Semua Status</option>
@@ -24,12 +25,12 @@
         </select>
       </div>
 
-      <div class="filter-group">
+      <div class="filter-item">
         <label>Periode</label>
         <input type="month" v-model="filters.periode" @change="loadTagihan" />
       </div>
 
-      <div class="filter-group">
+      <div class="filter-item grow">
         <label>Cari</label>
         <input
           type="text"
@@ -42,7 +43,7 @@
       <button @click="resetFilters" class="btn-secondary">
         <i class="fas fa-redo"></i> Reset
       </button>
-    </div>
+    </section>
 
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
@@ -54,12 +55,14 @@
     <div v-else-if="error" class="error-state">
       <i class="fas fa-exclamation-circle"></i>
       <p>{{ error }}</p>
-      <button @click="loadTagihan" class="btn-retry">Coba Lagi</button>
+      <button @click="loadTagihan" class="btn-retry">
+        <i class="fas fa-redo"></i> Coba Lagi
+      </button>
     </div>
 
     <!-- Data Table -->
-    <div v-else class="table-card">
-      <div class="table-header">
+    <section v-else class="table-wrap">
+      <div class="table-head">
         <h3>Daftar Tagihan SPP</h3>
         <span class="record-count">{{ pagination.total || 0 }} tagihan</span>
       </div>
@@ -72,7 +75,7 @@
 
       <!-- Table -->
       <div v-else class="table-responsive">
-        <table>
+        <table class="data-table">
           <thead>
             <tr>
               <th>Invoice</th>
@@ -115,11 +118,11 @@
                     title="Edit"
                     v-if="item.status !== 'LUNAS'"
                   >
-                    <i class="fas fa-edit"></i>
+                    <i class="fas fa-pen"></i>
                   </button>
                   <button
                     @click="deleteTagihan(item)"
-                    class="btn-icon btn-danger"
+                    class="btn-icon danger"
                     title="Hapus"
                     v-if="item.status === 'UNPAID'"
                   >
@@ -152,13 +155,13 @@
           Next <i class="fas fa-chevron-right"></i>
         </button>
       </div>
-    </div>
+    </section>
 
     <!-- Create/Edit Modal -->
     <div v-if="showCreateModal || showEditModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content">
+      <div class="modal-box">
         <div class="modal-header">
-          <h2>{{ showEditModal ? 'Edit Tagihan SPP' : 'Buat Tagihan SPP' }}</h2>
+          <h3>{{ showEditModal ? 'Edit Tagihan SPP' : 'Buat Tagihan SPP' }}</h3>
           <button @click="closeModal" class="btn-close">
             <i class="fas fa-times"></i>
           </button>
@@ -190,7 +193,7 @@
             <input type="date" v-model="form.jatuh_tempo" required />
           </div>
 
-          <div class="form-actions">
+          <div class="modal-actions">
             <button type="button" @click="closeModal" class="btn-secondary">Batal</button>
             <button type="submit" class="btn-primary" :disabled="submitting">
               <i v-if="submitting" class="fas fa-spinner fa-spin"></i>
@@ -215,8 +218,10 @@ const router = useRouter()
 
 const navigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/karyawan' },
+  { label: 'Data Siswa', icon: 'fas fa-user-graduate', to: '/dashboard/karyawan/data-siswa' },
   { label: 'Keuangan', icon: 'fas fa-wallet', to: '/dashboard/karyawan/keuangan' },
   { label: 'Tagihan SPP', icon: 'fas fa-file-invoice', to: '/dashboard/karyawan/keuangan/tagihan', active: true },
+  { label: 'Slip Gaji', icon: 'fas fa-money-check', to: '/dashboard/karyawan/keuangan/slip-gaji' },
 ]
 
 const loading = ref(true)
@@ -416,204 +421,217 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-header {
+/* Semua warna & font memakai design tokens global situs
+   (--forest-950, --leaf-500, --lime-400, dst dari main.css). */
+
+.welcome {
+  background: linear-gradient(110deg, var(--forest-950), var(--leaf-600));
+  padding: 27px 30px;
+  border-radius: var(--radius-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
-
-.page-header h1 {
-  font-size: 1.5rem;
-  color: #1e293b;
-  margin: 0 0 4px;
+.welcome h2 {
+  color: #fff;
+  font-size: 1.35rem;
+  margin: 4px 0;
 }
-
-.page-header p {
-  color: #64748b;
+.welcome p {
+  color: #d9efe0;
   margin: 0;
-  font-size: 0.9rem;
+}
+.eyebrow-dot.dark {
+  color: var(--lime-400);
+}
+.eyebrow-dot.dark::before {
+  background: var(--lime-400);
 }
 
-.btn-primary {
-  background: #3b82f6;
-  color: white;
+.btn-add {
+  background: var(--lime-400);
+  color: var(--forest-950);
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-family: var(--font-head);
+  font-weight: 600;
   cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
+  white-space: nowrap;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: background 0.2s;
+  transition: filter 0.2s;
+}
+.btn-add:hover {
+  filter: brightness(1.05);
 }
 
-.btn-primary:hover {
-  background: #2563eb;
-}
-
-.btn-primary:disabled {
-  background: #94a3b8;
-  cursor: not-allowed;
-}
-
-.filters-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+/* ---------- Filters ---------- */
+.filter-bar {
   display: flex;
   gap: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
   align-items: flex-end;
 }
-
-.filter-group {
+.filter-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-width: 200px;
+  min-width: 180px;
 }
-
-.filter-group label {
-  font-size: 0.85rem;
+.filter-item.grow {
+  flex: 1 1 220px;
+}
+.filter-item label {
+  font-size: 0.78rem;
+  color: var(--muted);
   font-weight: 600;
-  color: #475569;
+  font-family: var(--font-head);
 }
-
-.filter-group input,
-.filter-group select {
-  padding: 8px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.9rem;
+.filter-item input,
+.filter-item select {
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  font-size: 0.88rem;
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+}
+.filter-item input:focus,
+.filter-item select:focus {
+  border-color: var(--leaf-500);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(34, 181, 108, 0.14);
 }
 
 .btn-secondary {
-  background: #f1f5f9;
-  color: #475569;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  background: var(--cream);
+  color: var(--forest-950);
+  border: 1.5px solid var(--line);
+  padding: 9px 18px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  transition: background 0.2s;
+  gap: 8px;
+  height: fit-content;
 }
-
 .btn-secondary:hover {
-  background: #e2e8f0;
+  border-color: var(--leaf-500);
+  color: var(--leaf-600);
 }
 
+/* ---------- Loading / Error ---------- */
 .loading-state,
-.error-state {
+.error-state,
+.empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #64748b;
+  color: var(--muted);
 }
-
 .loading-state i {
   font-size: 2.5rem;
   margin-bottom: 16px;
-  color: #3b82f6;
+  color: var(--leaf-500);
 }
-
 .error-state i {
   font-size: 2.5rem;
   margin-bottom: 16px;
-  color: #ef4444;
+  color: var(--red);
 }
-
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  color: var(--line);
+}
 .btn-retry {
-  background: #3b82f6;
+  background: var(--leaf-500);
   color: white;
   border: none;
   padding: 10px 24px;
   border-radius: 8px;
   cursor: pointer;
   margin-top: 12px;
+  font-family: var(--font-head);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-retry:hover {
+  background: var(--leaf-600);
 }
 
-.table-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* ---------- Table ---------- */
+.table-wrap {
+  background: var(--paper);
+  border-radius: var(--radius-md);
   overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
 }
-
-.table-header {
+.table-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
 }
-
-.table-header h3 {
+.table-head h3 {
   font-size: 1rem;
-  color: #1e293b;
   margin: 0;
+  color: var(--forest-950);
 }
-
 .record-count {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--cream);
+  color: var(--forest-900);
   padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #94a3b8;
-}
-
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 12px;
-  opacity: 0.5;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-head);
 }
 
 .table-responsive {
   overflow-x: auto;
 }
-
-table {
+.data-table {
   width: 100%;
   border-collapse: collapse;
 }
-
-thead {
-  background: #f8fafc;
-}
-
-th {
+.data-table th,
+.data-table td {
+  padding: 13px 18px;
   text-align: left;
-  padding: 12px 16px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 0.86rem;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
 }
-
-td {
-  padding: 16px;
-  border-top: 1px solid #f1f5f9;
-  font-size: 0.9rem;
-  color: #334155;
+.data-table thead th {
+  background: var(--cream);
+  font-family: var(--font-head);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--forest-900);
+}
+.data-table tbody tr:hover {
+  background: #f8fbf7;
 }
 
 .invoice-number {
   font-family: monospace;
-  font-weight: 600;
-  color: #3b82f6;
+  font-weight: 700;
+  color: var(--leaf-600);
 }
 
 .student-info {
@@ -621,227 +639,230 @@ td {
   flex-direction: column;
   gap: 2px;
 }
-
 .student-info strong {
-  color: #1e293b;
+  color: var(--forest-950);
 }
-
 .student-info small {
-  color: #64748b;
-  font-size: 0.8rem;
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .status-badge {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
   display: inline-block;
+  font-family: var(--font-head);
 }
-
 .status-success {
-  background: #d1fae5;
-  color: #059669;
+  background: #e3f6ea;
+  color: var(--leaf-600);
 }
-
 .status-pending {
-  background: #fef3c7;
-  color: #d97706;
+  background: #fdf1dc;
+  color: #a9711f;
 }
-
 .status-warning {
-  background: #fed7aa;
-  color: #c2410c;
+  background: #fdeada;
+  color: #b3540f;
 }
-
 .status-error {
-  background: #fee2e2;
-  color: #dc2626;
+  background: #fbe4e4;
+  color: var(--red);
 }
 
 .action-buttons {
   display: flex;
   gap: 8px;
 }
-
 .btn-icon {
-  background: #f1f5f9;
-  color: #475569;
   border: none;
+  background: var(--cream);
+  color: var(--forest-900);
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+  transition: background 0.2s;
 }
-
 .btn-icon:hover {
-  background: #3b82f6;
-  color: white;
+  background: var(--line);
+}
+.btn-icon.danger:hover {
+  background: #fbe4e4;
+  color: var(--red);
 }
 
-.btn-icon.btn-danger:hover {
-  background: #ef4444;
-  color: white;
-}
-
+/* ---------- Pagination ---------- */
 .pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
+  padding: 16px 22px;
+  border-top: 1px solid var(--line);
 }
-
 .btn-page {
-  background: #f1f5f9;
-  color: #475569;
-  border: none;
+  background: var(--cream);
+  color: var(--forest-950);
+  border: 1.5px solid var(--line);
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.85rem;
-  display: flex;
+  font-family: var(--font-head);
+  font-weight: 600;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
-
 .btn-page:hover:not(:disabled) {
-  background: #e2e8f0;
+  border-color: var(--leaf-500);
+  color: var(--leaf-600);
 }
-
 .btn-page:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .page-info {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
-/* Modal */
+/* ---------- Modal ---------- */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(6, 20, 15, 0.55);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 200;
   padding: 20px;
 }
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
+.modal-box {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.4);
 }
-
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 20px 26px;
+  border-bottom: 1px solid var(--line);
 }
-
-.modal-header h2 {
-  font-size: 1.1rem;
-  color: #1e293b;
+.modal-header h3 {
+  font-size: 1.05rem;
+  color: var(--forest-950);
   margin: 0;
 }
-
 .btn-close {
   background: none;
   border: none;
-  font-size: 1.2rem;
-  color: #64748b;
+  font-size: 1.1rem;
+  color: var(--muted);
   cursor: pointer;
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: background 0.2s;
 }
-
 .btn-close:hover {
-  background: #f1f5f9;
+  background: var(--cream);
 }
-
 .modal-body {
-  padding: 24px;
+  padding: 24px 26px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
-
 .form-group label {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--forest-950);
   margin-bottom: 6px;
+  font-family: var(--font-head);
 }
-
 .required {
-  color: #ef4444;
+  color: var(--red);
 }
-
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
+  padding: 10px 13px;
+  border: 1.5px solid var(--line);
   border-radius: 8px;
   font-size: 0.9rem;
+  font-family: var(--font-body);
+  color: var(--ink);
 }
-
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--leaf-500);
+  box-shadow: 0 0 0 4px rgba(34, 181, 108, 0.14);
 }
 
-.form-actions {
+.modal-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
   margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.btn-primary {
+  background: var(--leaf-500);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.btn-primary:hover {
+  background: var(--leaf-600);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
-  .page-header {
+  .welcome {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
   }
-
-  .filters-card {
+  .filter-bar {
     flex-direction: column;
+    align-items: stretch;
   }
-
-  .filter-group {
+  .filter-item,
+  .filter-item.grow {
     width: 100%;
+    min-width: 0;
   }
-
   .table-responsive {
     font-size: 0.8rem;
   }
-
   td,
   th {
     padding: 10px;

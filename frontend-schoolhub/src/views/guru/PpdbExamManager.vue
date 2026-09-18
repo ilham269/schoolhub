@@ -265,9 +265,13 @@ import { onMounted, ref } from 'vue'
 import api from '../../utils/api'
 import DashboardLayout from '../../components/dashboard/DashboardLayout.vue'
 
-// Navigation
+// Menu sama persis seperti dashboard_guru.vue, supaya sidebar konsisten
+// di semua halaman portal guru.
 const navigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/guru' },
+  { label: 'Data Kelas', icon: 'fas fa-users', to: '/dashboard/guru/kelas' },
+  { label: 'Materi', icon: 'fas fa-book-open', to: '/dashboard/guru/materi' },
+  { label: 'Tugas', icon: 'fas fa-book-open', to: '/dashboard/guru/tugas' },
   {
     label: 'Ujian PPDB & Soal',
     icon: 'fas fa-file-circle-check',

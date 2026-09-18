@@ -1,10 +1,11 @@
 <template>
   <DashboardLayout title="Kelola Siswa" role-label="Admin" :navigation="navigation">
     <!-- Page Header -->
-    <div class="page-header">
+    <section class="welcome">
       <div>
-        <h2 class="page-title">Manajemen Siswa</h2>
-        <p class="page-subtitle">Kelola data siswa sekolah</p>
+        <span class="eyebrow-dot dark">Manajemen akademik</span>
+        <h2>Manajemen Siswa</h2>
+        <p>Kelola data siswa sekolah.</p>
       </div>
       <div class="page-actions">
         <Button variant="secondary" icon="download" @click="downloadTemplate('murid')">
@@ -24,7 +25,7 @@
         hidden
         @change="handleImportCsv($event, 'murid')"
       />
-    </div>
+    </section>
 
     <!-- Alert Message -->
     <Alert
@@ -34,52 +35,39 @@
       :message="alert.message"
     />
 
-    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:end; margin:16px 0;">
-      <div style="flex:1 1 220px; min-width:220px;">
-        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:#475569;">Cari siswa</label>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Nama, NIS, kelas..."
-          style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;"
-        />
+    <!-- Filters -->
+    <section class="filter-bar">
+      <div class="filter-item grow">
+        <label>Cari siswa</label>
+        <input v-model="searchQuery" type="text" placeholder="Nama, NIS, kelas..." />
       </div>
 
-      <div style="flex:1 1 180px; min-width:180px;">
-        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:#475569;">Kelas</label>
-        <select
-          v-model="kelasFilter"
-          style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;"
-        >
+      <div class="filter-item">
+        <label>Kelas</label>
+        <select v-model="kelasFilter">
           <option value="all">Semua kelas</option>
           <option v-for="kelas in kelasOptions" :key="kelas" :value="kelas">{{ kelas }}</option>
         </select>
       </div>
 
-      <div style="flex:1 1 160px; min-width:160px;">
-        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:#475569;">Jenis kelamin</label>
-        <select
-          v-model="genderFilter"
-          style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;"
-        >
+      <div class="filter-item">
+        <label>Jenis kelamin</label>
+        <select v-model="genderFilter">
           <option value="all">Semua</option>
           <option value="L">Laki-laki</option>
           <option value="P">Perempuan</option>
         </select>
       </div>
 
-      <div style="flex:1 1 160px; min-width:160px;">
-        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color:#475569;">Status</label>
-        <select
-          v-model="statusFilter"
-          style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;"
-        >
+      <div class="filter-item">
+        <label>Status</label>
+        <select v-model="statusFilter">
           <option value="all">Semua</option>
           <option value="active">Aktif</option>
           <option value="inactive">Nonaktif</option>
         </select>
       </div>
-    </div>
+    </section>
 
     <!-- Data Table -->
     <Card>
@@ -618,90 +606,151 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-header {
+/* Semua warna & font memakai design tokens global situs
+   (--forest-950, --leaf-500, --lime-400, dst dari main.css). */
+
+.welcome {
+  background: linear-gradient(110deg, var(--forest-950), var(--leaf-600));
+  padding: 27px 30px;
+  border-radius: var(--radius-lg);
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
+  position: relative;
 }
-
-.page-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
-  margin: 0 0 4px 0;
+.welcome h2 {
+  color: #fff;
+  font-size: 1.35rem;
+  margin: 4px 0;
 }
-
-.page-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280;
+.welcome p {
+  color: #d9efe0;
   margin: 0;
+}
+.eyebrow-dot.dark {
+  color: var(--lime-400);
+}
+.eyebrow-dot.dark::before {
+  background: var(--lime-400);
+}
+
+.page-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Filters ---------- */
+.filter-bar {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+.filter-item.grow {
+  flex: 1 1 240px;
+}
+.filter-item label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+  font-family: var(--font-head);
+}
+.filter-item input,
+.filter-item select {
+  padding: 10px 13px;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+}
+.filter-item input:focus,
+.filter-item select:focus {
+  outline: none;
+  border-color: var(--leaf-500);
+  box-shadow: 0 0 0 4px rgba(34, 181, 108, 0.14);
 }
 
 .text-muted {
-  color: #9ca3af;
+  color: var(--muted);
 }
 
-/* Detail Modal Styles */
+/* ---------- Detail Modal ---------- */
 .detail-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 22px;
 }
-
 .detail-section {
   padding: 20px;
-  background: #f9fafb;
-  border-radius: 8px;
+  background: var(--cream);
+  border-radius: var(--radius-md);
 }
-
 .detail-section-title {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #374151;
-  margin: 0 0 16px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #e5e7eb;
+  color: var(--forest-950);
+  margin: 0 0 14px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+  font-family: var(--font-head);
 }
-
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
 }
-
 .detail-item {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-
 .detail-item-full {
   grid-column: 1 / -1;
 }
-
 .detail-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6b7280;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-family: var(--font-head);
 }
-
 .detail-value {
-  font-size: 0.875rem;
-  color: #111827;
-  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--forest-950);
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
-  .page-header {
+  .welcome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .page-actions {
+    width: 100%;
+  }
+  .filter-bar {
     flex-direction: column;
     align-items: stretch;
   }
-
+  .filter-item,
+  .filter-item.grow {
+    width: 100%;
+    min-width: 0;
+  }
   .detail-grid {
     grid-template-columns: 1fr;
   }

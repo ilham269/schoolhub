@@ -1,10 +1,11 @@
 <template>
   <DashboardLayout title="Kelola Karyawan" role-label="Admin" :navigation="navigation">
     <!-- Page Header -->
-    <div class="page-header">
+    <section class="welcome">
       <div>
-        <h2 class="page-title">Manajemen Karyawan</h2>
-        <p class="page-subtitle">Kelola data karyawan dan staf sekolah</p>
+        <span class="eyebrow-dot dark">Manajemen sumber daya</span>
+        <h2>Manajemen Karyawan</h2>
+        <p>Kelola data karyawan dan staf sekolah.</p>
       </div>
       <div class="page-actions">
         <Button variant="secondary" icon="download" @click="downloadTemplate('karyawan')">
@@ -24,7 +25,7 @@
         hidden
         @change="handleImportCsv($event, 'karyawan')"
       />
-    </div>
+    </section>
 
     <!-- Alert Message -->
     <Alert
@@ -397,86 +398,97 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-header {
+/* Semua warna & font memakai design tokens global situs
+   (--forest-950, --leaf-500, --lime-400, dst dari main.css). */
+
+.welcome {
+  background: linear-gradient(110deg, var(--forest-950), var(--leaf-600));
+  padding: 27px 30px;
+  border-radius: var(--radius-lg);
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
 }
-
-.page-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
-  margin: 0 0 4px 0;
+.welcome h2 {
+  color: #fff;
+  font-size: 1.35rem;
+  margin: 4px 0;
 }
-
-.page-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280;
+.welcome p {
+  color: #d9efe0;
   margin: 0;
 }
+.eyebrow-dot.dark {
+  color: var(--lime-400);
+}
+.eyebrow-dot.dark::before {
+  background: var(--lime-400);
+}
 
-/* Detail Modal Styles */
+.page-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Detail Modal ---------- */
 .detail-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 22px;
 }
-
 .detail-section {
   padding: 20px;
-  background: #f9fafb;
-  border-radius: 8px;
+  background: var(--cream);
+  border-radius: var(--radius-md);
 }
-
 .detail-section-title {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #374151;
-  margin: 0 0 16px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #e5e7eb;
+  color: var(--forest-950);
+  margin: 0 0 14px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+  font-family: var(--font-head);
 }
-
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 16px;
 }
-
 .detail-item {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-
 .detail-item-full {
   grid-column: 1 / -1;
 }
-
 .detail-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6b7280;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-family: var(--font-head);
 }
-
 .detail-value {
-  font-size: 0.875rem;
-  color: #111827;
-  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--forest-950);
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
-  .page-header {
+  .welcome {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
   }
-
+  .page-actions {
+    width: 100%;
+  }
   .detail-grid {
     grid-template-columns: 1fr;
   }

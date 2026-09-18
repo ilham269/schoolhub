@@ -129,11 +129,11 @@
               </td>
               <td>
                 <div class="student-info">
-                  <strong>{{ getNamaSiswa(siswa) }}</strong>
+                  <strong>{{ siswa.Nama_lengkap_murid }}</strong>
                   <small>{{ siswa.user?.email }}</small>
                 </div>
               </td>
-              <td>{{ getKelasLabel(siswa.kelas) }}</td>
+              <td>{{ siswa.kelas?.name || '-' }}</td>
               <td>
                 <span class="gender-badge" :class="siswa.gender === 'L' ? 'male' : 'female'">
                   <i :class="siswa.gender === 'L' ? 'fas fa-mars' : 'fas fa-venus'"></i>
@@ -142,7 +142,7 @@
               </td>
               <td>
                 <div class="birth-info">
-                  <div>{{ getTempatLahir(siswa) }}</div>
+                  <div>{{ siswa.tanggal_lahir.tempat_lahir || '-' }}</div>
                   <small>{{ formatDate(siswa.tanggal_lahir) }}</small>
                 </div>
               </td>
@@ -187,7 +187,7 @@
               </div>
               <div class="detail-row">
                 <span class="detail-label">Nama Lengkap:</span>
-                <span class="detail-value">{{ getNamaSiswa(selectedSiswa) }}</span>
+                <span class="detail-value">{{ selectedSiswa.Nama_lengkap_murid }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Email:</span>
@@ -199,7 +199,7 @@
               </div>
               <div class="detail-row">
                 <span class="detail-label">Tempat Lahir:</span>
-                <span class="detail-value">{{ getTempatLahir(selectedSiswa) }}</span>
+                <span class="detail-value">{{ selectedSiswa.tempat_lahir || '-' }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Tanggal Lahir:</span>
@@ -216,7 +216,7 @@
               <h4><i class="fas fa-school"></i> Data Akademik</h4>
               <div class="detail-row">
                 <span class="detail-label">Kelas:</span>
-                <span class="detail-value">{{ getKelasLabel(selectedSiswa.kelas) }}</span>
+                <span class="detail-value">{{ selectedSiswa.kelas?.name || '-' }}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Hobi:</span>
@@ -454,6 +454,8 @@ const navigation = [
   { label: 'Dashboard', icon: 'fas fa-chart-pie', to: '/dashboard/karyawan' },
   { label: 'Data Siswa', icon: 'fas fa-user-graduate', to: '/dashboard/karyawan/data-siswa', active: true },
   { label: 'Keuangan', icon: 'fas fa-wallet', to: '/dashboard/karyawan/keuangan' },
+  { label: 'Tagihan SPP', icon: 'fas fa-file-invoice', to: '/dashboard/karyawan/keuangan/tagihan' },
+  { label: 'Slip Gaji', icon: 'fas fa-money-check', to: '/dashboard/karyawan/keuangan/slip-gaji' },
 ]
 
 const loading = ref(true)
@@ -461,36 +463,6 @@ const error = ref(null)
 const submitting = ref(false)
 const siswaList = ref([])
 const kelasList = ref([])
-
-const safeString = (value) => (value == null ? '' : String(value))
-
-const getNamaSiswa = (siswa) => {
-  const candidate =
-    siswa?.nama_lengkap_murid ??
-    siswa?.Nama_lengkap_murid ??
-    siswa?.user?.name ??
-    siswa?.user?.nama_lengkap_murid ??
-    null
-
-  return candidate ? safeString(candidate).trim() : '-'
-}
-
-const getKelasLabel = (kelas) => {
-  if (!kelas) return '-'
-  if (kelas.name) return kelas.name
-  if (kelas.nama_kelas) return kelas.nama_kelas
-  if (kelas.kelas) return `${kelas.kelas} ${kelas.nama_kelas || ''}`.trim()
-  return '-'
-}
-
-const getTempatLahir = (siswa) => {
-  if (!siswa) return '-'
-  if (siswa.tempat_lahir) return siswa.tempat_lahir
-  if (siswa.tanggal_lahir && typeof siswa.tanggal_lahir === 'object') {
-    return siswa.tanggal_lahir.tempat_lahir || '-'
-  }
-  return '-'
-}
 
 const filters = ref({
   kelas_id: '',
@@ -552,12 +524,12 @@ const filteredSiswa = computed(() => {
   }
 
   if (filters.value.search) {
-    const search = safeString(filters.value.search).trim().toLowerCase()
-    result = result.filter((s) => {
-      const nama = safeString(getNamaSiswa(s)).toLowerCase()
-      const nis = safeString(s?.nis).toLowerCase()
-      return nama.includes(search) || nis.includes(search)
-    })
+    const search = filters.value.search.toLowerCase()
+    result = result.filter(
+      s =>
+        s.Nama_lengkap_murid?.toLowerCase().includes(search) ||
+        s.nis?.toLowerCase().includes(search)
+    )
   }
 
   return result
@@ -630,7 +602,7 @@ const editSiswa = (siswa) => {
   editingId.value = siswa.id
   form.value = {
     nis: siswa.nis,
-    nama_lengkap_murid: getNamaSiswa(siswa),
+    nama_lengkap_murid: siswa.Nama_lengkap_murid,
     email: siswa.user?.email,
     password: '',
     gender: siswa.gender,
@@ -654,7 +626,7 @@ const editSiswa = (siswa) => {
 }
 
 const deleteSiswa = async (siswa) => {
-  if (!confirm(`Apakah Anda yakin ingin menghapus siswa ${getNamaSiswa(siswa)}?`)) {
+  if (!confirm(`Apakah Anda yakin ingin menghapus siswa ${siswa.Nama_lengkap_murid}?`)) {
     return
   }
 
