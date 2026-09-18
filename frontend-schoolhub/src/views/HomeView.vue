@@ -199,7 +199,7 @@
           }"
         >
           <img
-            :src="home.school.about_image"
+            src="https://i.pinimg.com/736x/62/cd/f5/62cdf5e9ff0fd855413c5a854263e727.jpg"
             :alt="`Siswa ${home.school.name}`"
           />
         </div>

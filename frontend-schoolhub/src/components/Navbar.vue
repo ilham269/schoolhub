@@ -45,7 +45,6 @@
               <router-link to="/pendaftaran" active-class="active"
                 >Pendaftaran Siswa Baru</router-link
               >
-              <router-link to="/components" active-class="active">Komponen UI (Demo)</router-link>
               <router-link to="/login" active-class="active">Login / Sign Up</router-link>
             </div>
           </li>
